@@ -42,5 +42,4 @@ waitForPort = 5000
 [userenv]
 
 [userenv.shared]
-#INSTAWORK_BASE_URL = "http://localhost:8080"
 INSTAWORK_BASE_URL = "https://afa3-4-4-32-42.ngrok-free.app"
