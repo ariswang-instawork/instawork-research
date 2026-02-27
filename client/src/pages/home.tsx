@@ -135,14 +135,8 @@ export default function Home() {
     },
   });
 
-  const handleLogin = async () => {
-    try {
-      const res = await fetch("/api/auth/login");
-      const data = await res.json();
-      window.location.href = data.url;
-    } catch (err) {
-      console.error("Failed to get login URL:", err);
-    }
+  const handleLogin = () => {
+    window.location.href = "/api/auth/login";
   };
 
   const isAuthenticated = authStatus.data?.authenticated === true;

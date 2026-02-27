@@ -31,6 +31,9 @@ export async function registerRoutes(
   }
 
   const isProduction = process.env.NODE_ENV === "production";
+
+  app.set("trust proxy", 1);
+
   const SessionStore = MemoryStore(session);
 
   app.use(
@@ -50,7 +53,7 @@ export async function registerRoutes(
 
   app.get("/api/auth/login", (req, res) => {
     if (!INSTAWORK_CLIENT_ID) {
-      return res.status(500).json({ error: "INSTAWORK_CLIENT_ID is not configured" });
+      return res.status(500).send("INSTAWORK_CLIENT_ID is not configured");
     }
 
     const state = randomBytes(16).toString("hex");
@@ -64,7 +67,14 @@ export async function registerRoutes(
       state: state,
     });
     const authorizeUrl = `${INSTAWORK_BASE_URL}/oauth2/authorize/?${params.toString()}`;
-    res.json({ url: authorizeUrl });
+
+    req.session.save((err) => {
+      if (err) {
+        console.error("Session save error:", err);
+        return res.status(500).send("Failed to save session");
+      }
+      res.redirect(authorizeUrl);
+    });
   });
 
   app.get("/api/auth/callback", async (req, res) => {
@@ -75,6 +85,7 @@ export async function registerRoutes(
     }
 
     if (!state || state !== req.session.oauthState) {
+      console.error("State mismatch:", { received: state, expected: req.session.oauthState });
       return res.redirect("/?error=invalid_state");
     }
 
@@ -107,7 +118,13 @@ export async function registerRoutes(
       req.session.accessToken = tokenData.access_token;
       req.session.tokenType = tokenData.token_type || "Bearer";
 
-      res.redirect("/?auth=success");
+      req.session.save((err) => {
+        if (err) {
+          console.error("Session save error after token:", err);
+          return res.redirect("/?error=session_error");
+        }
+        res.redirect("/?auth=success");
+      });
     } catch (error) {
       console.error("Token exchange error:", error);
       res.redirect("/?error=token_exchange_error");
