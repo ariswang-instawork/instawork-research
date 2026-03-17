@@ -9,13 +9,13 @@ A web application that implements OAuth 2.0 Authorization Code Flow with Instawo
 - **Routing**: wouter (frontend), Express (backend)
 - **State Management**: TanStack React Query
 
-## OAuth Flow
+## OAuth Flow (with PKCE)
 1. User clicks "Connect with Instawork" button
-2. Frontend requests the authorization URL from `GET /api/auth/login`
-3. Browser redirects to Instawork's `/oauth2/authorize/` endpoint
+2. Backend generates a PKCE `code_verifier` and its SHA-256 `code_challenge`, stores verifier in session
+3. Browser redirects to Instawork's `/oauth2/authorize/` with `code_challenge` and `code_challenge_method=S256`
 4. User consents on Instawork's page
-5. Instawork redirects back to `/api/auth/callback?code=...`
-6. Backend exchanges the code for an access token via `POST /oauth2/token/`
+5. Instawork redirects back to `/api/auth/callback?code=...&state=...`
+6. Backend validates state, then exchanges the code for an access token via `POST /oauth2/token/` including the `code_verifier`
 7. Token is stored in the server-side session
 8. Frontend calls `GET /api/users/me` which proxies to Instawork's API
 9. User profile data is rendered on the page

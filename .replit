@@ -42,4 +42,4 @@ waitForPort = 5000
 [userenv]
 
 [userenv.shared]
-INSTAWORK_BASE_URL = "https://7ff2-2601-645-c600-da54-3b-eab8-25b1-5726.ngrok-free.app"
+INSTAWORK_BASE_URL = "https://app.instawork.com"

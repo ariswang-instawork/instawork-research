@@ -13,6 +13,7 @@ function AuthStatusBanner({ error }: { error: string | null }) {
   const messages: Record<string, string> = {
     no_code: "Authorization failed — no code was returned.",
     invalid_state: "Authorization failed — invalid state parameter (possible CSRF attack).",
+    missing_verifier: "Authorization failed — missing PKCE code verifier.",
     token_exchange_failed: "Failed to exchange authorization code for a token.",
     token_exchange_error: "An error occurred during token exchange.",
   };

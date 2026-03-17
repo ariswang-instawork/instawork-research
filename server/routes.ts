@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import session from "express-session";
 import MemoryStore from "memorystore";
-import { randomBytes } from "crypto";
+import { randomBytes, createHash } from "crypto";
 
 const INSTAWORK_BASE_URL = process.env.INSTAWORK_BASE_URL || "http://localhost:8080";
 const INSTAWORK_CLIENT_ID = process.env.INSTAWORK_CLIENT_ID!;
@@ -13,6 +13,7 @@ declare module "express-session" {
     accessToken?: string;
     tokenType?: string;
     oauthState?: string;
+    codeVerifier?: string;
   }
 }
 
@@ -20,6 +21,18 @@ function getRedirectUri(req: Express.Request & { protocol: string; get: (h: stri
   const host = req.get("host");
   const protocol = req.headers["x-forwarded-proto"] || req.protocol;
   return `${protocol}://${host}/api/auth/callback`;
+}
+
+function generateCodeVerifier(): string {
+  return randomBytes(32)
+    .toString("base64url")
+    .slice(0, 128);
+}
+
+function generateCodeChallenge(verifier: string): string {
+  return createHash("sha256")
+    .update(verifier)
+    .digest("base64url");
 }
 
 export async function registerRoutes(
@@ -57,7 +70,11 @@ export async function registerRoutes(
     }
 
     const state = randomBytes(16).toString("hex");
+    const codeVerifier = generateCodeVerifier();
+    const codeChallenge = generateCodeChallenge(codeVerifier);
+
     req.session.oauthState = state;
+    req.session.codeVerifier = codeVerifier;
 
     const redirectUri = getRedirectUri(req as any);
     const params = new URLSearchParams({
@@ -65,6 +82,8 @@ export async function registerRoutes(
       client_id: INSTAWORK_CLIENT_ID,
       redirect_uri: redirectUri,
       state: state,
+      code_challenge: codeChallenge,
+      code_challenge_method: "S256",
     });
     const authorizeUrl = `${INSTAWORK_BASE_URL}/oauth2/authorize/?${params.toString()}`;
 
@@ -89,7 +108,14 @@ export async function registerRoutes(
       return res.redirect("/?error=invalid_state");
     }
 
+    const codeVerifier = req.session.codeVerifier;
+    if (!codeVerifier) {
+      console.error("Missing code_verifier in session");
+      return res.redirect("/?error=missing_verifier");
+    }
+
     delete req.session.oauthState;
+    delete req.session.codeVerifier;
 
     const redirectUri = getRedirectUri(req as any);
 
@@ -105,6 +131,7 @@ export async function registerRoutes(
           client_secret: INSTAWORK_CLIENT_SECRET,
           redirect_uri: redirectUri,
           code: code,
+          code_verifier: codeVerifier,
         }).toString(),
       });
 
