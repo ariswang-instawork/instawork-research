@@ -1,0 +1,70 @@
+Update my existing Instawork Research app. Do NOT rebuild from scratch.
+Keep React + Express + Mode sync + existing OAuth backend routes.
+
+## 1. Header auth (fix Log in)
+
+Add a sticky blue site header on all pages:
+- Left: logo from public/instawork_logo.png + "Instawork Research" (Research in lighter blue)
+- Right: "Log in" | "Sign up" | hamburger menu
+- Blue background #246BFD, white text/buttons
+
+Auth behavior:
+- "Log in" → GET /auth/login (Instawork OAuth). NEVER open the name/phone
+  "Check remaining sessions" drawer from Log in.
+- "Sign up" → external link only (new tab):
+  https://app.instawork.com/worker?utm_source=instawork_research&utm_medium=web&utm_campaign=voice_sessions
+  Do NOT route Sign up to any internal signup page or form.
+- If logged in (GET /api/me returns user): show "Log out" instead of "Log in"
+  → POST /auth/logout
+- After OAuth callback, return user to the page they came from.
+
+## 2. Replace name/phone eligibility with OAuth eligibility
+
+REMOVE EligibilityCheckDrawer entirely:
+- Delete name + phone inputs, POST /api/eligibility by phone/name, and related UI state.
+- "Check remaining sessions" must NOT ask for name or phone.
+
+New flow:
+- Not logged in → CTA says "Log in with Instawork" → /auth/login
+- Logged in → auto-fetch GET /api/eligibility (auth required, 401 if not logged in)
+- Show one row per business_id/site:
+  "X of Y sessions remaining at {site_label}"
+- If is_blocked → show blocked message, remaining = 0
+
+Backend:
+- GET /api/me — return OAuth session user (include worker_id if available)
+- GET /api/eligibility — auth required; lookup participant_booking by logged-in worker_id
+- participant_booking sync must include worker_id column from Mode bookings query
+
+Do NOT change existing OAuth authorize/callback/token routes — only wire the UI to them.
+
+## 3. Typography (match Juicebox)
+
+Self-host HK Grotesk like Juicebox:
+- Copy woff files to client/public/fonts/:
+  HKGrotesk-Regular2.woff, Medium2, SemiBold2, Bold2
+- Add @font-face for weights 400, 500, 600, 700, 800 in index.css
+- Set --font-sans: "HK Grotesk", Inter, system-ui, sans-serif
+- Apply font-sans on body; base size 14px (text-sm feel)
+- Page titles ~24px bold; hero headline ~26–32px; inputs/buttons 16px on mobile
+
+## 4. Change city drawer (LocationDrawer)
+
+Simplify "Change city" to a plain city list only:
+- Show the 9 research cities as tappable rows (Philadelphia, NYC, Boston, etc.)
+- REMOVE GPS / "Use my location" and ZIP code search from this drawer
+- Selecting a city closes drawer and filters sessions
+
+## 5. Branding rules (do not break)
+
+- Never show Q.ai, UX study, AI, Apple, Whisper, or client names in UI
+- Session name in UI: "Voice Research Session"
+- Keep existing blue/white design; do not change primary color
+
+## 6. Verify
+
+After changes, confirm:
+- Clicking "Log in" goes to Instawork OAuth (not name/phone modal)
+- "Sign up" opens app.instawork.com/worker with UTM params
+- Logged-in user sees remaining sessions per site without typing phone
+- Font renders as HK Grotesk (not only Inter)

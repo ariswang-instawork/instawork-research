@@ -4,6 +4,33 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Self-hosted HK Grotesk (Juicebox-style typography). Medium (500) and
+   ExtraBold (800) map to the nearest available cuts. */
+@font-face {
+  font-family: 'HK Grotesk';
+  src: url('/fonts/HKGrotesk-Regular.woff2') format('woff2'),
+    url('/fonts/HKGrotesk-Regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'HK Grotesk';
+  src: url('/fonts/HKGrotesk-SemiBold.woff2') format('woff2'),
+    url('/fonts/HKGrotesk-SemiBold.woff') format('woff');
+  font-weight: 500 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'HK Grotesk';
+  src: url('/fonts/HKGrotesk-Bold.woff2') format('woff2'),
+    url('/fonts/HKGrotesk-Bold.woff') format('woff');
+  font-weight: 700 800;
+  font-style: normal;
+  font-display: swap;
+}
+
 
 
 @theme inline {
@@ -39,7 +66,7 @@
   --color-success: hsl(var(--success));
   --color-brand-violet: hsl(var(--brand-violet));
 
-  --font-sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', system-ui, sans-serif;
+  --font-sans: 'HK Grotesk', Inter, -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', system-ui, sans-serif;
 
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -124,6 +151,7 @@
   }
   body {
     @apply font-sans antialiased bg-background text-foreground selection:bg-primary/20 selection:text-primary;
+    font-size: 14px;
   }
 }
 
