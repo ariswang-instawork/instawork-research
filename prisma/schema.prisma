@@ -1,0 +1,95 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model ShiftGroup {
+  id                         Int      @id @map("shift_group_id")
+  sortOrder                  Int?     @map("sort_order")
+  siteLabel                  String?  @map("site_label")
+  shiftLink                  String?  @map("shift_link")
+  gigTemplateId              Int?     @map("gig_template_id")
+  internalName               String?  @map("internal_name")
+  positionFkId               Int?     @map("position_fk_id")
+  positionName               String?  @map("position_name")
+  companyId                  Int?     @map("company_id")
+  companyName                String?  @map("company_name")
+  businessId                 Int?     @map("business_id")
+  businessName               String?  @map("business_name")
+  placeId                    Int?     @map("place_id")
+  city                       String?
+  stateCode                  String?  @map("state_code")
+  fullAddress                String?  @map("full_address")
+  latitude                   Float?
+  longitude                  Float?
+  timezone                   String?
+  timezoneAbbr               String?  @map("timezone_abbr")
+  shiftDate                  String?  @map("shift_date")
+  shiftStartTime             String?  @map("shift_start_time")
+  shiftEndTime               String?  @map("shift_end_time")
+  isOverbookShiftGroup       Boolean  @default(false) @map("is_overbook_shift_group")
+  originalShiftGroupId       Int?     @map("original_shift_group_id")
+  totalShiftsCount           Int?     @map("total_shifts_count")
+  filledShiftsCount          Int?     @map("filled_shifts_count")
+  openShiftsCount            Int?     @map("open_shifts_count")
+  fillRatePct                Float?   @map("fill_rate_pct")
+  payRateUsd                 Float?   @map("pay_rate_usd")
+  billRateUsd                Float?   @map("bill_rate_usd")
+  breakLength                Float?   @map("break_length")
+  isBreakPaid                Boolean? @map("is_break_paid")
+  estBillableHoursPerSlot    Float?   @map("estimated_billable_hours_per_slot")
+  estSubtotalPerSlotUsd      Float?   @map("estimated_subtotal_per_slot_usd")
+  estFilledSubtotalUsd       Float?   @map("estimated_filled_subtotal_usd")
+  estTotalSubtotalUsd        Float?   @map("estimated_total_subtotal_usd")
+  estProPayPerSlotUsd        Float?   @map("estimated_pro_pay_per_slot_usd")
+  estFilledProPayUsd         Float?   @map("estimated_filled_pro_pay_usd")
+  estTotalProPayUsd          Float?   @map("estimated_total_pro_pay_usd")
+  syncedAt                   DateTime @default(now()) @map("synced_at")
+
+  @@index([city])
+  @@index([businessId])
+  @@map("shift_group")
+}
+
+model ParticipantBooking {
+  id                  Int       @id @default(autoincrement())
+  workerId            Int?      @map("worker_id")
+  businessId          Int       @map("business_id")
+  siteLabel           String?   @map("site_label")
+  businessName        String?   @map("business_name")
+  companyId           Int?      @map("company_id")
+  companyName         String?   @map("company_name")
+  fullName            String?   @map("full_name")
+  phone               String?
+  phoneNorm           String    @map("phone_norm")
+  completedCount      Int       @default(0) @map("completed_count")
+  bookedCount         Int       @default(0) @map("booked_count")
+  cap                 Int?
+  remaining           Int?
+  isBlocked           Boolean   @default(false) @map("is_blocked")
+  blockedCompanyId    Int?      @map("blocked_company_id")
+  blockedCompanyName  String?   @map("blocked_company_name")
+  blockedBusinessName String?   @map("blocked_business_name")
+  lastBlockedAt       DateTime? @map("last_blocked_at")
+  syncedAt            DateTime  @default(now()) @map("synced_at")
+
+  @@unique([phoneNorm, businessId])
+  @@index([phoneNorm])
+  @@map("participant_booking")
+}
+
+model SyncRun {
+  id           Int       @id @default(autoincrement())
+  source       String
+  status       String
+  rowCount     Int?      @map("row_count")
+  error        String?
+  startedAt    DateTime  @default(now()) @map("started_at")
+  finishedAt   DateTime? @map("finished_at")
+
+  @@map("sync_run")
+}

@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import session from "express-session";
 import MemoryStore from "memorystore";
 import { randomBytes, createHash } from "crypto";
+import { registerApiRoutes } from "./apiRoutes";
 
 const INSTAWORK_BASE_URL = process.env.INSTAWORK_BASE_URL || "http://localhost:8080";
 const INSTAWORK_CLIENT_ID = process.env.INSTAWORK_CLIENT_ID!;
@@ -46,6 +47,8 @@ export async function registerRoutes(
   const isProduction = process.env.NODE_ENV === "production";
 
   app.set("trust proxy", 1);
+
+  registerApiRoutes(app);
 
   const SessionStore = MemoryStore(session);
 

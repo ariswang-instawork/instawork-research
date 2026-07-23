@@ -2,6 +2,7 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { serveStatic } from "./static";
 import { createServer } from "http";
+import { syncAll, logDataSummary } from "./modeSync";
 
 const app = express();
 const httpServer = createServer(app);
@@ -98,6 +99,10 @@ app.use((req, res, next) => {
     },
     () => {
       log(`serving on port ${port}`);
+      // Sync Mode data on boot (non-blocking), then log a data summary.
+      syncAll()
+        .then(() => logDataSummary())
+        .catch((err) => log(`boot sync failed: ${err?.message ?? err}`, "mode-sync"));
     },
   );
 })();

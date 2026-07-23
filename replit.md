@@ -1,5 +1,11 @@
 # Instawork OAuth App
 
+## Phase 1 Backend (Mode data sync)
+- **Stack:** Express (TS) + Prisma + Replit Postgres (`DATABASE_URL`). Prisma pinned to v6 (v7 requires prisma.config.ts/driver adapters).
+- **Models** (`prisma/schema.prisma`): `shift_group`, `participant_booking` (unique `[phone_norm, business_id]`), `sync_run`.
+- **Sync** (`server/modeSync.ts`): Mode Analytics workspace `instawork` (override via `MODE_WORKSPACE`). Juicebox pattern — latest succeeded report run → matching query run → `results/content.json`. HTTP Basic (`MODE_API_TOKEN`/`MODE_API_SECRET`), 10s timeout, 2 retries. Replace-all inside a transaction with a 0-valid-row guardrail (never wipes on failure). Bookings rows without a 10-digit phone or valid business_id are skipped. Runs on boot + `POST /api/cron/sync-mode` (requires `x-cron-secret` header matching `CRON_SECRET`).
+- **API** (`server/apiRoutes.ts`): `GET /api/health`, `GET /api/shift-groups?city=` (upcoming, open > 0, not overbook), `GET /api/shift-groups/:id`, `POST /api/eligibility {phone}` (last-10-digit normalize), `GET /admin` (counts + PII-redacted samples).
+
 ## Overview
 A web application that implements OAuth 2.0 Authorization Code Flow with Instawork. Users can authenticate with their Instawork account and view their profile data.
 
