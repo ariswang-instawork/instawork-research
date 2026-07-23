@@ -148,7 +148,7 @@ export function Shell({ children }: { children: ReactNode }) {
               href={SIGNUP_FORM_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="hidden md:inline-flex rounded-full bg-[#246BFD] text-white text-base font-medium px-4 py-2 leading-none items-center h-9 transition-opacity duration-150 active:opacity-85"
+              className="hidden md:inline-flex rounded-full bg-[#1c387d] text-white text-base font-medium px-4 py-2 leading-none items-center h-9 transition-opacity duration-150 active:opacity-85"
             >
               Sign up
             </a>
@@ -193,7 +193,7 @@ export function Shell({ children }: { children: ReactNode }) {
                     href={SIGNUP_FORM_URL}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="rounded-full bg-[#246BFD] text-white text-base font-medium px-4 py-2 leading-none inline-flex items-center h-9 transition-opacity duration-150 active:opacity-85"
+                    className="rounded-full bg-[#1c387d] text-white text-base font-medium px-4 py-2 leading-none inline-flex items-center h-9 transition-opacity duration-150 active:opacity-85"
                   >
                     Sign up
                   </a>
