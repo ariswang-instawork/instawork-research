@@ -92,14 +92,6 @@ export default function Landing() {
           </PrimaryCtaButton>
         </div>
 
-        <button
-          type="button"
-          onClick={() => setEligibilityOpen(true)}
-          className="block mt-4 text-base text-[#101828] underline underline-offset-2"
-        >
-          Log in to check your remaining sessions
-        </button>
-
         <p className="text-xs text-gray-500 mt-3">
           Not currently available to residents of Texas, Washington, or Illinois.
         </p>
