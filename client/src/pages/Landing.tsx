@@ -44,8 +44,8 @@ export default function Landing() {
       <main className="flex-1 overflow-y-auto px-5 pt-8 pb-[calc(2rem+env(safe-area-inset-bottom))] max-w-md mx-auto w-full [container-type:inline-size] animate-in fade-in slide-in-from-bottom-3 duration-500">
         {/* Location row */}
         <div className="flex items-center gap-2 mb-5">
-          <MapPin className="w-5 h-5 text-[#101828] shrink-0" strokeWidth={2} />
-          <span className="text-base font-bold text-[#101828]">{displaySite.label}</span>
+          <MapPin className="w-5 h-5 text-[#294eb2] shrink-0" strokeWidth={2} />
+          <span className="text-base font-bold text-[#294eb2]">{displaySite.label}</span>
           <button
             type="button"
             onClick={() => setIsDrawerOpen(true)}
@@ -56,7 +56,7 @@ export default function Landing() {
         </div>
 
         {/* Hero */}
-        <h2 className="text-[clamp(40px,10cqw,64px)] leading-[1.05] font-extrabold tracking-[-0.03em] text-[#101828] mb-5">
+        <h2 className="text-[clamp(40px,10cqw,64px)] leading-[1.05] font-extrabold tracking-[-0.03em] text-[#294eb2] mb-5">
           Get paid to record your voice.
         </h2>
         <p className="text-[17px] leading-[1.45] text-[#475467] mb-7">
@@ -91,7 +91,7 @@ export default function Landing() {
         <div className="mt-5">
           <PrimaryCtaButton
             onClick={handleSeeSessions}
-            className="rounded-2xl h-14 py-0 bg-[#101828] text-white font-bold hover:bg-[#101828]/90"
+            className="rounded-2xl h-14 py-0 bg-[#294eb2] text-white font-bold hover:bg-[#294eb2]/90"
           >
             See sessions
           </PrimaryCtaButton>
@@ -100,7 +100,7 @@ export default function Landing() {
         <button
           type="button"
           onClick={() => setEligibilityOpen(true)}
-          className="block mt-4 text-base text-[#101828] underline underline-offset-2"
+          className="block mt-4 text-base text-[#294eb2] underline underline-offset-2"
         >
           Log in to check your remaining sessions
         </button>
@@ -111,7 +111,7 @@ export default function Landing() {
 
         {/* Trust section */}
         <div className="mt-10">
-          <h2 className="text-[28px] leading-[1.15] font-bold tracking-tight text-[#101828] mb-6">
+          <h2 className="text-[28px] leading-[1.15] font-bold tracking-tight text-[#294eb2] mb-6">
             Why people choose Instawork Research
           </h2>
           <div className="space-y-3">
