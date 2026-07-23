@@ -156,7 +156,7 @@ export default function Landing() {
         <h2 className="text-[clamp(36px,9cqw,56px)] leading-[1.08] font-extrabold tracking-[-0.03em] text-[#101828] mb-[clamp(28px,5vw,48px)]">
           Get paid to record your voice.
         </h2>
-        <p className="text-base leading-[1.5] text-[#475467]">
+        <p className="text-xl leading-[1.4] text-[#475467]">
           Earn <span className="font-bold text-[#1c387d]">$66–$111</span> for a
           3-hour session.
         </p>
