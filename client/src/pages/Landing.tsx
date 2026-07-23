@@ -9,8 +9,6 @@ import {
   Mic,
   Wallet,
   MapPin,
-  Search,
-  ChevronRight,
 } from "lucide-react";
 import { PrimaryCtaButton } from "@/components/PrimaryCtaButton";
 
@@ -27,11 +25,6 @@ export default function Landing() {
   // straight to sessions, even when a previous location is stored.
   const handleSeeSessions = () => {
     setPickerFocus((n) => n + 1);
-  };
-
-  const handleBrowseNearby = () => {
-    if (!site) setSite(DEFAULT_SITE.key, DEFAULT_SITE.label);
-    setLocation("/sessions");
   };
 
   const handleSiteSelected = (key: string, label: string, origin?: SiteOrigin) => {
@@ -74,15 +67,6 @@ export default function Landing() {
             onSiteSelected={handleSiteSelected}
           />
 
-          <button
-            type="button"
-            onClick={handleBrowseNearby}
-            className="w-full h-16 flex items-center gap-3 rounded-2xl border border-[hsl(var(--border))] bg-white px-4 text-left transition-colors duration-150 active:bg-[#f5f6f8]"
-          >
-            <Search className="w-5 h-5 text-[#294eb1] shrink-0" strokeWidth={2} />
-            <span className="flex-1 text-base text-gray-900">Browse nearby sessions</span>
-            <ChevronRight className="w-5 h-5 text-[#294eb1] shrink-0" strokeWidth={2} />
-          </button>
         </div>
 
         {/* Primary CTA */}
