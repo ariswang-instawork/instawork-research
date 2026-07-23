@@ -77,7 +77,7 @@ export default function Landing() {
           <button
             type="button"
             onClick={handleBrowseNearby}
-            className="w-full h-16 flex items-center gap-3 rounded-2xl border border-[hsl(var(--border))] bg-white px-4 text-left"
+            className="w-full h-16 flex items-center gap-3 rounded-2xl border border-[hsl(var(--border))] bg-white px-4 text-left transition-colors duration-150 active:bg-[#f5f6f8]"
           >
             <Search className="w-5 h-5 text-[#294eb1] shrink-0" strokeWidth={2} />
             <span className="flex-1 text-base text-gray-900">Browse nearby sessions</span>
@@ -89,7 +89,7 @@ export default function Landing() {
         <div className="mt-5">
           <PrimaryCtaButton
             onClick={handleSeeSessions}
-            className="rounded-2xl h-14 py-0 bg-[#294eb1] text-white font-bold hover:bg-[#294eb1]/90"
+            className="rounded-2xl h-14 py-0 bg-[#294eb1] text-white font-bold hover:bg-[#294eb1]/90 transition-[transform,background-color] duration-150 active:scale-[0.98] active:bg-[#223f8f]"
           >
             See sessions
           </PrimaryCtaButton>

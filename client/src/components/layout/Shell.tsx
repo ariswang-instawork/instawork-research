@@ -1,11 +1,23 @@
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
-import { Menu, X, ChevronDown, Globe } from "lucide-react";
+import { ChevronDown, Globe } from "lucide-react";
 import { EligibilityCheckDrawer } from "@/components/Drawers";
 import { SIGNUP_FORM_URL } from "@/lib/constants";
 import { useAuthStatus, useLogout, login } from "@/hooks/use-auth";
 
 const LOGO_URL = `${import.meta.env.BASE_URL}instawork_logo_white_background.png`;
+
+/** Hamburger that morphs into an X (top/bottom rotate, middle fades). */
+function HamburgerIcon({ open }: { open: boolean }) {
+  const bar = "absolute left-0 right-0 h-[2px] rounded-full bg-white transition-all duration-200 ease-out";
+  return (
+    <span className="relative block w-6 h-6" aria-hidden="true">
+      <span className={`${bar} ${open ? "top-[11px] rotate-45" : "top-[5px]"}`} />
+      <span className={`${bar} top-[11px] ${open ? "opacity-0" : "opacity-100"}`} />
+      <span className={`${bar} ${open ? "top-[11px] -rotate-45" : "top-[17px]"}`} />
+    </span>
+  );
+}
 
 function MenuAccordion({
   label,
@@ -24,32 +36,71 @@ function MenuAccordion({
         type="button"
         onClick={onToggle}
         aria-expanded={open}
-        className="w-full flex items-center justify-between text-left text-[26px] leading-[1.12] font-bold tracking-tight text-gray-900 py-4"
+        className="w-full flex items-center justify-between text-left text-[26px] leading-[1.12] font-bold tracking-tight text-gray-900 py-4 rounded-lg transition-colors duration-150 active:bg-black/[0.06]"
       >
         <span>{label}</span>
         <ChevronDown
-          className={`w-6 h-6 text-gray-900 shrink-0 transition-transform ${open ? "rotate-180" : ""}`}
+          className={`w-6 h-6 text-gray-900 shrink-0 transition-transform duration-[250ms] ${open ? "rotate-180" : ""}`}
           strokeWidth={2}
         />
       </button>
-      {open && <div className="pb-4 pr-8">{children}</div>}
+      {/* Height + opacity animate via the grid-rows trick (content stays mounted). */}
+      <div
+        className={`grid transition-[grid-template-rows,opacity] duration-[250ms] ease-out ${
+          open ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+        }`}
+      >
+        <div className="overflow-hidden">
+          <div className="pb-4 pr-8">{children}</div>
+        </div>
+      </div>
     </div>
   );
 }
 
 export function Shell({ children }: { children: ReactNode }) {
   const [, setLocation] = useLocation();
+  // menuMounted keeps the panel in the DOM during the close animation;
+  // menuOpen drives the open/closed visual state.
+  const [menuMounted, setMenuMounted] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [eligibilityOpen, setEligibilityOpen] = useState(false);
-  const [expandedItem, setExpandedItem] = useState<string | null>(null);
+  // "How it works" starts expanded on first open.
+  const [expandedItem, setExpandedItem] = useState<string | null>("how");
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const openMenu = () => {
+    if (closeTimer.current) clearTimeout(closeTimer.current);
+    setMenuMounted(true);
+    // Two rAFs so the panel paints in its hidden state before transitioning.
+    requestAnimationFrame(() => requestAnimationFrame(() => setMenuOpen(true)));
+  };
+
+  const closeMenu = () => {
+    setMenuOpen(false);
+    if (closeTimer.current) clearTimeout(closeTimer.current);
+    closeTimer.current = setTimeout(() => setMenuMounted(false), 250);
+  };
+
+  const toggleMenu = () => (menuOpen ? closeMenu() : openMenu());
+
+  // Lock body scroll while the menu is open.
+  useEffect(() => {
+    if (!menuMounted) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [menuMounted]);
 
   const go = (path: string) => {
-    setMenuOpen(false);
+    closeMenu();
     setLocation(path);
   };
 
   const openEligibility = () => {
-    setMenuOpen(false);
+    closeMenu();
     setEligibilityOpen(true);
   };
 
@@ -60,7 +111,7 @@ export function Shell({ children }: { children: ReactNode }) {
   // "Log in" starts the Instawork OAuth flow (returning here afterwards);
   // "Log out" ends the session.
   const handleAuthClick = () => {
-    setMenuOpen(false);
+    closeMenu();
     if (isAuthenticated) void logout();
     else login();
   };
@@ -87,7 +138,7 @@ export function Shell({ children }: { children: ReactNode }) {
             <button
               type="button"
               onClick={handleAuthClick}
-              className="text-base font-medium text-white"
+              className="text-base font-medium text-white transition-opacity duration-150 active:opacity-85"
             >
               {isAuthenticated ? "Log out" : "Log in"}
             </button>
@@ -95,24 +146,29 @@ export function Shell({ children }: { children: ReactNode }) {
               href={SIGNUP_FORM_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="rounded-full bg-white text-[#101828] text-base font-medium px-4 py-2 leading-none inline-flex items-center h-9"
+              className="rounded-full bg-white text-[#101828] text-base font-medium px-4 py-2 leading-none inline-flex items-center h-9 transition-opacity duration-150 active:opacity-85"
             >
               Sign up
             </a>
             <button
               type="button"
-              onClick={() => setMenuOpen(true)}
-              aria-label="Open menu"
+              onClick={toggleMenu}
+              aria-label={menuOpen ? "Close menu" : "Open menu"}
+              aria-expanded={menuOpen}
               className="p-1 text-white"
             >
-              <Menu className="w-6 h-6" strokeWidth={2} />
+              <HamburgerIcon open={menuOpen} />
             </button>
           </div>
         </header>
 
         {/* Full-screen menu */}
-        {menuOpen && (
-          <div className="fixed inset-0 z-[1200] flex justify-center bg-black/20">
+        {menuMounted && (
+          <div
+            className={`fixed inset-0 z-[1200] flex justify-center bg-black/20 transition-opacity duration-200 ${
+              menuOpen ? "opacity-100" : "opacity-0"
+            }`}
+          >
             <div className="w-full max-w-[480px] bg-background min-h-[100dvh] flex flex-col">
               {/* Menu header — mirrors the app header with X in place of the hamburger */}
               <div className="bg-[#294eb1] px-4 py-3 flex items-center justify-between gap-2">
@@ -127,7 +183,7 @@ export function Shell({ children }: { children: ReactNode }) {
                   <button
                     type="button"
                     onClick={handleAuthClick}
-                    className="text-base font-medium text-white"
+                    className="text-base font-medium text-white transition-opacity duration-150 active:opacity-85"
                   >
                     {isAuthenticated ? "Log out" : "Log in"}
                   </button>
@@ -135,26 +191,31 @@ export function Shell({ children }: { children: ReactNode }) {
                     href={SIGNUP_FORM_URL}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="rounded-full bg-white text-[#101828] text-base font-medium px-4 py-2 leading-none inline-flex items-center h-9"
+                    className="rounded-full bg-white text-[#101828] text-base font-medium px-4 py-2 leading-none inline-flex items-center h-9 transition-opacity duration-150 active:opacity-85"
                   >
                     Sign up
                   </a>
                   <button
                     type="button"
-                    onClick={() => setMenuOpen(false)}
+                    onClick={closeMenu}
                     aria-label="Close menu"
+                    aria-expanded={menuOpen}
                     className="p-1 text-white"
                   >
-                    <X className="w-6 h-6" strokeWidth={2} />
+                    <HamburgerIcon open={menuOpen} />
                   </button>
                 </div>
               </div>
 
-              <nav className="flex-1 overflow-y-auto flex flex-col px-6 pt-8 pb-6">
+              <nav
+                className={`flex-1 overflow-y-auto flex flex-col px-6 pt-8 pb-6 transition-[opacity,transform] duration-200 ease-out ${
+                  menuOpen ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2"
+                }`}
+              >
                 <button
                   type="button"
                   onClick={() => go("/sessions")}
-                  className="text-left text-[26px] leading-[1.12] font-bold tracking-tight text-gray-900 py-4"
+                  className="text-left text-[26px] leading-[1.12] font-bold tracking-tight text-gray-900 py-4 rounded-lg transition-colors duration-150 active:bg-black/[0.06]"
                 >
                   Find sessions
                 </button>
@@ -174,7 +235,7 @@ export function Shell({ children }: { children: ReactNode }) {
                 <button
                   type="button"
                   onClick={() => go("/")}
-                  className="text-left text-[26px] leading-[1.12] font-bold tracking-tight text-gray-900 py-4"
+                  className="text-left text-[26px] leading-[1.12] font-bold tracking-tight text-gray-900 py-4 rounded-lg transition-colors duration-150 active:bg-black/[0.06]"
                 >
                   Locations
                 </button>
@@ -187,15 +248,15 @@ export function Shell({ children }: { children: ReactNode }) {
                   }
                 >
                   <p className="text-base text-gray-600">
-                    You can book up to 3 sessions.{" "}
+                    You must have an Instawork account.{" "}
                     <button
                       type="button"
                       onClick={openEligibility}
                       className="text-primary underline underline-offset-2"
                     >
-                      Check your remaining sessions
-                    </button>
-                    .
+                      Log in
+                    </button>{" "}
+                    to see how many sessions you can still book at each location.
                   </p>
                 </MenuAccordion>
 
@@ -205,8 +266,8 @@ export function Shell({ children }: { children: ReactNode }) {
                   onToggle={() => setExpandedItem(expandedItem === "faq" ? null : "faq")}
                 >
                   <p className="text-base text-gray-600">
-                    No experience is needed — we'll guide you through every step.
-                    Sessions take about 3 hours and pay $66–$111 through Instawork.
+                    Sessions are about 3 hours. Pay is shown before you book. You'll
+                    need a valid ID at the location.
                   </p>
                 </MenuAccordion>
 
@@ -216,8 +277,8 @@ export function Shell({ children }: { children: ReactNode }) {
                   onToggle={() => setExpandedItem(expandedItem === "help" ? null : "help")}
                 >
                   <p className="text-base text-gray-600">
-                    Questions about a booking? Reach out through your Instawork app, or
-                    check your remaining sessions from the Eligibility section above.
+                    Questions? Log in with your Instawork account or sign up to get
+                    started.
                   </p>
                 </MenuAccordion>
 

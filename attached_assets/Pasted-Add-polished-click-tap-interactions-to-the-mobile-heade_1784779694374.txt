@@ -1,0 +1,55 @@
+Add polished click/tap interactions to the mobile header menu. Match the
+reference screenshots — do NOT change colors, fonts, or layout.
+
+## 1. Hamburger → X animation
+- When menu opens: hamburger animates to an X (top/bottom bars rotate, middle fades)
+- When menu closes: reverse animation
+- Use CSS transitions (~200–250ms ease)
+- Toggle aria-expanded on the menu button
+
+## 2. Menu panel slide-in
+- Mobile menu slides down from below the blue header (not instant show/hide)
+- Fade + translateY: start at translateY(-8px) opacity 0 → translateY(0) opacity 1
+- On close: reverse
+- Lock body scroll while menu is open
+- Clicking a nav link closes the menu with the close animation
+
+## 3. Accordion rows (How it works, Eligibility, FAQ, Help)
+Each accordion item must expand/collapse on click with animation:
+
+**How it works** (expanded by default on first open):
+"Book a session near you, visit the location, and complete simple guided
+voice recording tasks. You're paid through Instawork after your session."
+
+**Eligibility** (collapsed):
+"You must have an Instawork account. Log in to see how many sessions you
+can still book at each location."
+
+**FAQ** (collapsed):
+"Sessions are about 3 hours. Pay is shown before you book. You'll need a
+valid ID at the location."
+
+**Help** (collapsed):
+"Questions? Log in with your Instawork account or sign up to get started."
+
+Accordion behavior:
+- Chevron rotates 180° when open (⌄ → ^)
+- Content height animates open/close (max-height + opacity transition, ~250ms)
+- Only one section open at a time (clicking another closes the previous)
+- Tap feedback: accordion row gets a subtle background highlight on :active
+  (rgba white overlay ~8% on the white menu panel)
+
+## 4. Button press effects (landing page)
+Add :active scale feedback on tappable elements:
+- "See sessions" primary button: scale(0.98) on press, slight darken
+- "Browse nearby sessions" row: background #f5f6f8 on press
+- City/ZIP input row: same press highlight
+- Header "Log in" / "Sign up": opacity 0.85 on press
+- All transitions ~150ms
+
+## 5. Keep unchanged
+- Blue header #246BFD, white Sign up pill, HK Grotesk font
+- Log in → /auth/login, Sign up → external Instawork worker URL with UTMs
+- Do not add name/phone eligibility drawer
+
+Use CSS transitions + minimal JS for accordion state. Prefer CSS over heavy animation libraries.

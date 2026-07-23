@@ -300,7 +300,7 @@ export function LocationCombobox({
             setActiveIndex(-1);
           }}
           onKeyDown={handleInputKeyDown}
-          className="w-full h-16 rounded-2xl border border-[hsl(var(--border))] bg-white pl-12 pr-12 text-base text-gray-900 placeholder:text-gray-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+          className="w-full h-16 rounded-2xl border border-[hsl(var(--border))] bg-white pl-12 pr-12 text-base text-gray-900 placeholder:text-gray-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 transition-colors duration-150 active:bg-[#f5f6f8]"
         />
         <button
           type="button"
