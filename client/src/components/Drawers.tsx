@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import { useGetSites, useCheckEligibility } from "@/lib/api-client";
 import { calculateDistance } from "@/lib/zipCentroids";
 import { useSiteStorage, type SiteOrigin } from "@/hooks/use-site";
-import { MapPin, X, Check } from "lucide-react";
+import { MapPin, Navigation, ShieldCheck, X, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PrimaryCtaButton } from "@/components/PrimaryCtaButton";
 import { Input } from "@/components/ui/input";
@@ -37,115 +37,198 @@ export function LocationDrawer({
   const { data, isLoading } = useGetSites();
   const { site } = useSiteStorage();
   const [isSearching, setIsSearching] = useState(false);
-  const [query, setQuery] = useState("");
+  const [zip, setZip] = useState("");
   const [error, setError] = useState<string | null>(null);
   // Incremented whenever the drawer closes or a new search starts, so
-  // late async results from a stale search are ignored.
+  // late async results from a stale search are ignored (no surprise
+  // navigation after the user closed the drawer).
   const searchIdRef = useRef(0);
+  // When no open sessions are within 50 miles, we show a result view instead
+  // of navigating. `far` keeps the closest option so the user can still book it.
+  const [farResult, setFarResult] = useState<
+    | { kind: "far"; key: string; label: string; distanceMiles: number; originLabel: string }
+    | { kind: "none" }
+    | null
+  >(null);
 
-  const sites = (data?.sites ?? [])
+  /** Cities that actually have open sessions, alphabetized for the list. */
+  const availableSites = (data?.sites ?? [])
     .filter((s) => s.openCount > 0)
     .sort((a, b) => a.label.localeCompare(b.label));
 
-  const reset = () => {
+  const resetToInput = () => {
     searchIdRef.current++; // Invalidate any in-flight search.
+    setFarResult(null);
     setError(null);
-    setQuery("");
+    setZip("");
     setIsSearching(false);
   };
 
-  const noMatchMessage = "No sessions in that area yet — try one of the cities below.";
+  /**
+   * Distance + filtering logic:
+   * 1. Only sites with coordinates AND at least one open session count.
+   * 2. Distance from the user to each site uses the Haversine formula.
+   * 3. Sites are sorted nearest-to-farthest; the nearest one wins.
+   * 4. If the nearest open site is within 50 miles, we navigate straight to
+   *    its sessions. Otherwise we show a "no sessions nearby" view that still
+   *    offers the closest option.
+   */
+  const findNearest = (lat: number, lng: number): NearbyResult => {
+    const candidates = (data?.sites ?? [])
+      .filter((s) => s.latitude != null && s.longitude != null && s.openCount > 0)
+      .map((s) => ({
+        key: s.key,
+        label: s.label,
+        distanceMiles: calculateDistance(lat, lng, s.latitude!, s.longitude!),
+      }))
+      .sort((a, b) => a.distanceMiles - b.distanceMiles);
 
-  /** Case-insensitive match of typed text against available city names/labels. */
-  const matchCity = (text: string) => {
-    const q = text.trim().toLowerCase();
-    if (!q) return null;
-    return (
-      sites.find((s) => s.label.toLowerCase() === q || s.city.toLowerCase() === q) ??
-      sites.find((s) => s.city.toLowerCase().startsWith(q)) ??
-      null
+    const nearest = candidates[0];
+    if (!nearest) return { kind: "none" };
+    const rounded = Math.round(nearest.distanceMiles);
+    return {
+      kind: nearest.distanceMiles <= NEARBY_RADIUS_MILES ? "nearby" : "far",
+      key: nearest.key,
+      label: nearest.label,
+      distanceMiles: rounded,
+    };
+  };
+
+  const applyResult = (result: NearbyResult, originLabel: string) => {
+    if (result.kind === "nearby") {
+      onSiteSelected(result.key, result.label, {
+        label: originLabel,
+        distanceMiles: result.distanceMiles,
+      });
+      return;
+    }
+    if (result.kind === "far") {
+      setFarResult({ ...result, originLabel });
+      return;
+    }
+    setFarResult({ kind: "none" });
+  };
+
+  const handleGeolocation = () => {
+    if (isSearching || isLoading) return; // Prevent duplicate/premature searches.
+    setError(null);
+    if (!navigator.geolocation) {
+      setError("We couldn\u2019t access your location. Enter your ZIP code instead.");
+      return;
+    }
+    const searchId = ++searchIdRef.current;
+    setIsSearching(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        if (searchIdRef.current !== searchId) return; // Drawer closed/reset — ignore.
+        setIsSearching(false);
+        applyResult(
+          findNearest(pos.coords.latitude, pos.coords.longitude),
+          "your current location",
+        );
+      },
+      () => {
+        if (searchIdRef.current !== searchId) return;
+        setIsSearching(false);
+        setError("We couldn\u2019t access your location. Enter your ZIP code instead.");
+      },
+      { timeout: 10000 }
     );
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleZipSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    // Guard against duplicate searches AND Enter-key submits before sites load.
     if (isSearching || isLoading) return;
     setError(null);
-    const text = query.trim();
-    if (!text) return;
-
-    // 1. Direct city-name match against available cities.
-    const cityMatch = matchCity(text);
-    if (cityMatch) {
-      onSiteSelected(cityMatch.key, cityMatch.label);
+    const cleanZip = zip.trim();
+    if (!/^\d{5}$/.test(cleanZip)) {
+      setError("Enter a valid 5-digit ZIP code.");
       return;
     }
-
-    // 2. ZIP code → server-side geocode → nearest available city.
-    if (/^\d{5}$/.test(text)) {
-      const searchId = ++searchIdRef.current;
-      setIsSearching(true);
-      try {
-        const resp = await fetch(`${import.meta.env.BASE_URL}api/geocode-zip?zip=${text}`);
-        if (searchIdRef.current !== searchId) return; // Drawer closed/reset.
-        if (!resp.ok) {
-          setError(
-            resp.status === 404 || resp.status === 400
-              ? noMatchMessage
-              : "Could not look up that ZIP code right now.",
-          );
-          return;
-        }
-        const coords = (await resp.json()) as { latitude: number; longitude: number };
-        if (searchIdRef.current !== searchId) return;
-        const candidates = sites
-          .filter((s) => s.latitude != null && s.longitude != null)
-          .map((s) => ({
-            ...s,
-            distanceMiles: calculateDistance(
-              coords.latitude,
-              coords.longitude,
-              s.latitude!,
-              s.longitude!,
-            ),
-          }))
-          .sort((a, b) => a.distanceMiles - b.distanceMiles);
-        const nearest = candidates[0];
-        if (nearest && nearest.distanceMiles <= NEARBY_RADIUS_MILES) {
-          onSiteSelected(nearest.key, nearest.label, {
-            label: text,
-            distanceMiles: Math.round(nearest.distanceMiles),
-          });
-        } else {
-          setError(noMatchMessage);
-        }
-      } catch {
-        if (searchIdRef.current !== searchId) return;
-        setError("Could not look up that ZIP code right now.");
-      } finally {
-        if (searchIdRef.current === searchId) setIsSearching(false);
+    const searchId = ++searchIdRef.current;
+    setIsSearching(true);
+    try {
+      // ZIP → coordinates happens server-side so no third-party geocoding
+      // calls (or keys) live in the frontend.
+      const resp = await fetch(
+        `${import.meta.env.BASE_URL}api/geocode-zip?zip=${cleanZip}`,
+      );
+      if (searchIdRef.current !== searchId) return; // Drawer closed/reset — ignore.
+      if (!resp.ok) {
+        setError(
+          resp.status === 404 || resp.status === 400
+            ? "Enter a valid 5-digit ZIP code."
+            : "Could not look up that ZIP code right now.",
+        );
+        return;
       }
-      return;
+      const coords = (await resp.json()) as { latitude: number; longitude: number };
+      if (searchIdRef.current !== searchId) return;
+      applyResult(findNearest(coords.latitude, coords.longitude), cleanZip);
+    } catch {
+      if (searchIdRef.current !== searchId) return;
+      setError("Could not look up that ZIP code right now.");
+    } finally {
+      if (searchIdRef.current === searchId) setIsSearching(false);
     }
-
-    // 3. Anything else — not an available city.
-    setError(noMatchMessage);
   };
 
   return (
-    <Drawer
-      open={isOpen}
-      onOpenChange={(open) => {
-        if (!open) reset();
-        onOpenChange(open);
-      }}
-    >
+    <Drawer open={isOpen} onOpenChange={(open) => { if (!open) resetToInput(); onOpenChange(open); }}>
       <DrawerContent className="max-w-[480px] mx-auto">
-        <div className="w-full max-w-[448px] mx-auto p-6 pt-2 flex flex-col">
-          <DrawerHeader className="p-0 mb-4 relative text-left">
-            <DrawerTitle className="text-[19px] font-semibold pr-10">Choose your city</DrawerTitle>
+        {farResult ? (
+          <div className="w-full max-w-[448px] mx-auto p-6 flex flex-col items-center text-center">
+            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-6 text-primary">
+              <MapPin className="w-8 h-8" />
+            </div>
+            <DrawerHeader className="p-0 mb-6">
+              <DrawerTitle className="text-[19px] font-semibold mb-2">
+                {farResult.kind === "far"
+                  ? "No sessions nearby right now"
+                  : "No sessions available right now"}
+              </DrawerTitle>
+              <DrawerDescription className="text-muted-foreground">
+                {farResult.kind === "far"
+                  ? `The closest available session is ${farResult.distanceMiles} miles away.`
+                  : "Check back soon for new session openings."}
+              </DrawerDescription>
+            </DrawerHeader>
+            <div className="w-full space-y-3 max-w-sm">
+              {farResult.kind === "far" && (
+                <Button
+                  size="lg"
+                  className="w-full h-14 rounded-xl text-[16px] font-semibold bg-primary hover:bg-primary/90 text-white shadow-none"
+                  onClick={() =>
+                    onSiteSelected(farResult.key, farResult.label, {
+                      label: farResult.originLabel,
+                      distanceMiles: farResult.distanceMiles,
+                    })
+                  }
+                >
+                  View closest session
+                </Button>
+              )}
+              <Button
+                variant="outline"
+                size="lg"
+                className="w-full h-14 rounded-xl text-[16px] font-semibold border-primary text-primary bg-white hover:bg-primary/5 hover:text-primary shadow-none"
+                onClick={resetToInput}
+              >
+                Try another ZIP code
+              </Button>
+            </div>
+            <p className="mt-8 text-xs text-muted-foreground font-medium flex items-center gap-1.5 pb-safe">
+              <ShieldCheck className="w-4 h-4" />
+              We only use your location to find nearby sessions.
+            </p>
+          </div>
+        ) : (
+        <div className="w-full max-w-[448px] mx-auto px-6 pb-6 pt-2 flex flex-col">
+          <DrawerHeader className="p-0 mb-5 relative text-left">
+            <DrawerTitle className="text-[19px] font-semibold pr-10">Find sessions near you</DrawerTitle>
             <DrawerDescription className="text-muted-foreground">
-              Pick an available city, or enter a city or ZIP code.
+              Share your location, enter your ZIP code, or pick a city.
             </DrawerDescription>
             <DrawerClose asChild>
               <button
@@ -158,80 +241,111 @@ export function LocationDrawer({
             </DrawerClose>
           </DrawerHeader>
 
-          <form onSubmit={handleSubmit} className="space-y-1.5 text-left mb-4">
-            <Label htmlFor="city-zip-input" className="text-sm font-medium text-foreground">
-              Enter city or ZIP code
-            </Label>
-            <div className="flex gap-2">
+          <div className="w-full space-y-4">
+            <Button
+              size="lg"
+              className="w-full h-14 rounded-xl text-[16px] font-semibold bg-primary hover:bg-primary/90 text-white shadow-none"
+              onClick={handleGeolocation}
+              disabled={isSearching || isLoading}
+            >
+              {isSearching ? (
+                <div className="flex items-center gap-2">
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Searching...
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <Navigation className="w-5 h-5" />
+                  Use my current location
+                </div>
+              )}
+            </Button>
+
+            <div className="relative flex items-center py-1">
+              <div className="flex-grow border-t border-border"></div>
+              <span className="flex-shrink-0 mx-4 text-muted-foreground text-sm font-medium">or</span>
+              <div className="flex-grow border-t border-border"></div>
+            </div>
+
+            <form onSubmit={handleZipSubmit} className="space-y-1.5 text-left">
+              <Label htmlFor="zip-input" className="text-sm font-medium text-foreground">ZIP code</Label>
+              <div className="flex gap-2">
               <Input
-                id="city-zip-input"
-                placeholder="e.g. Boston or 02108"
-                value={query}
-                onChange={(e) => {
-                  setQuery(e.target.value);
-                  setError(null);
-                }}
+                id="zip-input"
+                placeholder="Enter ZIP code"
+                value={zip}
+                onChange={(e) => { setZip(e.target.value); setError(null); }}
                 className="h-12 rounded-xl text-[16px] bg-secondary/50 border-transparent focus-visible:bg-background focus-visible:ring-primary/20 transition-all"
                 type="text"
-                autoComplete="off"
+                pattern="[0-9]*"
+                inputMode="numeric"
+                maxLength={5}
+                autoComplete="postal-code"
               />
               <Button
                 type="submit"
+                size="lg"
                 className="h-12 rounded-xl px-5 bg-secondary text-foreground hover:bg-secondary/80 shrink-0 font-semibold"
-                disabled={isLoading || isSearching || !query.trim()}
+                disabled={isLoading || isSearching || !zip}
               >
-                {isSearching ? "..." : "Go"}
+                Search
               </Button>
-            </div>
-            {error && (
-              <p className="text-sm text-destructive pt-1" role="alert">
-                {error}
-              </p>
-            )}
-          </form>
+              </div>
+            </form>
 
-          <p className="text-sm font-medium text-muted-foreground mb-2">Available cities</p>
-          <div
-            className="overflow-y-auto max-h-[40dvh] -mx-2 pb-safe"
-            role="listbox"
-            aria-label="Available cities"
-          >
-            {isLoading ? (
-              <p className="text-sm text-muted-foreground px-2 py-3">Loading cities…</p>
-            ) : sites.length === 0 ? (
-              <p className="text-sm text-muted-foreground px-2 py-3">
-                No cities available right now — check back soon.
-              </p>
-            ) : (
-              sites.map((s) => {
-                const selected = site?.key === s.key;
-                return (
-                  <button
-                    key={s.key}
-                    type="button"
-                    role="option"
-                    aria-selected={selected}
-                    onClick={() => onSiteSelected(s.key, s.label)}
-                    className={`w-full min-h-[44px] flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl text-left text-[16px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 ${
-                      selected
-                        ? "bg-primary/10 text-primary font-semibold"
-                        : "text-gray-900 hover:bg-secondary/60"
-                    }`}
-                  >
-                    <span className="flex items-center gap-2.5">
-                      <MapPin
-                        className={`w-[18px] h-[18px] shrink-0 ${selected ? "text-primary" : "text-muted-foreground"}`}
-                        strokeWidth={2}
-                      />
-                      {s.label}
-                    </span>
-                    {selected && <Check className="w-5 h-5 shrink-0" strokeWidth={2.5} />}
-                  </button>
-                );
-              })
+            {error && (
+              <p className="text-sm text-destructive" role="alert">{error}</p>
             )}
+
+            <div className="relative flex items-center py-1">
+              <div className="flex-grow border-t border-border"></div>
+              <span className="flex-shrink-0 mx-4 text-muted-foreground text-sm font-medium">or choose a city</span>
+              <div className="flex-grow border-t border-border"></div>
+            </div>
+
+            <div
+              className="overflow-y-auto max-h-[32dvh] -mx-2 pb-safe"
+              role="listbox"
+              aria-label="Available cities"
+            >
+              {isLoading ? (
+                <p className="text-sm text-muted-foreground px-2 py-3">Loading cities…</p>
+              ) : availableSites.length === 0 ? (
+                <p className="text-sm text-muted-foreground px-2 py-3">
+                  No cities available right now — check back soon.
+                </p>
+              ) : (
+                availableSites.map((s) => {
+                  const selected = site?.key === s.key;
+                  return (
+                    <button
+                      key={s.key}
+                      type="button"
+                      role="option"
+                      aria-selected={selected}
+                      onClick={() => onSiteSelected(s.key, s.label)}
+                      className={`w-full min-h-[44px] flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl text-left text-[16px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 ${
+                        selected
+                          ? "bg-primary/10 text-primary font-semibold"
+                          : "text-gray-900 hover:bg-secondary/60"
+                      }`}
+                    >
+                      <span className="flex items-center gap-2.5">
+                        <MapPin
+                          className={`w-[18px] h-[18px] shrink-0 ${selected ? "text-primary" : "text-muted-foreground"}`}
+                          strokeWidth={2}
+                        />
+                        {s.label}
+                      </span>
+                      {selected && <Check className="w-5 h-5 shrink-0" strokeWidth={2.5} />}
+                    </button>
+                  );
+                })
+              )}
+            </div>
           </div>
         </div>
+        )}
       </DrawerContent>
     </Drawer>
   );
