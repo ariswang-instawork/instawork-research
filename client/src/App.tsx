@@ -6,6 +6,11 @@ import SessionDetail from "@/pages/SessionDetail";
 import Admin from "@/pages/Admin";
 import { Toaster } from "@/components/ui/sonner";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { consumeAuthReturn } from "@/hooks/use-auth";
+
+// After the OAuth callback redirects to "/?auth=success", restore the page
+// the user was on when they hit "Log in". Runs before the router mounts.
+consumeAuthReturn();
 
 const queryClient = new QueryClient({
   defaultOptions: {

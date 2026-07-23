@@ -4,6 +4,7 @@ import session from "express-session";
 import MemoryStore from "memorystore";
 import { randomBytes, createHash } from "crypto";
 import { registerApiRoutes } from "./apiRoutes";
+import { prisma } from "./db";
 
 const INSTAWORK_BASE_URL = process.env.INSTAWORK_BASE_URL || "http://localhost:8080";
 const INSTAWORK_CLIENT_ID = process.env.INSTAWORK_CLIENT_ID!;
@@ -199,6 +200,78 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Instawork API request error:", error);
       res.status(500).json({ error: "Failed to connect to Instawork API" });
+    }
+  });
+
+  /** Fetch the logged-in Instawork user via the session's access token. */
+  async function fetchInstaworkUser(req: { session: session.Session & Partial<session.SessionData> }) {
+    const response = await fetch(`${INSTAWORK_BASE_URL}/api/users/me/`, {
+      headers: {
+        Authorization: `${req.session.tokenType || "Bearer"} ${req.session.accessToken}`,
+      },
+    });
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Instawork API error:", response.status, errorText);
+      return null;
+    }
+    return response.json();
+  }
+
+  // Current user from the OAuth session (worker identity for eligibility).
+  app.get("/api/me", async (req, res) => {
+    if (!req.session.accessToken) {
+      return res.status(401).json({ error: "Not authenticated" });
+    }
+    try {
+      const userData = await fetchInstaworkUser(req);
+      if (!userData) {
+        return res.status(502).json({ error: "Failed to fetch user data" });
+      }
+      // Return only what the UI needs — never the full upstream profile.
+      const workerId = userData.id ?? userData.worker_id ?? userData.pk ?? null;
+      const name =
+        userData.first_name || userData.name
+          ? [userData.first_name ?? userData.name, userData.last_name].filter(Boolean).join(" ")
+          : null;
+      res.json({ workerId, name });
+    } catch (error) {
+      console.error("Instawork API request error:", error);
+      res.status(500).json({ error: "Failed to connect to Instawork API" });
+    }
+  });
+
+  // Auth-required eligibility: the logged-in worker's participant_booking
+  // rows, one per business/site. Never keyed by name/phone from the client.
+  app.get("/api/eligibility", async (req, res) => {
+    if (!req.session.accessToken) {
+      return res.status(401).json({ error: "Not authenticated" });
+    }
+    try {
+      const userData = await fetchInstaworkUser(req);
+      const workerId = Number(userData?.id ?? userData?.worker_id ?? userData?.pk);
+      if (!userData || !Number.isFinite(workerId)) {
+        return res.status(502).json({ error: "Could not resolve your worker account" });
+      }
+      const bookings = await prisma.participantBooking.findMany({
+        where: { workerId },
+        orderBy: { siteLabel: "asc" },
+      });
+      res.json({
+        workerId,
+        sites: bookings.map((b) => ({
+          businessId: b.businessId,
+          siteLabel: b.siteLabel,
+          cap: b.cap ?? 3,
+          remaining: b.isBlocked ? 0 : Math.max(0, b.remaining ?? 3),
+          completedCount: b.completedCount,
+          bookedCount: b.bookedCount,
+          isBlocked: b.isBlocked,
+        })),
+      });
+    } catch (error) {
+      console.error("eligibility lookup failed:", error);
+      res.status(500).json({ error: "We couldn't check right now — please try again" });
     }
   });
 

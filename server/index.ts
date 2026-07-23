@@ -49,7 +49,14 @@ app.use((req, res, next) => {
     const duration = Date.now() - start;
     if (path.startsWith("/api")) {
       let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
-      if (capturedJsonResponse) {
+      // Never log response bodies for identity/auth endpoints — they can
+      // carry PII (user profile) or session-sensitive data.
+      const sensitive =
+        path.startsWith("/api/auth") ||
+        path.startsWith("/api/me") ||
+        path.startsWith("/api/users") ||
+        path.startsWith("/api/eligibility");
+      if (capturedJsonResponse && !sensitive) {
         logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
       }
 

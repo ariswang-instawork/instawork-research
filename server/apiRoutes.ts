@@ -216,69 +216,8 @@ export function registerApiRoutes(app: Express) {
     }
   });
 
-  // --- Eligibility (no PII in logs) ---
-  app.post("/api/eligibility", async (req, res) => {
-    if (!eligibilityEnabled()) {
-      return res.status(404).json({ error: "This feature is not available" });
-    }
-    const ip = req.ip ?? "unknown";
-    if (rateLimited(ip)) {
-      return res.status(429).json({ error: "Too many requests — try again in a minute" });
-    }
-    const name = req.body?.name;
-    const phone = req.body?.phone;
-    if (
-      typeof name !== "string" ||
-      name.trim().length < 1 ||
-      name.length > 120 ||
-      typeof phone !== "string" ||
-      phone.trim().length < 7 ||
-      phone.length > 30
-    ) {
-      return res.status(400).json({ error: "Please enter your name and phone number" });
-    }
-    try {
-      const phoneNorm = normalizePhone(phone);
-      if (phoneNorm.length !== 10) {
-        return res.status(400).json({ error: "Please enter a valid 10-digit phone number" });
-      }
-      const bookings = await prisma.participantBooking.findMany({ where: { phoneNorm } });
-      if (bookings.length === 0) {
-        return res.json({
-          found: false,
-          completedCount: null,
-          bookedCount: null,
-          cap: 3,
-          remaining: 3,
-          isBlocked: false,
-          message: "Looks like you haven't booked one yet — you can book up to 3.",
-        });
-      }
-      // Aggregate across businesses: program cap applies to the participant.
-      const completedCount = bookings.reduce((s, b) => s + b.completedCount, 0);
-      const bookedCount = bookings.reduce((s, b) => s + b.bookedCount, 0);
-      const isBlocked = bookings.some((b) => b.isBlocked);
-      const minRemaining = Math.min(...bookings.map((b) => b.remaining ?? 3));
-      const remaining = isBlocked ? 0 : Math.max(0, minRemaining);
-      // isBlocked is returned for internal use only — the participant-facing
-      // message never differs based on it.
-      res.json({
-        found: true,
-        completedCount,
-        bookedCount,
-        cap: 3,
-        remaining,
-        isBlocked,
-        message:
-          remaining === 0
-            ? "Unfortunately, you can't book more sessions — you've already hit the cap. Refer a friend who might be interested."
-            : `You can book ${remaining} more session${remaining === 1 ? "" : "s"}.`,
-      });
-    } catch (err) {
-      console.error("eligibility lookup failed:", err);
-      res.status(400).json({ error: "We couldn't check right now — please try again" });
-    }
-  });
+  // Eligibility moved to GET /api/eligibility (OAuth session required) in
+  // server/routes.ts — the old name/phone POST lookup is gone.
 
   // --- Admin (password protected) ---
   app.post("/api/admin/status", async (req, res) => {

@@ -3,6 +3,7 @@ import { useLocation } from "wouter";
 import { Menu, X, ChevronDown, Globe } from "lucide-react";
 import { EligibilityCheckDrawer } from "@/components/Drawers";
 import { SIGNUP_FORM_URL } from "@/lib/constants";
+import { useAuthStatus, useLogout, login } from "@/hooks/use-auth";
 
 const LOGO_URL = `${import.meta.env.BASE_URL}instawork_logo.png`;
 
@@ -52,6 +53,18 @@ export function Shell({ children }: { children: ReactNode }) {
     setEligibilityOpen(true);
   };
 
+  const { data: auth } = useAuthStatus();
+  const isAuthenticated = !!auth?.authenticated;
+  const logout = useLogout();
+
+  // "Log in" starts the Instawork OAuth flow (returning here afterwards);
+  // "Log out" ends the session.
+  const handleAuthClick = () => {
+    setMenuOpen(false);
+    if (isAuthenticated) void logout();
+    else login();
+  };
+
   return (
     <div className="min-h-[100dvh] w-full bg-background flex justify-center text-foreground font-sans selection:bg-primary/20 selection:text-primary">
       <div className="w-full max-w-[480px] bg-card min-h-[100dvh] flex flex-col relative shadow-2xl shadow-black/5 ring-1 ring-border/50">
@@ -73,10 +86,10 @@ export function Shell({ children }: { children: ReactNode }) {
           <div className="flex items-center gap-3 shrink-0">
             <button
               type="button"
-              onClick={openEligibility}
+              onClick={handleAuthClick}
               className="text-base font-medium text-white"
             >
-              Log in
+              {isAuthenticated ? "Log out" : "Log in"}
             </button>
             <a
               href={SIGNUP_FORM_URL}
@@ -113,10 +126,10 @@ export function Shell({ children }: { children: ReactNode }) {
                 <div className="flex items-center gap-3 shrink-0">
                   <button
                     type="button"
-                    onClick={openEligibility}
+                    onClick={handleAuthClick}
                     className="text-base font-medium text-white"
                   >
-                    Log in
+                    {isAuthenticated ? "Log out" : "Log in"}
                   </button>
                   <a
                     href={SIGNUP_FORM_URL}

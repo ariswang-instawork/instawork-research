@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
-import { useGetSites, useCheckEligibility } from "@/lib/api-client";
+import { useGetSites } from "@/lib/api-client";
+import { useAuthStatus, useEligibility, login } from "@/hooks/use-auth";
 import { calculateDistance } from "@/lib/zipCentroids";
 import { useSiteStorage, type SiteOrigin } from "@/hooks/use-site";
 import { MapPin, Navigation, ShieldCheck, X, Check } from "lucide-react";
@@ -370,30 +371,11 @@ export function EligibilityCheckDrawer({
     setUncontrolledOpen(v);
     onOpenChange?.(v);
   };
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [resultMsg, setResultMsg] = useState<{ text: string, type: 'success' | 'error' | 'neutral' | 'blocked' } | null>(null);
 
-  const checkMutation = useCheckEligibility();
-
-  const handleCheck = () => {
-    if (!name || !phone) return;
-    setResultMsg(null);
-    checkMutation.mutate({ data: { name, phone } }, {
-      onSuccess: (res) => {
-        if (res.isBlocked || res.remaining === 0) {
-          setResultMsg({ text: res.message, type: 'blocked' });
-        } else if (!res.found) {
-          setResultMsg({ text: res.message, type: 'neutral' });
-        } else {
-          setResultMsg({ text: res.message, type: 'success' });
-        }
-      },
-      onError: () => {
-        setResultMsg({ text: "Could not check eligibility right now.", type: 'error' });
-      }
-    });
-  };
+  const { data: auth, isLoading: authLoading } = useAuthStatus();
+  const isAuthenticated = !!auth?.authenticated;
+  // Only fetch eligibility once logged in AND the drawer is open.
+  const eligibility = useEligibility(isAuthenticated && isOpen);
 
   return (
     <Drawer open={isOpen} onOpenChange={setIsOpen}>
@@ -411,53 +393,67 @@ export function EligibilityCheckDrawer({
       <DrawerContent className="max-w-[480px] mx-auto">
         <div className="w-full max-w-[448px] mx-auto">
           <DrawerHeader>
-            <DrawerTitle>Check remaining sessions</DrawerTitle>
+            <DrawerTitle>
+              {isAuthenticated ? "Your remaining sessions" : "Check remaining sessions"}
+            </DrawerTitle>
             <DrawerDescription>
-              Enter your Instawork name and phone number to see how many sessions you can still book.
+              {isAuthenticated
+                ? "Based on your Instawork account."
+                : "Log in with your Instawork account to see how many sessions you can still book."}
             </DrawerDescription>
           </DrawerHeader>
-          <div className="p-4 space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">Name on your Instawork account</Label>
-              <Input 
-                id="name" 
-                placeholder="First and last name" 
-                value={name} 
-                onChange={e => setName(e.target.value)} 
-                className="rounded-xl h-12 bg-white border-[hsl(var(--border))]"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="phone">Phone number on your Instawork account</Label>
-              <Input 
-                id="phone" 
-                placeholder="(555) 123-4567" 
-                type="tel" 
-                value={phone} 
-                onChange={e => setPhone(e.target.value)}
-                className="rounded-xl h-12 bg-white border-[hsl(var(--border))]"
-              />
-            </div>
 
-            {resultMsg && (
-              <div className={`p-4 rounded-xl text-sm font-medium border ${
-                resultMsg.type === 'success' ? 'bg-success/10 text-success border-success/20' : 
-                resultMsg.type === 'error' ? 'bg-destructive/10 text-destructive border-destructive/20' : 
-                resultMsg.type === 'blocked' ? 'bg-amber-50 text-amber-900 border-amber-200' :
-                'bg-muted text-muted-foreground border-transparent'
-              }`}>
-                {resultMsg.text}
+          <div className="p-4 space-y-3">
+            {!isAuthenticated ? null : eligibility.isLoading ? (
+              <div className="space-y-3">
+                <div className="h-14 rounded-xl bg-muted animate-pulse" />
+                <div className="h-14 rounded-xl bg-muted animate-pulse" />
               </div>
+            ) : eligibility.isError ? (
+              <div className="p-4 rounded-xl text-sm font-medium border bg-destructive/10 text-destructive border-destructive/20">
+                Could not check eligibility right now.
+              </div>
+            ) : eligibility.data && eligibility.data.sites.length === 0 ? (
+              <div className="p-4 rounded-xl text-sm font-medium border bg-muted text-muted-foreground border-transparent">
+                Looks like you haven't booked one yet — you can book up to 3.
+              </div>
+            ) : (
+              eligibility.data?.sites.map((s) => (
+                <div
+                  key={s.businessId}
+                  className={`p-4 rounded-xl border ${
+                    s.isBlocked
+                      ? "bg-amber-50 border-amber-200"
+                      : "bg-white border-[hsl(var(--border))]"
+                  }`}
+                >
+                  <p className="text-[15px] font-bold text-gray-900">
+                    {s.siteLabel ?? "Session site"}
+                  </p>
+                  {s.isBlocked ? (
+                    <p className="text-sm font-medium text-amber-900 mt-0.5">
+                      You can't book more sessions at this site.
+                    </p>
+                  ) : (
+                    <p className="text-sm text-muted-foreground mt-0.5">
+                      {s.remaining} of {s.cap} session{s.cap === 1 ? "" : "s"} remaining
+                    </p>
+                  )}
+                </div>
+              ))
             )}
           </div>
+
           <DrawerFooter className="pb-safe pt-2">
-            <Button 
-              className="w-full h-12 rounded-xl font-bold bg-primary hover:bg-primary/90 shadow-none"
-              onClick={handleCheck}
-              disabled={checkMutation.isPending || !name || !phone}
-            >
-              {checkMutation.isPending ? "Checking..." : "Check remaining sessions"}
-            </Button>
+            {!isAuthenticated && (
+              <Button
+                className="w-full h-12 rounded-xl font-bold bg-primary hover:bg-primary/90 shadow-none"
+                onClick={login}
+                disabled={authLoading}
+              >
+                Log in with Instawork
+              </Button>
+            )}
             <DrawerClose asChild>
               <Button variant="ghost" className="h-12 rounded-xl font-normal text-muted-foreground">Close</Button>
             </DrawerClose>
