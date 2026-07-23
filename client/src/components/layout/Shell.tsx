@@ -176,7 +176,7 @@ export function Shell({ children }: { children: ReactNode }) {
               <div className="bg-white border-b border-[#e4e7ec] px-4 py-3 flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2 min-w-0">
                   <img src={LOGO_URL} alt="" className="w-9 h-9 rounded-[10px] shrink-0" />
-                  <span className="text-xl font-bold leading-none whitespace-nowrap">
+                  <span className="text-xl font-bold leading-none whitespace-nowrap truncate min-w-0">
                     <span className="text-black">Instawork</span>{" "}
                     <span className="text-[#1c387d]">Research</span>
                   </span>
