@@ -157,7 +157,7 @@ export default function Landing() {
           Get paid to record your voice.
         </h2>
         <p className="text-xl leading-[1.4] text-[#475467]">
-          Earn <span className="font-bold text-[#1c387d]">$66–$111</span> for a
+          Earn <span className="font-bold text-[#1c387d] text-2xl">$66–$111</span> for a
           3-hour session.
         </p>
         <p className="text-base leading-[1.5] text-[#475467] mt-2 mb-[clamp(28px,5vw,48px)]">
