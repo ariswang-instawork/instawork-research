@@ -9,7 +9,7 @@ const LOGO_URL = `${import.meta.env.BASE_URL}instawork_logo_white_background.png
 
 /** Hamburger that morphs into an X (top/bottom rotate, middle fades). */
 function HamburgerIcon({ open }: { open: boolean }) {
-  const bar = "absolute left-0 right-0 h-[2px] rounded-full bg-white transition-all duration-200 ease-out";
+  const bar = "absolute left-0 right-0 h-[2px] rounded-full bg-current transition-all duration-200 ease-out";
   return (
     <span className="relative block w-6 h-6" aria-hidden="true">
       <span className={`${bar} ${open ? "top-[11px] rotate-45" : "top-[5px]"}`} />
@@ -140,7 +140,7 @@ export function Shell({ children }: { children: ReactNode }) {
             <button
               type="button"
               onClick={handleAuthClick}
-              className="hidden md:block text-base font-medium text-[#1c387d] transition-opacity duration-150 active:opacity-85"
+              className="hidden md:block text-base font-medium text-[#101828] transition-opacity duration-150 active:opacity-85"
             >
               {isAuthenticated ? "Log out" : "Log in"}
             </button>
@@ -157,7 +157,7 @@ export function Shell({ children }: { children: ReactNode }) {
               onClick={toggleMenu}
               aria-label={menuOpen ? "Close menu" : "Open menu"}
               aria-expanded={menuOpen}
-              className="p-1 text-[#1c387d]"
+              className="p-1 text-[#101828]"
             >
               <HamburgerIcon open={menuOpen} />
             </button>
@@ -185,7 +185,7 @@ export function Shell({ children }: { children: ReactNode }) {
                   <button
                     type="button"
                     onClick={handleAuthClick}
-                    className="text-base font-medium text-[#1c387d] transition-opacity duration-150 active:opacity-85"
+                    className="text-base font-medium text-[#101828] transition-opacity duration-150 active:opacity-85"
                   >
                     {isAuthenticated ? "Log out" : "Log in"}
                   </button>
@@ -202,7 +202,7 @@ export function Shell({ children }: { children: ReactNode }) {
                     onClick={closeMenu}
                     aria-label="Close menu"
                     aria-expanded={menuOpen}
-                    className="p-1 text-[#1c387d]"
+                    className="p-1 text-[#101828]"
                   >
                     <HamburgerIcon open={menuOpen} />
                   </button>
