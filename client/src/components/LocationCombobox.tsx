@@ -34,7 +34,9 @@ export function LocationCombobox({
   const { data, isLoading } = useGetSites();
   const { site } = useSiteStorage();
   const [open, setOpen] = useState(false);
-  const [query, setQuery] = useState("");
+  // Shows the selected city when idle; acts as the filter while typing.
+  const [query, setQuery] = useState(() => site?.label ?? "");
+  const [selectedLabel, setSelectedLabel] = useState(() => site?.label ?? "");
   const [isSearching, setIsSearching] = useState(false);
   const [error, setError] = useState<string | null>(null);
   // When the nearest open site is >50 miles away, keep it around so the user
@@ -63,7 +65,8 @@ export function LocationCombobox({
   const isZip = /^\d{5}$/.test(trimmed);
   const filteredSites = useMemo(() => {
     const q = trimmed.toLowerCase();
-    if (!q || isZip) return availableSites;
+    // Don't filter by the already-selected label — show the full list.
+    if (!q || isZip || trimmed === selectedLabel) return availableSites;
     return availableSites.filter(
       (s) => s.label.toLowerCase().includes(q) || s.city.toLowerCase().includes(q),
     );
@@ -100,7 +103,8 @@ export function LocationCombobox({
 
   const close = () => {
     setOpen(false);
-    setQuery("");
+    // Restore the selected city label (or clear an abandoned search).
+    setQuery(selectedLabel);
     resetTransient();
   };
 
@@ -138,7 +142,10 @@ export function LocationCombobox({
   }, [focusSignal]);
 
   const selectSite = (key: string, label: string, origin?: SiteOrigin) => {
-    close();
+    setOpen(false);
+    setSelectedLabel(label);
+    setQuery(label);
+    resetTransient();
     onSiteSelected(key, label, origin);
   };
 
@@ -290,7 +297,11 @@ export function LocationCombobox({
           autoComplete="off"
           placeholder="Choose a city or ZIP code"
           value={query}
-          onFocus={() => setOpen(true)}
+          onFocus={(e) => {
+            setOpen(true);
+            // Select the existing city label so typing replaces it.
+            e.target.select();
+          }}
           onClick={() => setOpen(true)}
           onChange={(e) => {
             setQuery(e.target.value);

@@ -105,12 +105,10 @@ export default function Landing() {
 
   const displaySite = site || DEFAULT_SITE;
 
-  // "View sessions": reveal the inline panel (needs a selected site).
+  // "View sessions": reveal the inline panel for the displayed city
+  // (falls back to the default site when none was explicitly picked).
   const handleSeeSessions = () => {
-    if (!site) {
-      setPickerFocus((n) => n + 1);
-      return;
-    }
+    if (!site) setSite(displaySite.key, displaySite.label);
     setSessionsOpen(true);
     localStorage.setItem("iw_sessions_expanded", "1");
     requestAnimationFrame(() => {
