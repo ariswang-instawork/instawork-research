@@ -66,7 +66,7 @@
   --color-success: hsl(var(--success));
   --color-brand-violet: hsl(var(--brand-violet));
 
-  --font-sans: 'HK Grotesk', Inter, -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', system-ui, sans-serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Helvetica Neue', 'HK Grotesk', Inter, system-ui, sans-serif;
 
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
