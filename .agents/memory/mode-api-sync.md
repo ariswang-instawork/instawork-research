@@ -8,3 +8,4 @@ description: Lessons syncing Mode report data via API keys in this project
 - **Why:** avoids triggering fresh report runs (slow, needs run permissions) and mirrors the Juicebox pattern requested by the user.
 - Bookings dataset is ~110k rows; replace-all works fine as one Prisma transaction with `createMany` in 5k chunks and a raised `timeout` (~12s total). Guardrail must check the *post-validation/dedupe* count, not raw fetch length.
 - Prisma 7 broke `url = env(...)` in schema files; project pins prisma@6 + @prisma/client@6.
+- API contract lives in the uploaded prior project (`attached_assets/instawork-research-project/lib/api-spec/openapi.yaml`); user chose to keep the Prisma backend but match that spec (/sites, /sessions, /eligibility, /admin/*). Public responses must pass `sanitizeLabel` (never leak "Q.ai" / "UX Study" codenames); eligibility never echoes name/phone and messages must not differ for blocked users.
