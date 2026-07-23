@@ -41,7 +41,7 @@ export default function Landing() {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col bg-white">
-      <main className="flex-1 overflow-y-auto px-6 pt-6 pb-[calc(2rem+env(safe-area-inset-bottom))] max-w-md mx-auto w-full animate-in fade-in slide-in-from-bottom-3 duration-500">
+      <main className="flex-1 overflow-y-auto px-5 pt-8 pb-[calc(2rem+env(safe-area-inset-bottom))] max-w-md mx-auto w-full animate-in fade-in slide-in-from-bottom-3 duration-500">
         {/* Location row */}
         <div className="flex items-center gap-2 mb-5">
           <MapPin className="w-5 h-5 text-gray-900 shrink-0" strokeWidth={2} />
@@ -56,20 +56,20 @@ export default function Landing() {
         </div>
 
         {/* Hero */}
-        <h2 className="text-[26px] leading-[1.12] font-bold tracking-tight text-gray-900 mb-4">
+        <h2 className="text-[40px] leading-[1.05] font-extrabold tracking-[-0.03em] text-gray-900 mb-5">
           Get paid to record your voice.
         </h2>
-        <p className="text-base text-gray-900 mb-6">
+        <p className="text-[17px] leading-[1.45] text-gray-600 mb-7">
           Earn <span className="font-bold text-primary">$66–$111</span> for a 3-hour
           session. Visit a nearby location and complete simple voice recording tasks.
         </p>
 
         {/* Two search cards */}
-        <div className="space-y-4">
+        <div className="space-y-3">
           <button
             type="button"
             onClick={() => setIsDrawerOpen(true)}
-            className="w-full flex items-center gap-3 rounded-2xl border border-[hsl(var(--border))] bg-white px-4 py-4 text-left"
+            className="w-full h-16 flex items-center gap-3 rounded-2xl border border-[hsl(var(--border))] bg-white px-4 text-left"
           >
             <MapPin className="w-5 h-5 text-primary shrink-0" strokeWidth={2} />
             <span className="flex-1 text-base text-gray-600">Choose a city or ZIP code</span>
@@ -79,7 +79,7 @@ export default function Landing() {
           <button
             type="button"
             onClick={handleBrowseNearby}
-            className="w-full flex items-center gap-3 rounded-2xl border border-[hsl(var(--border))] bg-white px-4 py-4 text-left"
+            className="w-full h-16 flex items-center gap-3 rounded-2xl border border-[hsl(var(--border))] bg-white px-4 text-left"
           >
             <Search className="w-5 h-5 text-primary shrink-0" strokeWidth={2} />
             <span className="flex-1 text-base text-gray-900">Browse nearby sessions</span>
@@ -91,7 +91,7 @@ export default function Landing() {
         <div className="mt-5">
           <PrimaryCtaButton
             onClick={handleSeeSessions}
-            className="rounded-2xl bg-[#246BFD] text-white hover:bg-[#246BFD]/90 shadow-md shadow-black/15"
+            className="rounded-2xl h-14 py-0 bg-[#246BFD] text-white hover:bg-[#246BFD]/90 shadow-md shadow-black/15"
           >
             See sessions
           </PrimaryCtaButton>
@@ -111,7 +111,7 @@ export default function Landing() {
 
         {/* Trust section */}
         <div className="mt-10">
-          <h2 className="text-[26px] leading-[1.12] font-bold tracking-tight text-gray-900 mb-6">
+          <h2 className="text-[28px] leading-[1.15] font-bold tracking-tight text-gray-900 mb-6">
             Why people choose Instawork Research
           </h2>
           <div className="space-y-7">
