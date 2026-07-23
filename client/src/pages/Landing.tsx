@@ -63,16 +63,15 @@ export default function Landing() {
         </div>
 
         {/* Hero */}
-        <h2 className="text-[clamp(36px,9cqw,56px)] leading-[1.08] font-extrabold tracking-[-0.03em] mb-5">
-          <span className="block text-[#101828]">Share your voice.</span>
-          <span className="block text-[#1c387d]">Earn $66–$111.</span>
+        <h2 className="text-[clamp(36px,9cqw,56px)] leading-[1.08] font-extrabold tracking-[-0.03em] text-[#101828] mb-5">
+          Get paid to record your voice.
         </h2>
         <p className="text-base leading-[1.5] text-[#475467]">
-          Complete a 3-hour, in-person voice recording session at a nearby
-          location.
+          Earn <span className="font-bold text-[#1c387d]">$66–$111</span> for a
+          3-hour session.
         </p>
         <p className="text-base leading-[1.5] text-[#475467] mt-1 mb-7">
-          The tasks are simple, guided, and paid.
+          Visit a nearby location and complete simple, guided recording tasks.
         </p>
 
         {/* Location search + browse */}
