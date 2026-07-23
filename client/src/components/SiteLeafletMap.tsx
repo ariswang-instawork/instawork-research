@@ -20,7 +20,7 @@ L.Icon.Default.mergeOptions({
   shadowUrl: markerShadow,
 });
 
-const PRIMARY = "hsl(221 83% 53%)";
+const PRIMARY = "#1c387d";
 
 type SiteWithCoords = Site & { latitude: number; longitude: number };
 
