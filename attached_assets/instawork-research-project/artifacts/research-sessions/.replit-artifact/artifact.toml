@@ -1,0 +1,27 @@
+kind = "web"
+previewPath = "/"
+title = "Instawork Research Sessions"
+version = "1.0.0"
+id = "artifacts/research-sessions"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 23276
+
+[services.development]
+run = "pnpm --filter @workspace/research-sessions run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/research-sessions", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/research-sessions/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "23276"
+BASE_PATH = "/"

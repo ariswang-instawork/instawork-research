@@ -1,0 +1,395 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: Instawork Research sessions API
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: sessions
+    description: Research session operations
+  - name: admin
+    description: Admin operations
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+  /app-health:
+    get:
+      operationId: getAppHealth
+      tags: [health]
+      summary: App health and sync freshness
+      responses:
+        "200":
+          description: App health
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AppHealth"
+  /sites:
+    get:
+      operationId: getSites
+      tags: [sessions]
+      summary: List research sites with open session counts
+      responses:
+        "200":
+          description: Sites list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SitesResponse"
+  /sessions:
+    get:
+      operationId: getSessions
+      tags: [sessions]
+      summary: Upcoming bookable sessions for a site
+      parameters:
+        - name: site
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Sessions list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SessionsResponse"
+        "404":
+          description: Unknown site
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiMessage"
+  /sessions/{id}:
+    get:
+      operationId: getSessionById
+      tags: [sessions]
+      summary: One session's detail
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Session detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SessionDetail"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiMessage"
+  /eligibility:
+    post:
+      operationId: checkEligibility
+      tags: [sessions]
+      summary: Check how many sessions a participant can still book
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EligibilityInput"
+      responses:
+        "200":
+          description: Eligibility result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EligibilityResult"
+        "404":
+          description: Feature disabled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiMessage"
+        "429":
+          description: Rate limited
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiMessage"
+  /admin/status:
+    post:
+      operationId: getAdminStatus
+      tags: [admin]
+      summary: Admin sync status (password protected)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminAuth"
+      responses:
+        "200":
+          description: Admin status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminStatus"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiMessage"
+  /admin/sync:
+    post:
+      operationId: triggerAdminSync
+      tags: [admin]
+      summary: Trigger a manual Mode sync (password protected)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminAuth"
+      responses:
+        "200":
+          description: Sync result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SyncResult"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiMessage"
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+    ApiMessage:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+    AppHealth:
+      type: object
+      required: [ok, sessionCount, eligibilityEnabled]
+      properties:
+        ok:
+          type: boolean
+        syncedAt:
+          type: ["string", "null"]
+        sessionCount:
+          type: integer
+        eligibilityEnabled:
+          type: boolean
+        lastSync:
+          oneOf:
+            - $ref: "#/components/schemas/SyncRunInfo"
+            - type: "null"
+    SyncRunInfo:
+      type: object
+      required: [status, startedAt]
+      properties:
+        status:
+          type: string
+        startedAt:
+          type: string
+        finishedAt:
+          type: ["string", "null"]
+        rowCount:
+          type: ["integer", "null"]
+        siteCount:
+          type: ["integer", "null"]
+        message:
+          type: ["string", "null"]
+    Site:
+      type: object
+      required: [key, city, stateCode, label, openCount]
+      properties:
+        key:
+          type: string
+        city:
+          type: string
+        stateCode:
+          type: string
+        label:
+          type: string
+        latitude:
+          type: ["number", "null"]
+        longitude:
+          type: ["number", "null"]
+        openCount:
+          type: integer
+    SitesResponse:
+      type: object
+      required: [syncedAt, sites]
+      properties:
+        syncedAt:
+          type: ["string", "null"]
+        sites:
+          type: array
+          items:
+            $ref: "#/components/schemas/Site"
+    SiteInfo:
+      type: object
+      required: [city, stateCode, label]
+      properties:
+        city:
+          type: string
+        stateCode:
+          type: string
+        label:
+          type: string
+    SessionItem:
+      type: object
+      required: [id, date, dateISO, time, payLabel, payAmount, payRateUsd, billableHours, hoursLabel, booked, total, open, bookUrl, fullAddress, latitude, longitude, neighborhoodLabel]
+      properties:
+        id:
+          type: string
+        date:
+          type: string
+        dateISO:
+          type: string
+        time:
+          type: string
+        payLabel:
+          type: string
+        payAmount:
+          type: string
+        payRateUsd:
+          type: number
+          nullable: true
+        billableHours:
+          type: number
+          nullable: true
+        hoursLabel:
+          type: string
+        booked:
+          type: integer
+        total:
+          type: integer
+        open:
+          type: integer
+        bookUrl:
+          type: string
+        fullAddress:
+          type: ["string", "null"]
+        latitude:
+          type: ["number", "null"]
+        longitude:
+          type: ["number", "null"]
+        neighborhoodLabel:
+          type: ["string", "null"]
+    SessionsResponse:
+      type: object
+      required: [syncedAt, site, sessions]
+      properties:
+        syncedAt:
+          type: ["string", "null"]
+        site:
+          $ref: "#/components/schemas/SiteInfo"
+        sessions:
+          type: array
+          items:
+            $ref: "#/components/schemas/SessionItem"
+    SessionDetail:
+      allOf:
+        - $ref: "#/components/schemas/SessionItem"
+        - type: object
+          required: [city, stateCode, label]
+          properties:
+            city:
+              type: string
+            stateCode:
+              type: string
+            label:
+              type: string
+            syncedAt:
+              type: ["string", "null"]
+    EligibilityInput:
+      type: object
+      required: [name, phone]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 120
+        phone:
+          type: string
+          minLength: 7
+          maxLength: 30
+    EligibilityResult:
+      type: object
+      required: [found, cap, remaining, isBlocked, message]
+      properties:
+        found:
+          type: boolean
+        completedCount:
+          type: ["integer", "null"]
+        bookedCount:
+          type: ["integer", "null"]
+        cap:
+          type: integer
+        remaining:
+          type: integer
+        isBlocked:
+          type: boolean
+        message:
+          type: string
+    AdminAuth:
+      type: object
+      required: [password]
+      properties:
+        password:
+          type: string
+    AdminStatus:
+      type: object
+      required: [sessionCount, siteCount, eligibilityEnabled, recentRuns]
+      properties:
+        sessionCount:
+          type: integer
+        siteCount:
+          type: integer
+        syncedAt:
+          type: ["string", "null"]
+        eligibilityEnabled:
+          type: boolean
+        recentRuns:
+          type: array
+          items:
+            $ref: "#/components/schemas/SyncRunInfo"
+    SyncResult:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+        message:
+          type: ["string", "null"]
+        rowCount:
+          type: ["integer", "null"]
+        siteCount:
+          type: ["integer", "null"]

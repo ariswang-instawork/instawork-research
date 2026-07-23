@@ -1,0 +1,3 @@
+- [Mode API sync](mode-api-sync.md) — Mode link hrefs can be absolute (allowlist app.mode.com before auth'd fetch); sort runs by created_at desc before picking latest succeeded.
+- [Bulk inserts & PII logs](bulk-insert-and-log-pii.md) — chunk Drizzle bulk inserts (65,535 bind-param cap); never log full DB errors near PII (params leak into logs).
+- [Leaflet mobile map](leaflet-mobile-map.md) — invalidateSize before fitBounds, zoomSnap 0.25 on narrow cards, escape text in divIcon html, per-site label placement.
