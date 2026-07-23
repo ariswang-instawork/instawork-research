@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Available sessions — Instawork Research</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
+
+  <div class="page">
+    <header class="site-header">
+      <nav class="nav-container" aria-label="Primary navigation">
+        <a class="brand" href="index.html" aria-label="Instawork Research home">
+          <span class="brand-icon" aria-hidden="true">W</span>
+          <span class="brand-name">Instawork <strong>Research</strong></span>
+        </a>
+        <div class="nav-actions">
+          <a class="login-link" href="login.html">Log in</a>
+          <button id="menuButton" class="menu-button" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobileMenu">
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+        </div>
+      </nav>
+      <div id="mobileMenu" class="mobile-menu" hidden>
+        <nav class="mobile-menu-content" aria-label="Mobile navigation">
+          <a href="index.html">Home</a>
+          <a href="sessions.html">Find sessions</a>
+          <a href="login.html">Log in</a>
+          <a href="signup.html">Sign up</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main-content" class="subpage-main">
+      <div class="page-container">
+        <div class="location-bar">
+          <div class="location-label">
+            <span class="location-icon" aria-hidden="true">●</span>
+            <div class="location-text">
+              <strong data-location-label>Chicago, IL</strong>
+              <span data-location-subtitle>Showing nearby voice recording sessions</span>
+            </div>
+          </div>
+          <button class="btn-secondary" type="button" data-open-city-dialog>Change location</button>
+        </div>
+
+        <h1 class="page-title">Available sessions</h1>
+        <p class="lead">Choose a session to view details and book in the Instawork app.</p>
+
+        <div class="session-list" id="session-list" aria-live="polite"></div>
+      </div>
+    </main>
+
+    <footer class="sticky-footer">
+      <div class="page-container">
+        <a class="primary-button" href="login.html?redirect=remaining-sessions">Check your remaining sessions</a>
+      </div>
+    </footer>
+  </div>
+
+  <dialog id="cityDialog" class="city-dialog">
+    <form method="dialog" id="cityDialogForm">
+      <div class="dialog-header">
+        <h2>Change location</h2>
+        <button class="dialog-close" value="cancel" type="submit" aria-label="Close">×</button>
+      </div>
+      <label for="cityDialogInput">City or ZIP code</label>
+      <input id="cityDialogInput" type="text" placeholder="Enter city or ZIP code">
+      <div class="city-options" id="city-options"></div>
+      <button id="saveCityButton" class="primary-button" type="button">Save location</button>
+    </form>
+  </dialog>
+</body>
+</html>
