@@ -40,7 +40,7 @@ export default function Landing() {
   };
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col bg-[#F5F6F8]">
+    <div className="flex min-h-0 flex-1 flex-col bg-white">
       <main className="flex-1 overflow-y-auto px-5 pt-8 pb-[calc(2rem+env(safe-area-inset-bottom))] max-w-md mx-auto w-full [container-type:inline-size] animate-in fade-in slide-in-from-bottom-3 duration-500">
         {/* Location row */}
         <div className="flex items-center gap-2 mb-5">
