@@ -147,7 +147,7 @@ export function SiteLeafletMap() {
     <div className="relative z-0 rounded-xl border border-gray-200 bg-white overflow-hidden" data-testid="card-site-map">
       <div className="bg-white border-b border-gray-200 px-6 py-2.5 flex items-center gap-3">
         <MapPin className="w-5 h-5 text-gray-500 shrink-0" strokeWidth={1.75} />
-        <p className="text-[15px] font-medium leading-[1.4] text-gray-500">Tap a location to view open shifts.</p>
+        <p className="text-[15px] font-medium leading-[1.4] text-gray-500">Tap a location to view open sessions.</p>
       </div>
       <div className="h-[280px] w-full relative">
         {isLoading || sites.length === 0 ? (
