@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { useSiteStorage, type SiteOrigin } from "@/hooks/use-site";
-import { LocationDrawer, EligibilityCheckDrawer } from "@/components/Drawers";
+import { LocationDrawer } from "@/components/Drawers";
 import { DEFAULT_SITE } from "@/lib/constants";
 import {
   Sparkles,
@@ -18,7 +18,6 @@ export default function Landing() {
   const { site, setSite } = useSiteStorage();
   const [, setLocation] = useLocation();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [eligibilityOpen, setEligibilityOpen] = useState(false);
 
   const displaySite = site || DEFAULT_SITE;
 
@@ -97,15 +96,7 @@ export default function Landing() {
           </PrimaryCtaButton>
         </div>
 
-        <button
-          type="button"
-          onClick={() => setEligibilityOpen(true)}
-          className="block mx-auto mt-4 text-base text-gray-900 underline underline-offset-2"
-        >
-          Log in to check your remaining sessions
-        </button>
-
-        <p className="text-xs text-center text-gray-500 mt-3">
+        <p className="text-xs text-center text-gray-500 mt-4">
           Not currently available to residents of Texas, Washington, or Illinois.
         </p>
 
@@ -146,11 +137,6 @@ export default function Landing() {
         onSiteSelected={handleSiteSelected}
       />
 
-      <EligibilityCheckDrawer
-        hideTrigger
-        open={eligibilityOpen}
-        onOpenChange={setEligibilityOpen}
-      />
     </div>
   );
 }
