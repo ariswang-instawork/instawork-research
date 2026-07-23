@@ -3,7 +3,8 @@ import { Link, useLocation } from "wouter";
 import { useState } from "react";
 import { useGetSessions } from "@/lib/api-client";
 import { useSiteStorage, type SiteOrigin } from "@/hooks/use-site";
-import { LocationDrawer, EligibilityCheckDrawer } from "@/components/Drawers";
+import { EligibilityCheckDrawer } from "@/components/Drawers";
+import { LocationCombobox } from "@/components/LocationCombobox";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DEFAULT_SITE, SESSION_CAP } from "@/lib/constants";
@@ -11,14 +12,15 @@ import { DEFAULT_SITE, SESSION_CAP } from "@/lib/constants";
 export default function Sessions() {
   const { site, setSite } = useSiteStorage();
   const [, setLocation] = useLocation();
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  // Whether the inline location picker is shown in place of the city label.
+  const [isPickerOpen, setIsPickerOpen] = useState(false);
 
   const displaySite = site || DEFAULT_SITE;
   const { data, isLoading } = useGetSessions({ site: displaySite.key });
 
   const handleSiteSelected = (key: string, label: string, origin?: SiteOrigin) => {
     setSite(key, label, origin);
-    setIsDrawerOpen(false);
+    setIsPickerOpen(false);
   };
 
   return (
@@ -32,7 +34,7 @@ export default function Sessions() {
         
         <div className="mb-6">
           <button 
-            onClick={() => setIsDrawerOpen(true)}
+            onClick={() => setIsPickerOpen(true)}
             className="text-[14px] text-muted-foreground font-normal hover:text-foreground transition-colors"
           >
             {displaySite.label}
@@ -42,12 +44,19 @@ export default function Sessions() {
             <p className="text-[12.5px] text-muted-foreground mt-0.5">
               Showing sessions near {site.origin.label}{" "}
               <button
-                onClick={() => setIsDrawerOpen(true)}
+                onClick={() => setIsPickerOpen(true)}
                 className="text-primary hover:underline"
               >
                 Change location
               </button>
             </p>
+          )}
+          {isPickerOpen && (
+            <LocationCombobox
+              autoFocus
+              onSiteSelected={handleSiteSelected}
+              className="mt-3"
+            />
           )}
         </div>
 
@@ -117,13 +126,7 @@ export default function Sessions() {
         )}
       </main>
 
-      <EligibilityCheckDrawer suppressed={isDrawerOpen} />
-
-      <LocationDrawer 
-        isOpen={isDrawerOpen} 
-        onOpenChange={setIsDrawerOpen} 
-        onSiteSelected={handleSiteSelected} 
-      />
+      <EligibilityCheckDrawer suppressed={isPickerOpen} />
     </div>
   );
 }
