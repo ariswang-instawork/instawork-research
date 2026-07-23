@@ -56,7 +56,7 @@ export function Shell({ children }: { children: ReactNode }) {
     <div className="min-h-[100dvh] w-full bg-background flex justify-center text-foreground font-sans selection:bg-primary/20 selection:text-primary">
       <div className="w-full max-w-[480px] bg-card min-h-[100dvh] flex flex-col relative shadow-2xl shadow-black/5 ring-1 ring-border/50">
         {/* Shared app header */}
-        <header className="sticky top-0 z-[1100] bg-card border-b border-[hsl(var(--border))] px-4 py-3 flex items-center justify-between gap-2">
+        <header className="sticky top-0 z-[1100] bg-[#246BFD] px-4 py-3 flex items-center justify-between gap-2">
           <button
             type="button"
             onClick={() => go("/")}
@@ -64,9 +64,8 @@ export function Shell({ children }: { children: ReactNode }) {
             aria-label="Instawork Research home"
           >
             <img src={LOGO_URL} alt="" className="w-9 h-9 rounded-[10px] shrink-0" />
-            <span className="text-base font-bold leading-none whitespace-nowrap">
-              <span className="text-gray-900">Instawork</span>{" "}
-              <span className="text-primary">Research</span>
+            <span className="text-base font-bold leading-none whitespace-nowrap text-white">
+              Instawork Research
             </span>
           </button>
 
@@ -74,7 +73,7 @@ export function Shell({ children }: { children: ReactNode }) {
             <button
               type="button"
               onClick={openEligibility}
-              className="text-base font-medium text-gray-900"
+              className="text-base font-medium text-white"
             >
               Log in
             </button>
@@ -82,7 +81,7 @@ export function Shell({ children }: { children: ReactNode }) {
               href={SIGNUP_FORM_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="rounded-full bg-primary text-white text-base font-medium px-4 py-2 leading-none inline-flex items-center h-9"
+              className="rounded-full bg-white text-[#246BFD] text-base font-medium px-4 py-2 leading-none inline-flex items-center h-9"
             >
               Sign up
             </a>
@@ -90,7 +89,7 @@ export function Shell({ children }: { children: ReactNode }) {
               type="button"
               onClick={() => setMenuOpen(true)}
               aria-label="Open menu"
-              className="p-1 text-gray-900"
+              className="p-1 text-white"
             >
               <Menu className="w-6 h-6" strokeWidth={2} />
             </button>
@@ -102,19 +101,18 @@ export function Shell({ children }: { children: ReactNode }) {
           <div className="fixed inset-0 z-[1200] flex justify-center bg-black/20">
             <div className="w-full max-w-[480px] bg-background min-h-[100dvh] flex flex-col">
               {/* Menu header — mirrors the app header with X in place of the hamburger */}
-              <div className="bg-card border-b border-[hsl(var(--border))] px-4 py-3 flex items-center justify-between gap-2">
+              <div className="bg-[#246BFD] px-4 py-3 flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2 min-w-0">
                   <img src={LOGO_URL} alt="" className="w-9 h-9 rounded-[10px] shrink-0" />
-                  <span className="text-base font-bold leading-none whitespace-nowrap">
-                    <span className="text-gray-900">Instawork</span>{" "}
-                    <span className="text-primary">Research</span>
+                  <span className="text-base font-bold leading-none whitespace-nowrap text-white">
+                    Instawork Research
                   </span>
                 </div>
                 <div className="flex items-center gap-3 shrink-0">
                   <button
                     type="button"
                     onClick={openEligibility}
-                    className="text-base font-medium text-gray-900"
+                    className="text-base font-medium text-white"
                   >
                     Log in
                   </button>
@@ -122,7 +120,7 @@ export function Shell({ children }: { children: ReactNode }) {
                     href={SIGNUP_FORM_URL}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="rounded-full bg-primary text-white text-base font-medium px-4 py-2 leading-none inline-flex items-center h-9"
+                    className="rounded-full bg-white text-[#246BFD] text-base font-medium px-4 py-2 leading-none inline-flex items-center h-9"
                   >
                     Sign up
                   </a>
@@ -130,7 +128,7 @@ export function Shell({ children }: { children: ReactNode }) {
                     type="button"
                     onClick={() => setMenuOpen(false)}
                     aria-label="Close menu"
-                    className="p-1 text-gray-900"
+                    className="p-1 text-white"
                   >
                     <X className="w-6 h-6" strokeWidth={2} />
                   </button>
