@@ -5,7 +5,7 @@ import { EligibilityCheckDrawer } from "@/components/Drawers";
 import { SIGNUP_FORM_URL } from "@/lib/constants";
 import { useAuthStatus, useLogout, login } from "@/hooks/use-auth";
 
-const LOGO_URL = `${import.meta.env.BASE_URL}instawork_logo.png`;
+const LOGO_URL = `${import.meta.env.BASE_URL}instawork_logo_white_background.png`;
 
 function MenuAccordion({
   label,
