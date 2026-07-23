@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { useSiteStorage, type SiteOrigin } from "@/hooks/use-site";
-import { EligibilityCheckDrawer } from "@/components/Drawers";
-import { LocationCombobox } from "@/components/LocationCombobox";
+import { LocationDrawer, EligibilityCheckDrawer } from "@/components/Drawers";
 import { DEFAULT_SITE } from "@/lib/constants";
 import {
   Sparkles,
@@ -10,6 +9,7 @@ import {
   Wallet,
   MapPin,
   Search,
+  Send,
   ChevronRight,
 } from "lucide-react";
 import { PrimaryCtaButton } from "@/components/PrimaryCtaButton";
@@ -17,16 +17,15 @@ import { PrimaryCtaButton } from "@/components/PrimaryCtaButton";
 export default function Landing() {
   const { site, setSite } = useSiteStorage();
   const [, setLocation] = useLocation();
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [eligibilityOpen, setEligibilityOpen] = useState(false);
-  // Incremented to focus the inline location field and open its dropdown.
-  const [pickerFocus, setPickerFocus] = useState(0);
 
   const displaySite = site || DEFAULT_SITE;
 
-  // Always route users through the location picker first — never navigate
-  // straight to sessions, even when a previous location is stored.
+  // Always open the location drawer first — never navigate straight to
+  // sessions, even when a previous location is stored.
   const handleSeeSessions = () => {
-    setPickerFocus((n) => n + 1);
+    setIsDrawerOpen(true);
   };
 
   const handleBrowseNearby = () => {
@@ -36,6 +35,7 @@ export default function Landing() {
 
   const handleSiteSelected = (key: string, label: string, origin?: SiteOrigin) => {
     setSite(key, label, origin);
+    setIsDrawerOpen(false);
     setLocation("/sessions");
   };
 
@@ -48,7 +48,7 @@ export default function Landing() {
           <span className="text-base font-bold text-[#101828]">{displaySite.label}</span>
           <button
             type="button"
-            onClick={() => setPickerFocus((n) => n + 1)}
+            onClick={() => setIsDrawerOpen(true)}
             className="text-base text-[#246BFD] underline underline-offset-2"
           >
             Change city
@@ -64,12 +64,17 @@ export default function Landing() {
           session. Visit a nearby location and complete simple voice recording tasks.
         </p>
 
-        {/* Location search + browse */}
+        {/* Two search cards */}
         <div className="space-y-3">
-          <LocationCombobox
-            focusSignal={pickerFocus}
-            onSiteSelected={handleSiteSelected}
-          />
+          <button
+            type="button"
+            onClick={() => setIsDrawerOpen(true)}
+            className="w-full h-16 flex items-center gap-3 rounded-2xl border border-[hsl(var(--border))] bg-white px-4 text-left"
+          >
+            <MapPin className="w-5 h-5 text-[#246BFD] shrink-0" strokeWidth={2} />
+            <span className="flex-1 text-base text-gray-600">Choose a city or ZIP code</span>
+            <Send className="w-5 h-5 text-[#246BFD] shrink-0" strokeWidth={2} />
+          </button>
 
           <button
             type="button"
@@ -134,6 +139,12 @@ export default function Landing() {
           </div>
         </div>
       </main>
+
+      <LocationDrawer
+        isOpen={isDrawerOpen}
+        onOpenChange={setIsDrawerOpen}
+        onSiteSelected={handleSiteSelected}
+      />
 
       <EligibilityCheckDrawer
         hideTrigger
