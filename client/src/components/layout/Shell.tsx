@@ -130,7 +130,7 @@ export function Shell({ children }: { children: ReactNode }) {
             <img src={LOGO_URL} alt="" className="w-9 h-9 rounded-[10px] shrink-0" />
             <span className="text-xl font-bold leading-none whitespace-nowrap truncate min-w-0">
               <span className="text-black">Instawork</span>{" "}
-              <span className="text-[#0033cc]">Research</span>
+              <span className="text-[#1c387d]">Research</span>
             </span>
           </button>
 
@@ -178,7 +178,7 @@ export function Shell({ children }: { children: ReactNode }) {
                   <img src={LOGO_URL} alt="" className="w-9 h-9 rounded-[10px] shrink-0" />
                   <span className="text-xl font-bold leading-none whitespace-nowrap">
                     <span className="text-black">Instawork</span>{" "}
-                    <span className="text-[#0033cc]">Research</span>
+                    <span className="text-[#1c387d]">Research</span>
                   </span>
                 </div>
                 <div className="flex items-center gap-3 shrink-0">
