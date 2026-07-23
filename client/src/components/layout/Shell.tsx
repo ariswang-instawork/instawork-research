@@ -120,7 +120,7 @@ export function Shell({ children }: { children: ReactNode }) {
     <div className="min-h-[100dvh] w-full bg-background flex justify-center text-foreground font-sans selection:bg-primary/20 selection:text-primary">
       <div className="w-full max-w-[480px] bg-card min-h-[100dvh] flex flex-col relative shadow-2xl shadow-black/5 ring-1 ring-border/50">
         {/* Shared app header */}
-        <header className="sticky top-0 z-[1100] bg-[#1c387d] px-4 py-3 flex items-center justify-between gap-2">
+        <header className="sticky top-0 z-[1100] bg-white border-b border-[#e4e7ec] px-4 py-3 flex items-center justify-between gap-2">
           <button
             type="button"
             onClick={() => go("/")}
@@ -129,8 +129,8 @@ export function Shell({ children }: { children: ReactNode }) {
           >
             <img src={LOGO_URL} alt="" className="w-9 h-9 rounded-[10px] shrink-0" />
             <span className="text-xl font-bold leading-none whitespace-nowrap truncate min-w-0">
-              <span className="text-white">Instawork</span>{" "}
-              <span className="text-[#AFCBFF]">Research</span>
+              <span className="text-black">Instawork</span>{" "}
+              <span className="text-[#1c387d]">Research</span>
             </span>
           </button>
 
@@ -140,7 +140,7 @@ export function Shell({ children }: { children: ReactNode }) {
             <button
               type="button"
               onClick={handleAuthClick}
-              className="hidden md:block text-base font-medium text-white transition-opacity duration-150 active:opacity-85"
+              className="hidden md:block text-base font-medium text-[#1c387d] transition-opacity duration-150 active:opacity-85"
             >
               {isAuthenticated ? "Log out" : "Log in"}
             </button>
@@ -148,7 +148,7 @@ export function Shell({ children }: { children: ReactNode }) {
               href={SIGNUP_FORM_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="hidden md:inline-flex rounded-full bg-white text-[#101828] text-base font-medium px-4 py-2 leading-none items-center h-9 transition-opacity duration-150 active:opacity-85"
+              className="hidden md:inline-flex rounded-full bg-[#246BFD] text-white text-base font-medium px-4 py-2 leading-none items-center h-9 transition-opacity duration-150 active:opacity-85"
             >
               Sign up
             </a>
@@ -157,7 +157,7 @@ export function Shell({ children }: { children: ReactNode }) {
               onClick={toggleMenu}
               aria-label={menuOpen ? "Close menu" : "Open menu"}
               aria-expanded={menuOpen}
-              className="p-1 text-white"
+              className="p-1 text-[#1c387d]"
             >
               <HamburgerIcon open={menuOpen} />
             </button>
@@ -173,19 +173,19 @@ export function Shell({ children }: { children: ReactNode }) {
           >
             <div className="w-full max-w-[480px] bg-background min-h-[100dvh] flex flex-col">
               {/* Menu header — mirrors the app header with X in place of the hamburger */}
-              <div className="bg-[#1c387d] px-4 py-3 flex items-center justify-between gap-2">
+              <div className="bg-white border-b border-[#e4e7ec] px-4 py-3 flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2 min-w-0">
                   <img src={LOGO_URL} alt="" className="w-9 h-9 rounded-[10px] shrink-0" />
                   <span className="text-xl font-bold leading-none whitespace-nowrap">
-                    <span className="text-white">Instawork</span>{" "}
-                    <span className="text-[#AFCBFF]">Research</span>
+                    <span className="text-black">Instawork</span>{" "}
+                    <span className="text-[#1c387d]">Research</span>
                   </span>
                 </div>
                 <div className="flex items-center gap-3 shrink-0">
                   <button
                     type="button"
                     onClick={handleAuthClick}
-                    className="text-base font-medium text-white transition-opacity duration-150 active:opacity-85"
+                    className="text-base font-medium text-[#1c387d] transition-opacity duration-150 active:opacity-85"
                   >
                     {isAuthenticated ? "Log out" : "Log in"}
                   </button>
@@ -193,7 +193,7 @@ export function Shell({ children }: { children: ReactNode }) {
                     href={SIGNUP_FORM_URL}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="rounded-full bg-white text-[#101828] text-base font-medium px-4 py-2 leading-none inline-flex items-center h-9 transition-opacity duration-150 active:opacity-85"
+                    className="rounded-full bg-[#246BFD] text-white text-base font-medium px-4 py-2 leading-none inline-flex items-center h-9 transition-opacity duration-150 active:opacity-85"
                   >
                     Sign up
                   </a>
@@ -202,7 +202,7 @@ export function Shell({ children }: { children: ReactNode }) {
                     onClick={closeMenu}
                     aria-label="Close menu"
                     aria-expanded={menuOpen}
-                    className="p-1 text-white"
+                    className="p-1 text-[#1c387d]"
                   >
                     <HamburgerIcon open={menuOpen} />
                   </button>
