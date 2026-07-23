@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { useSiteStorage, type SiteOrigin } from "@/hooks/use-site";
-import { LocationDrawer } from "@/components/Drawers";
+import { LocationDrawer, EligibilityCheckDrawer } from "@/components/Drawers";
 import { DEFAULT_SITE } from "@/lib/constants";
 import {
   Sparkles,
@@ -18,6 +18,7 @@ export default function Landing() {
   const { site, setSite } = useSiteStorage();
   const [, setLocation] = useLocation();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [eligibilityOpen, setEligibilityOpen] = useState(false);
 
   const displaySite = site || DEFAULT_SITE;
 
@@ -39,27 +40,27 @@ export default function Landing() {
   };
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col bg-white">
-      <main className="flex-1 overflow-y-auto px-5 pt-8 pb-[calc(2rem+env(safe-area-inset-bottom))] max-w-md mx-auto w-full animate-in fade-in slide-in-from-bottom-3 duration-500">
+    <div className="flex min-h-0 flex-1 flex-col bg-[#F5F6F8]">
+      <main className="flex-1 overflow-y-auto px-5 pt-8 pb-[calc(2rem+env(safe-area-inset-bottom))] max-w-md mx-auto w-full [container-type:inline-size] animate-in fade-in slide-in-from-bottom-3 duration-500">
         {/* Location row */}
         <div className="flex items-center gap-2 mb-5">
-          <MapPin className="w-5 h-5 text-gray-900 shrink-0" strokeWidth={2} />
-          <span className="text-base font-bold text-gray-900">{displaySite.label}</span>
+          <MapPin className="w-5 h-5 text-[#101828] shrink-0" strokeWidth={2} />
+          <span className="text-base font-bold text-[#101828]">{displaySite.label}</span>
           <button
             type="button"
             onClick={() => setIsDrawerOpen(true)}
-            className="text-base text-primary underline underline-offset-2"
+            className="text-base text-[#246BFD] underline underline-offset-2"
           >
             Change city
           </button>
         </div>
 
         {/* Hero */}
-        <h2 className="text-[40px] leading-[1.05] font-extrabold tracking-[-0.03em] text-gray-900 mb-5">
+        <h2 className="text-[clamp(40px,10cqw,64px)] leading-[1.05] font-extrabold tracking-[-0.03em] text-[#101828] mb-5">
           Get paid to record your voice.
         </h2>
-        <p className="text-[17px] leading-[1.45] text-gray-600 mb-7">
-          Earn <span className="font-bold text-primary">$66–$111</span> for a 3-hour
+        <p className="text-[17px] leading-[1.45] text-[#475467] mb-7">
+          Earn <span className="font-bold text-[#246BFD]">$66–$111</span> for a 3-hour
           session. Visit a nearby location and complete simple voice recording tasks.
         </p>
 
@@ -70,9 +71,9 @@ export default function Landing() {
             onClick={() => setIsDrawerOpen(true)}
             className="w-full h-16 flex items-center gap-3 rounded-2xl border border-[hsl(var(--border))] bg-white px-4 text-left"
           >
-            <MapPin className="w-5 h-5 text-primary shrink-0" strokeWidth={2} />
+            <MapPin className="w-5 h-5 text-[#246BFD] shrink-0" strokeWidth={2} />
             <span className="flex-1 text-base text-gray-600">Choose a city or ZIP code</span>
-            <Send className="w-5 h-5 text-primary shrink-0" strokeWidth={2} />
+            <Send className="w-5 h-5 text-[#246BFD] shrink-0" strokeWidth={2} />
           </button>
 
           <button
@@ -80,9 +81,9 @@ export default function Landing() {
             onClick={handleBrowseNearby}
             className="w-full h-16 flex items-center gap-3 rounded-2xl border border-[hsl(var(--border))] bg-white px-4 text-left"
           >
-            <Search className="w-5 h-5 text-primary shrink-0" strokeWidth={2} />
+            <Search className="w-5 h-5 text-[#246BFD] shrink-0" strokeWidth={2} />
             <span className="flex-1 text-base text-gray-900">Browse nearby sessions</span>
-            <ChevronRight className="w-5 h-5 text-primary shrink-0" strokeWidth={2} />
+            <ChevronRight className="w-5 h-5 text-[#246BFD] shrink-0" strokeWidth={2} />
           </button>
         </div>
 
@@ -90,37 +91,45 @@ export default function Landing() {
         <div className="mt-5">
           <PrimaryCtaButton
             onClick={handleSeeSessions}
-            className="rounded-2xl h-14 py-0 bg-[#246BFD] text-white hover:bg-[#246BFD]/90 shadow-md shadow-black/15"
+            className="rounded-2xl h-14 py-0 bg-[#101828] text-white font-bold hover:bg-[#101828]/90"
           >
             See sessions
           </PrimaryCtaButton>
         </div>
 
-        <p className="text-xs text-center text-gray-500 mt-4">
+        <button
+          type="button"
+          onClick={() => setEligibilityOpen(true)}
+          className="block mt-4 text-base text-[#101828] underline underline-offset-2"
+        >
+          Log in to check your remaining sessions
+        </button>
+
+        <p className="text-xs text-gray-500 mt-3">
           Not currently available to residents of Texas, Washington, or Illinois.
         </p>
 
         {/* Trust section */}
         <div className="mt-10">
-          <h2 className="text-[28px] leading-[1.15] font-bold tracking-tight text-gray-900 mb-6">
+          <h2 className="text-[28px] leading-[1.15] font-bold tracking-tight text-[#101828] mb-6">
             Why people choose Instawork Research
           </h2>
-          <div className="space-y-7">
-            <div className="flex items-start gap-4">
+          <div className="space-y-3">
+            <div className="flex items-start gap-4 bg-white rounded-2xl border border-[hsl(var(--border))] p-4">
               <Sparkles className="w-5 h-5 text-muted-foreground shrink-0 mt-0.5" strokeWidth={1.75} />
               <div>
                 <p className="text-base font-bold text-gray-900">No experience needed</p>
                 <p className="text-base text-gray-600 mt-0.5">We'll guide you through every step.</p>
               </div>
             </div>
-            <div className="flex items-start gap-4">
+            <div className="flex items-start gap-4 bg-white rounded-2xl border border-[hsl(var(--border))] p-4">
               <Mic className="w-5 h-5 text-muted-foreground shrink-0 mt-0.5" strokeWidth={1.75} />
               <div>
                 <p className="text-base font-bold text-gray-900">Simple guided session</p>
                 <p className="text-base text-gray-600 mt-0.5">Complete simple voice recording tasks.</p>
               </div>
             </div>
-            <div className="flex items-start gap-4">
+            <div className="flex items-start gap-4 bg-white rounded-2xl border border-[hsl(var(--border))] p-4">
               <Wallet className="w-5 h-5 text-muted-foreground shrink-0 mt-0.5" strokeWidth={1.75} />
               <div>
                 <p className="text-base font-bold text-gray-900">Paid through Instawork</p>
@@ -135,6 +144,12 @@ export default function Landing() {
         isOpen={isDrawerOpen}
         onOpenChange={setIsDrawerOpen}
         onSiteSelected={handleSiteSelected}
+      />
+
+      <EligibilityCheckDrawer
+        hideTrigger
+        open={eligibilityOpen}
+        onOpenChange={setEligibilityOpen}
       />
 
     </div>
