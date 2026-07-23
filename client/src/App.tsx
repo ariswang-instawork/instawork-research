@@ -1,7 +1,6 @@
 import { Shell } from "@/components/layout/Shell";
-import { Route, Switch, Router as WouterRouter } from "wouter";
+import { Route, Switch, Redirect, Router as WouterRouter } from "wouter";
 import Landing from "@/pages/Landing";
-import Sessions from "@/pages/Sessions";
 import SessionDetail from "@/pages/SessionDetail";
 import Admin from "@/pages/Admin";
 import { Toaster } from "@/components/ui/sonner";
@@ -26,7 +25,10 @@ function AppRouter() {
     <Shell>
       <Switch>
         <Route path="/" component={Landing} />
-        <Route path="/sessions" component={Sessions} />
+        {/* The session list now lives inline on the landing page. */}
+        <Route path="/sessions">
+          <Redirect to="/" />
+        </Route>
         <Route path="/sessions/:id" component={SessionDetail} />
         <Route path="/admin" component={Admin} />
         <Route>

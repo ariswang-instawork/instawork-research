@@ -1,18 +1,82 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { useSiteStorage, type SiteOrigin } from "@/hooks/use-site";
 import { EligibilityCheckDrawer } from "@/components/Drawers";
 import { LocationCombobox } from "@/components/LocationCombobox";
+import { useGetSessions } from "@/lib/api-client";
+import { Skeleton } from "@/components/ui/skeleton";
 import { DEFAULT_SITE } from "@/lib/constants";
 import {
   Sparkles,
   Mic,
   Wallet,
   MapPin,
+  ChevronRight,
 } from "lucide-react";
 import { PrimaryCtaButton } from "@/components/PrimaryCtaButton";
 import { SiteLeafletMap } from "@/components/SiteLeafletMap";
 import { login } from "@/hooks/use-auth";
+
+function SessionsList({ siteKey, siteLabel }: { siteKey: string; siteLabel: string }) {
+  const [, setLocation] = useLocation();
+  const { data, isLoading } = useGetSessions({ site: siteKey });
+
+  if (isLoading) {
+    return (
+      <div>
+        {[1, 2, 3].map((i) => (
+          <div
+            key={i}
+            className="flex items-center justify-between py-[18px] border-b border-[hsl(var(--border))] animate-pulse"
+          >
+            <div className="flex-1 space-y-2">
+              <Skeleton className="h-5 w-32 bg-muted" />
+              <Skeleton className="h-4 w-24 bg-muted" />
+            </div>
+            <Skeleton className="h-5 w-14 bg-muted" />
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  if (!data?.sessions || data.sessions.length === 0) {
+    return (
+      <p className="text-base text-[#475467] py-4">
+        No open sessions in {siteLabel} right now. Try another city.
+      </p>
+    );
+  }
+
+  return (
+    <div>
+      {data.sessions.map((session) => (
+        <div
+          key={session.id}
+          role="button"
+          tabIndex={0}
+          onClick={() => setLocation(`/sessions/${session.id}`)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              setLocation(`/sessions/${session.id}`);
+            }
+          }}
+          className="flex items-center justify-between py-[18px] min-h-[44px] border-b border-[hsl(var(--border))] cursor-pointer hover:bg-muted/40 active:opacity-60 transition-[background-color,opacity] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 rounded-sm"
+        >
+          <div className="flex-1 min-w-0">
+            <div className="font-bold text-[16px] mb-0.5">{session.date}</div>
+            <div className="text-muted-foreground text-[13px]">{session.time}</div>
+          </div>
+          <div className="flex items-center gap-4 shrink-0">
+            <span className="font-bold text-[15px]">{session.payLabel || "$72"}</span>
+            <ChevronRight className="w-5 h-5 text-muted-foreground shrink-0" aria-hidden="true" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export default function Landing() {
   const { site, setSite } = useSiteStorage();
@@ -20,18 +84,46 @@ export default function Landing() {
   const [eligibilityOpen, setEligibilityOpen] = useState(false);
   // Incremented to focus the inline location field and open its dropdown.
   const [pickerFocus, setPickerFocus] = useState(0);
+  // Inline sessions panel; restored across reloads and detail-page visits.
+  const [sessionsOpen, setSessionsOpen] = useState(
+    () => localStorage.getItem("iw_sessions_expanded") === "1",
+  );
+  const sessionsPanelRef = useRef<HTMLDivElement | null>(null);
+
+  // Legacy entry points (map "View openings", menu "Find sessions") ask the
+  // landing page to reveal the inline sessions panel via this event.
+  useEffect(() => {
+    const onViewSessions = () => {
+      setSessionsOpen(true);
+      requestAnimationFrame(() => {
+        sessionsPanelRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    };
+    window.addEventListener("iw:view-sessions", onViewSessions);
+    return () => window.removeEventListener("iw:view-sessions", onViewSessions);
+  }, []);
 
   const displaySite = site || DEFAULT_SITE;
 
-  // Always route users through the location picker first — never navigate
-  // straight to sessions, even when a previous location is stored.
+  // "View sessions": reveal the inline panel (needs a selected site).
   const handleSeeSessions = () => {
-    setPickerFocus((n) => n + 1);
+    if (!site) {
+      setPickerFocus((n) => n + 1);
+      return;
+    }
+    setSessionsOpen(true);
+    localStorage.setItem("iw_sessions_expanded", "1");
+    requestAnimationFrame(() => {
+      sessionsPanelRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
   };
 
+  // Picking a city only updates the selection — never navigates, and
+  // collapses a previously revealed sessions panel.
   const handleSiteSelected = (key: string, label: string, origin?: SiteOrigin) => {
     setSite(key, label, origin);
-    setLocation("/sessions");
+    setSessionsOpen(false);
+    localStorage.removeItem("iw_sessions_expanded");
   };
 
   return (
@@ -109,6 +201,30 @@ export default function Landing() {
         </p>
           </div>
         </div>
+
+        {/* Inline sessions panel — revealed by "View sessions" */}
+        {sessionsOpen && (
+          <div
+            ref={sessionsPanelRef}
+            className="mt-[clamp(32px,6vw,48px)] scroll-mt-20 animate-in fade-in slide-in-from-bottom-3 duration-300"
+          >
+            <h2 className="text-[24px] leading-[1.15] font-bold tracking-tight text-[#101828]">
+              Available sessions
+            </h2>
+            <p className="text-base text-[#475467] mt-1 mb-4">{displaySite.label}</p>
+            <SessionsList siteKey={displaySite.key} siteLabel={displaySite.label} />
+            <p className="text-[13px] text-[#475467] mt-5">
+              Already booked or completed a session?{" "}
+              <button
+                type="button"
+                onClick={() => setEligibilityOpen(true)}
+                className="text-[#1c387d] underline underline-offset-2"
+              >
+                Check remaining sessions
+              </button>
+            </p>
+          </div>
+        )}
 
         {/* Map card */}
         <div className="my-[clamp(32px,6vw,48px)] rounded-2xl overflow-hidden border border-[hsl(var(--border))]">

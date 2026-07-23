@@ -1,0 +1,136 @@
+# UX update — Inline sessions on landing (no separate sessions page)
+
+Refactor the Instawork Research mobile web app so **session list stays on the home/landing page**. Do **not** navigate to a separate "Available sessions" screen when a user picks a city. Session **detail** can remain its own route.
+
+## Goal
+
+Current problem: tapping a city in the location dropdown immediately opens a new screen ("Available sessions" with a back arrow). That feels abrupt.
+
+New flow:
+1. User picks a city → **only updates the location field + chip** (dropdown closes).
+2. User taps **"View sessions"** → session cards **expand inline below** the search area on the same page, with smooth scroll.
+3. User taps a session row → goes to session detail (separate route is fine).
+4. If user **changes city after sessions were shown**, **hide/collapse** the session list and require tapping **"View sessions"** again (do not auto-refresh while browsing cities).
+
+## Stack (unchanged)
+
+Node + Express + Prisma + Postgres + React + Vite + Tailwind. Mode sync, `/api/sites`, `/api/sessions`, `/api/sessions/:id` — keep existing backend. Juicebox design tokens (primary blue, Inter font, lucide-react icons, 14px radius cards).
+
+## Landing page layout (single scrollable page)
+
+Match the reference UI:
+- **Location row** (top): pin icon + `{City, ST}` + text link **"Change city"** (opens the same dropdown as the search field).
+- **H1:** "Get paid to record your voice."
+- **Pay line:** "Earn **$66–$111**" for a 3-hour session." (use live min/max from synced data if available; otherwise constants.)
+- **Sub:** "Visit a nearby location and complete simple, guided recording tasks."
+
+### Location search + dropdown (inline, NOT a modal)
+
+One search field:
+- Placeholder: **"Choose a city or ZIP code"**
+- Left: MapPin icon. Right: small send/chevron icon.
+- Tapping/focusing the field opens a **dropdown panel attached below the input** (not a full-screen modal, not a new route).
+
+Dropdown contents (top to bottom):
+1. **"Use my current location"** row with crosshair icon + subtext "Find sessions near you"
+   - On tap: `navigator.geolocation.getCurrentPosition` (8s timeout, spinner on row).
+   - On success: haversine nearest site from `GET /api/sites`, select it, close dropdown.
+   - On deny/fail: inline error "Couldn't detect location — pick a city below."
+2. Thin divider
+3. Scrollable list of sites from `/api/sites`, each row: pin icon + `{City, ST}` + checkmark on selected row (blue highlight on hover/selected)
+
+**Typing behavior:**
+- Filter the city list as user types.
+- If input matches a ZIP (5 digits), resolve via bundled client-side ZIP→centroid dataset → nearest site (same haversine logic). Do not call external geocoding APIs.
+
+**On city/site select (list tap OR geolocation OR ZIP resolve):**
+- Save `{ key, label }` to `localStorage` key `iw_site`
+- Update search input value to `{City, ST}`
+- Update location row chip
+- **Close dropdown**
+- **Do NOT fetch sessions yet**
+- **Do NOT navigate**
+- If a sessions panel was previously visible, **hide it** (collapse with a short animation)
+
+### Primary CTA
+
+Full-width blue button below the search field: **"View sessions"**
+
+On click:
+1. Ensure a site is selected (if none, open the dropdown and focus the input; do not navigate away).
+2. `GET /api/sessions?site={key}` — show loading skeleton in the panel.
+3. Reveal an inline **"Available sessions"** section directly below the button (same page):
+   - Small heading: **"Available sessions"**
+   - Subtitle: `{City, ST}`
+   - Session rows (see below)
+4. `scrollIntoView({ behavior: 'smooth', block: 'start' })` on the panel header.
+
+### Inline session list (replaces old Screen 2)
+
+Each row (full-width tappable card):
+- Left: date (`Thu, Jul 23`), time (`5:30 – 8:30 PM`)
+- Right: pay amount (e.g. `$79.50`) + chevron `>`
+- Tap row → `/sessions/:id` or `/session/:id` detail route
+
+**Do not** show a back arrow on this list — user is still on the landing page.
+
+Empty state (inline): "No open sessions in {City, ST} right now. Try another city."
+
+Footer note under list: "Already booked or completed a session?" + link **"Check remaining sessions"** (optional eligibility lookup if wired).
+
+Optional second row below search (keep if already built): **"Browse nearby sessions"** — same as opening the dropdown.
+
+### Session detail (unchanged — separate route OK)
+
+Keep detail as its own page with back arrow → returns to landing (preserve selected city; if sessions panel was open, re-expand it on return using `localStorage` flag `iw_sessions_expanded`).
+
+Detail page: date, time, pay, address, "Book this session" → Instawork `bookUrl` in same tab.
+
+## Routing changes
+
+- **Remove** standalone `/sessions` list page (or redirect `/sessions` → `/` with `?showSessions=1`).
+- Keep `/sessions/:id` (or `/session/:id`) for detail only.
+- Landing is `/` — the only place the list appears.
+
+## State to persist (`localStorage`)
+
+| Key | Value |
+|---|---|
+| `iw_site` | `{ key, label }` selected site |
+| `iw_sessions_expanded` | `"1"` if user last viewed inline sessions (re-open panel on reload) |
+
+On reload: restore city + re-fetch and show sessions panel only if `iw_sessions_expanded === "1"`.
+
+## Keep from original spec (do not drop)
+
+- Branding: "Instawork Research", session name "Voice Research Session", never show partner/Q.ai/UX study text.
+- Sign-up funnel section ("How it works" 4 steps + `SIGNUP_FORM_URL`).
+- "Before you book" requirements card.
+- Excluded states disclaimer: Texas, Washington, Illinois.
+- Mode sync, `/admin`, sanitization, `payLabel` vs `payAmount` (no duplicate `$`).
+- Optional eligibility check (hidden if bookings tokens unset).
+
+## Interaction rules (acceptance)
+
+- [ ] Picking a city **never** navigates to a new page.
+- [ ] Sessions appear **only** after **"View sessions"** is tapped.
+- [ ] Changing city after sessions were shown **hides** the list until **"View sessions"** is tapped again.
+- [ ] Dropdown is inline under the search field, not a blocking modal.
+- [ ] "Use my current location" works from the dropdown top row.
+- [ ] Session detail still works; back returns to landing with city preserved.
+- [ ] Mobile: iOS Safari + Android Chrome, 44px tap targets, safe areas, no horizontal scroll.
+- [ ] Loading skeleton while fetching sessions; friendly empty state.
+
+## Out of scope
+
+- Map view, calendar grid, in-app booking, login accounts.
+
+## Build order for this refactor
+
+1. Remove/replace separate sessions list route and navigation on city select.
+2. Build inline `LocationDropdown` component (geolocation + site list + ZIP filter).
+3. Add collapsible `SessionsPanel` below CTA on landing.
+4. Wire "View sessions" → fetch → expand → smooth scroll.
+5. Persist `iw_site` + `iw_sessions_expanded`; restore on reload.
+6. Update detail back-nav to return to expanded landing state.
+7. QA the checklist above on mobile.

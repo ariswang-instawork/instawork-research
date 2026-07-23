@@ -35,7 +35,7 @@ export default function SessionDetail() {
     return (
       <div className="flex-1 flex items-center justify-center flex-col gap-4">
         <h1 className="text-xl font-bold">Session not found</h1>
-        <Link href="/sessions">
+        <Link href="/">
           <Button variant="outline">Go back</Button>
         </Link>
       </div>
@@ -51,7 +51,7 @@ export default function SessionDetail() {
   return (
     <div className="flex-1 flex flex-col bg-white pb-32">
       <main className="flex-1 px-6 pt-5 pb-10 overflow-y-auto max-w-md mx-auto w-full animate-in fade-in slide-in-from-bottom-3 duration-500">
-        <Link href="/sessions" className="inline-flex items-center mb-6 -ml-1">
+        <Link href="/" className="inline-flex items-center mb-6 -ml-1">
           <ArrowLeft className="w-5 h-5 text-foreground" />
         </Link>
 

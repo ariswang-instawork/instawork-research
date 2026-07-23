@@ -216,7 +216,11 @@ export function Shell({ children }: { children: ReactNode }) {
               >
                 <button
                   type="button"
-                  onClick={() => go("/sessions")}
+                  onClick={() => {
+                    localStorage.setItem("iw_sessions_expanded", "1");
+                    go("/");
+                    window.dispatchEvent(new CustomEvent("iw:view-sessions"));
+                  }}
                   className="text-left text-[26px] leading-[1.12] font-bold tracking-tight text-gray-900 py-4 rounded-lg transition-colors duration-150 active:bg-black/[0.06]"
                 >
                   Find sessions

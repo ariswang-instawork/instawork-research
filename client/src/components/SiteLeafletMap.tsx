@@ -135,7 +135,10 @@ export function SiteLeafletMap() {
 
   const handleView = (site: Site) => {
     setSite(site.key, site.label);
-    navigate("/sessions");
+    // Session list lives inline on the landing page now.
+    localStorage.setItem("iw_sessions_expanded", "1");
+    navigate("/");
+    window.dispatchEvent(new CustomEvent("iw:view-sessions"));
   };
 
   return (
