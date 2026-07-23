@@ -11,6 +11,8 @@ import {
   MapPin,
 } from "lucide-react";
 import { PrimaryCtaButton } from "@/components/PrimaryCtaButton";
+import { SiteLeafletMap } from "@/components/SiteLeafletMap";
+import { login } from "@/hooks/use-auth";
 
 export default function Landing() {
   const { site, setSite } = useSiteStorage();
@@ -61,15 +63,13 @@ export default function Landing() {
         </div>
 
         {/* Hero */}
-        <h2 className="text-[clamp(40px,10cqw,64px)] leading-[1.05] font-extrabold tracking-[-0.03em] text-[#101828] mb-5">
-          Get paid to record your voice.
+        <h2 className="text-[clamp(36px,9cqw,56px)] leading-[1.08] font-extrabold tracking-[-0.03em] mb-5">
+          <span className="block text-[#101828]">Share your voice.</span>
+          <span className="block text-[#294eb1]">Earn $66–$111.</span>
         </h2>
-        <p className="text-[17px] leading-[1.45] text-[#475467]">
-          Earn <span className="font-bold text-[#294eb1]">$66–$111</span> for a 3-hour
-          session.
-        </p>
-        <p className="text-[17px] leading-[1.45] text-[#475467] mt-1 mb-7">
-          Visit a nearby location and complete simple voice recording tasks.
+        <p className="text-base leading-[1.5] text-[#475467] mb-7">
+          Complete a 3-hour, in-person voice recording session at a nearby
+          location. The tasks are simple, guided, and paid.
         </p>
 
         {/* Location search + browse */}
@@ -87,20 +87,50 @@ export default function Landing() {
             onClick={handleSeeSessions}
             className="rounded-2xl h-14 py-0 bg-[#294eb1] text-white font-bold hover:bg-[#294eb1]/90 transition-[transform,background-color] duration-150 active:scale-[0.98] active:bg-[#223f8f]"
           >
-            See sessions
+            View sessions
           </PrimaryCtaButton>
         </div>
 
-        <p className="text-xs text-gray-500 mt-3">
+        <div className="mt-4 flex items-center justify-center">
+          <button
+            type="button"
+            onClick={() =>
+              document
+                .getElementById("trust-section")
+                ?.scrollIntoView({ behavior: "smooth", block: "start" })
+            }
+            className="text-base font-medium text-[#294eb1]"
+          >
+            How it works →
+          </button>
+        </div>
+
+        <p className="text-base text-[#475467] mt-4 text-center">
+          Already have an account?{" "}
+          <button
+            type="button"
+            onClick={() => login()}
+            className="text-[#294eb1] underline underline-offset-2 font-medium"
+          >
+            Log in
+          </button>
+        </p>
+
+        <p className="text-xs text-gray-500 mt-4">
           Not currently available to residents of Texas, Washington, or Illinois.
         </p>
           </div>
         </div>
 
+        {/* Map card */}
+        <div className="mt-8 rounded-2xl overflow-hidden border border-[hsl(var(--border))]">
+          <SiteLeafletMap />
+        </div>
+
         {/* Trust section */}
-        <div className="mt-10">
+        <div className="mt-10" id="trust-section">
           <h2 className="text-[28px] leading-[1.15] font-bold tracking-tight text-[#101828] mb-6">
-            Why people choose Instawork Research
+            Why people choose Instawork
           </h2>
           <div className="space-y-3">
             <div className="flex items-start gap-4 bg-white rounded-2xl border border-[hsl(var(--border))] p-4">
