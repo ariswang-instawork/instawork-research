@@ -128,7 +128,7 @@ export function Shell({ children }: { children: ReactNode }) {
             aria-label="Instawork Research home"
           >
             <img src={LOGO_URL} alt="" className="w-9 h-9 rounded-[10px] shrink-0" />
-            <span className="text-lg font-bold leading-none whitespace-nowrap truncate min-w-0">
+            <span className="text-xl font-bold leading-none whitespace-nowrap truncate min-w-0">
               <span className="text-white">Instawork</span>{" "}
               <span className="text-[#AFCBFF]">Research</span>
             </span>
@@ -176,7 +176,7 @@ export function Shell({ children }: { children: ReactNode }) {
               <div className="bg-[#294eb1] px-4 py-3 flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2 min-w-0">
                   <img src={LOGO_URL} alt="" className="w-9 h-9 rounded-[10px] shrink-0" />
-                  <span className="text-lg font-bold leading-none whitespace-nowrap">
+                  <span className="text-xl font-bold leading-none whitespace-nowrap">
                     <span className="text-white">Instawork</span>{" "}
                     <span className="text-[#AFCBFF]">Research</span>
                   </span>
