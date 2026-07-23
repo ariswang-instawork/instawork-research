@@ -67,9 +67,12 @@ export default function Landing() {
           <span className="block text-[#101828]">Share your voice.</span>
           <span className="block text-[#294eb1]">Earn $66–$111.</span>
         </h2>
-        <p className="text-base leading-[1.5] text-[#475467] mb-7">
+        <p className="text-base leading-[1.5] text-[#475467]">
           Complete a 3-hour, in-person voice recording session at a nearby
-          location. The tasks are simple, guided, and paid.
+          location.
+        </p>
+        <p className="text-base leading-[1.5] text-[#475467] mt-1 mb-7">
+          The tasks are simple, guided, and paid.
         </p>
 
         {/* Location search + browse */}
