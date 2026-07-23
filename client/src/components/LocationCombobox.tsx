@@ -276,7 +276,7 @@ export function LocationCombobox({
       {/* Search field */}
       <div className="relative">
         <MapPin
-          className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#246BFD] pointer-events-none"
+          className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#294eb1] pointer-events-none"
           strokeWidth={2}
         />
         <input
@@ -306,7 +306,7 @@ export function LocationCombobox({
           type="button"
           aria-label={open ? "Close location suggestions" : "Open location suggestions"}
           onClick={() => (open ? close() : (setOpen(true), inputRef.current?.focus()))}
-          className="absolute right-1.5 top-1/2 -translate-y-1/2 w-11 h-11 flex items-center justify-center rounded-full text-[#246BFD] hover:bg-secondary/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+          className="absolute right-1.5 top-1/2 -translate-y-1/2 w-11 h-11 flex items-center justify-center rounded-full text-[#294eb1] hover:bg-secondary/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
         >
           <Send className="w-5 h-5" strokeWidth={2} />
         </button>

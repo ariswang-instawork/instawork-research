@@ -49,7 +49,7 @@ export default function Landing() {
           <button
             type="button"
             onClick={() => setPickerFocus((n) => n + 1)}
-            className="text-base text-[#246BFD] underline underline-offset-2"
+            className="text-base text-[#294eb1] underline underline-offset-2"
           >
             Change city
           </button>
@@ -60,7 +60,7 @@ export default function Landing() {
           Get paid to record your voice.
         </h2>
         <p className="text-[17px] leading-[1.45] text-[#475467] mb-7">
-          Earn <span className="font-bold text-[#246BFD]">$66–$111</span> for a 3-hour
+          Earn <span className="font-bold text-[#294eb1]">$66–$111</span> for a 3-hour
           session. Visit a nearby location and complete simple voice recording tasks.
         </p>
 
@@ -76,9 +76,9 @@ export default function Landing() {
             onClick={handleBrowseNearby}
             className="w-full h-16 flex items-center gap-3 rounded-2xl border border-[hsl(var(--border))] bg-white px-4 text-left"
           >
-            <Search className="w-5 h-5 text-[#246BFD] shrink-0" strokeWidth={2} />
+            <Search className="w-5 h-5 text-[#294eb1] shrink-0" strokeWidth={2} />
             <span className="flex-1 text-base text-gray-900">Browse nearby sessions</span>
-            <ChevronRight className="w-5 h-5 text-[#246BFD] shrink-0" strokeWidth={2} />
+            <ChevronRight className="w-5 h-5 text-[#294eb1] shrink-0" strokeWidth={2} />
           </button>
         </div>
 
@@ -86,7 +86,7 @@ export default function Landing() {
         <div className="mt-5">
           <PrimaryCtaButton
             onClick={handleSeeSessions}
-            className="rounded-2xl h-14 py-0 bg-[#246BFD] text-white font-bold hover:bg-[#246BFD]/90"
+            className="rounded-2xl h-14 py-0 bg-[#294eb1] text-white font-bold hover:bg-[#294eb1]/90"
           >
             See sessions
           </PrimaryCtaButton>
