@@ -36,10 +36,10 @@ export default function Landing() {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col bg-white">
-      <main className="flex-1 overflow-y-auto px-5 pt-8 pb-[calc(2rem+env(safe-area-inset-bottom))] max-w-md mx-auto w-full [container-type:inline-size] animate-in fade-in slide-in-from-bottom-3 duration-500">
+      <main className="flex-1 overflow-y-auto px-[clamp(24px,6vw,72px)] pt-[clamp(32px,6vw,64px)] pb-[calc(clamp(64px,10vw,112px)+env(safe-area-inset-bottom))] max-w-md mx-auto w-full [container-type:inline-size] animate-in fade-in slide-in-from-bottom-3 duration-500">
         {/* Hero: illustration above the copy on mobile, two columns on md+ */}
         <div>
-          <div className="rounded-2xl overflow-hidden mb-6">
+          <div className="rounded-2xl overflow-hidden mb-[clamp(28px,5vw,48px)]">
             <img
               src={`${import.meta.env.BASE_URL}hero-voice-recording.png`}
               alt=""
@@ -50,7 +50,7 @@ export default function Landing() {
 
           <div>
         {/* Location row */}
-        <div className="flex items-center gap-2 mb-5">
+        <div className="flex items-center gap-2 mb-[clamp(20px,4vw,32px)]">
           <MapPin className="w-5 h-5 text-[#101828] shrink-0" strokeWidth={2} />
           <span className="text-base font-bold text-[#101828]">{displaySite.label}</span>
           <button
@@ -63,19 +63,19 @@ export default function Landing() {
         </div>
 
         {/* Hero */}
-        <h2 className="text-[clamp(36px,9cqw,56px)] leading-[1.08] font-extrabold tracking-[-0.03em] text-[#101828] mb-5">
+        <h2 className="text-[clamp(36px,9cqw,56px)] leading-[1.08] font-extrabold tracking-[-0.03em] text-[#101828] mb-[clamp(28px,5vw,48px)]">
           Get paid to record your voice.
         </h2>
         <p className="text-base leading-[1.5] text-[#475467]">
           Earn <span className="font-bold text-[#1c387d]">$66–$111</span> for a
           3-hour session.
         </p>
-        <p className="text-base leading-[1.5] text-[#475467] mt-1 mb-7">
+        <p className="text-base leading-[1.5] text-[#475467] mt-2 mb-[clamp(28px,5vw,48px)]">
           Visit a nearby location and complete simple, guided recording tasks.
         </p>
 
         {/* Location search + browse */}
-        <div className="space-y-3">
+        <div className="space-y-[clamp(16px,3vw,24px)]">
           <LocationCombobox
             focusSignal={pickerFocus}
             onSiteSelected={handleSiteSelected}
@@ -84,16 +84,16 @@ export default function Landing() {
         </div>
 
         {/* Primary CTA */}
-        <div className="mt-5">
+        <div className="mt-[clamp(16px,3vw,24px)]">
           <PrimaryCtaButton
             onClick={handleSeeSessions}
-            className="rounded-2xl h-14 py-0 bg-[#1c387d] text-white font-bold hover:bg-[#1c387d]/90 transition-[transform,background-color] duration-150 active:scale-[0.98] active:bg-[#16295e]"
+            className="rounded-2xl h-auto px-7 py-[18px] bg-[#1c387d] text-white font-bold hover:bg-[#1c387d]/90 transition-[transform,background-color] duration-150 active:scale-[0.98] active:bg-[#16295e]"
           >
             View sessions
           </PrimaryCtaButton>
         </div>
 
-        <p className="text-base text-[#475467] mt-4 text-center">
+        <p className="text-base text-[#475467] mt-[clamp(16px,3vw,24px)] text-center">
           Already have an account?{" "}
           <button
             type="button"
@@ -104,38 +104,38 @@ export default function Landing() {
           </button>
         </p>
 
-        <p className="text-xs text-gray-500 mt-4">
+        <p className="text-xs text-gray-500 mt-[clamp(16px,3vw,24px)]">
           Not currently available to residents of Texas, Washington, or Illinois.
         </p>
           </div>
         </div>
 
         {/* Map card */}
-        <div className="mt-8 rounded-2xl overflow-hidden border border-[hsl(var(--border))]">
+        <div className="my-[clamp(32px,6vw,48px)] rounded-2xl overflow-hidden border border-[hsl(var(--border))]">
           <SiteLeafletMap />
         </div>
 
         {/* Trust section */}
-        <div className="mt-10" id="trust-section">
-          <h2 className="text-[28px] leading-[1.15] font-bold tracking-tight text-[#101828] mb-6">
+        <div className="mt-[clamp(80px,12vw,112px)]" id="trust-section">
+          <h2 className="text-[28px] leading-[1.15] font-bold tracking-tight text-[#101828] mb-[clamp(32px,5vw,48px)]">
             Why people choose Instawork
           </h2>
-          <div className="space-y-3">
-            <div className="flex items-start gap-4 bg-white rounded-2xl border border-[hsl(var(--border))] p-4">
+          <div className="space-y-[clamp(16px,3vw,24px)]">
+            <div className="flex items-start gap-4 bg-white rounded-2xl border border-[hsl(var(--border))] p-[clamp(24px,4vw,32px)]">
               <Sparkles className="w-5 h-5 text-muted-foreground shrink-0 mt-0.5" strokeWidth={1.75} />
               <div>
                 <p className="text-base font-bold text-gray-900">No experience needed</p>
                 <p className="text-base text-gray-600 mt-0.5">We'll guide you through every step.</p>
               </div>
             </div>
-            <div className="flex items-start gap-4 bg-white rounded-2xl border border-[hsl(var(--border))] p-4">
+            <div className="flex items-start gap-4 bg-white rounded-2xl border border-[hsl(var(--border))] p-[clamp(24px,4vw,32px)]">
               <Mic className="w-5 h-5 text-muted-foreground shrink-0 mt-0.5" strokeWidth={1.75} />
               <div>
                 <p className="text-base font-bold text-gray-900">Simple guided session</p>
                 <p className="text-base text-gray-600 mt-0.5">Complete simple voice recording tasks.</p>
               </div>
             </div>
-            <div className="flex items-start gap-4 bg-white rounded-2xl border border-[hsl(var(--border))] p-4">
+            <div className="flex items-start gap-4 bg-white rounded-2xl border border-[hsl(var(--border))] p-[clamp(24px,4vw,32px)]">
               <Wallet className="w-5 h-5 text-muted-foreground shrink-0 mt-0.5" strokeWidth={1.75} />
               <div>
                 <p className="text-base font-bold text-gray-900">Paid through Instawork</p>
