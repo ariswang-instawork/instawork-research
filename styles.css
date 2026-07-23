@@ -129,14 +129,9 @@ input:focus-visible {
 .brand-icon {
   width: 48px;
   height: 48px;
-  display: grid;
-  place-items: center;
+  display: block;
   border-radius: 14px;
-  background: var(--white);
-  color: var(--blue);
-  font-size: 27px;
-  font-weight: 900;
-  font-style: italic;
+  object-fit: cover;
   flex-shrink: 0;
 }
 

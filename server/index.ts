@@ -38,6 +38,8 @@ for (const asset of [
   });
 }
 
+app.use("/public", express.static(path.join(root, "public")));
+
 const port = parseInt(process.env.PORT || "5000", 10);
 app.listen(port, "0.0.0.0", () => {
   console.log(`[express] serving on port ${port}`);
