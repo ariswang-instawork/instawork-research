@@ -93,20 +93,6 @@ export default function Landing() {
           </PrimaryCtaButton>
         </div>
 
-        <div className="mt-4 flex items-center justify-center">
-          <button
-            type="button"
-            onClick={() =>
-              document
-                .getElementById("trust-section")
-                ?.scrollIntoView({ behavior: "smooth", block: "start" })
-            }
-            className="text-base font-medium text-[#1c387d]"
-          >
-            How it works →
-          </button>
-        </div>
-
         <p className="text-base text-[#475467] mt-4 text-center">
           Already have an account?{" "}
           <button
