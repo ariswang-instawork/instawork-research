@@ -56,7 +56,7 @@ export default function Landing() {
           <button
             type="button"
             onClick={() => setPickerFocus((n) => n + 1)}
-            className="text-base text-[#294eb1] underline underline-offset-2"
+            className="text-base text-[#1c387d] underline underline-offset-2"
           >
             Change city
           </button>
@@ -65,7 +65,7 @@ export default function Landing() {
         {/* Hero */}
         <h2 className="text-[clamp(36px,9cqw,56px)] leading-[1.08] font-extrabold tracking-[-0.03em] mb-5">
           <span className="block text-[#101828]">Share your voice.</span>
-          <span className="block text-[#294eb1]">Earn $66–$111.</span>
+          <span className="block text-[#1c387d]">Earn $66–$111.</span>
         </h2>
         <p className="text-base leading-[1.5] text-[#475467]">
           Complete a 3-hour, in-person voice recording session at a nearby
@@ -88,7 +88,7 @@ export default function Landing() {
         <div className="mt-5">
           <PrimaryCtaButton
             onClick={handleSeeSessions}
-            className="rounded-2xl h-14 py-0 bg-[#294eb1] text-white font-bold hover:bg-[#294eb1]/90 transition-[transform,background-color] duration-150 active:scale-[0.98] active:bg-[#223f8f]"
+            className="rounded-2xl h-14 py-0 bg-[#1c387d] text-white font-bold hover:bg-[#1c387d]/90 transition-[transform,background-color] duration-150 active:scale-[0.98] active:bg-[#16295e]"
           >
             View sessions
           </PrimaryCtaButton>
@@ -102,7 +102,7 @@ export default function Landing() {
                 .getElementById("trust-section")
                 ?.scrollIntoView({ behavior: "smooth", block: "start" })
             }
-            className="text-base font-medium text-[#294eb1]"
+            className="text-base font-medium text-[#1c387d]"
           >
             How it works →
           </button>
@@ -113,7 +113,7 @@ export default function Landing() {
           <button
             type="button"
             onClick={() => login()}
-            className="text-[#294eb1] underline underline-offset-2 font-medium"
+            className="text-[#1c387d] underline underline-offset-2 font-medium"
           >
             Log in
           </button>

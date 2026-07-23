@@ -120,7 +120,7 @@ export function Shell({ children }: { children: ReactNode }) {
     <div className="min-h-[100dvh] w-full bg-background flex justify-center text-foreground font-sans selection:bg-primary/20 selection:text-primary">
       <div className="w-full max-w-[480px] bg-card min-h-[100dvh] flex flex-col relative shadow-2xl shadow-black/5 ring-1 ring-border/50">
         {/* Shared app header */}
-        <header className="sticky top-0 z-[1100] bg-[#294eb1] px-4 py-3 flex items-center justify-between gap-2">
+        <header className="sticky top-0 z-[1100] bg-[#1c387d] px-4 py-3 flex items-center justify-between gap-2">
           <button
             type="button"
             onClick={() => go("/")}
@@ -173,7 +173,7 @@ export function Shell({ children }: { children: ReactNode }) {
           >
             <div className="w-full max-w-[480px] bg-background min-h-[100dvh] flex flex-col">
               {/* Menu header — mirrors the app header with X in place of the hamburger */}
-              <div className="bg-[#294eb1] px-4 py-3 flex items-center justify-between gap-2">
+              <div className="bg-[#1c387d] px-4 py-3 flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2 min-w-0">
                   <img src={LOGO_URL} alt="" className="w-9 h-9 rounded-[10px] shrink-0" />
                   <span className="text-xl font-bold leading-none whitespace-nowrap">
