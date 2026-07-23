@@ -35,6 +35,18 @@ export default function Landing() {
   return (
     <div className="flex min-h-0 flex-1 flex-col bg-white">
       <main className="flex-1 overflow-y-auto px-5 pt-8 pb-[calc(2rem+env(safe-area-inset-bottom))] max-w-md mx-auto w-full [container-type:inline-size] animate-in fade-in slide-in-from-bottom-3 duration-500">
+        {/* Hero: illustration above the copy on mobile, two columns on md+ */}
+        <div>
+          <div className="rounded-2xl overflow-hidden mb-6">
+            <img
+              src={`${import.meta.env.BASE_URL}hero-voice-recording.png`}
+              alt=""
+              loading="lazy"
+              className="w-full h-auto object-cover md:max-h-[420px]"
+            />
+          </div>
+
+          <div>
         {/* Location row */}
         <div className="flex items-center gap-2 mb-5">
           <MapPin className="w-5 h-5 text-[#101828] shrink-0" strokeWidth={2} />
@@ -82,6 +94,8 @@ export default function Landing() {
         <p className="text-xs text-gray-500 mt-3">
           Not currently available to residents of Texas, Washington, or Illinois.
         </p>
+          </div>
+        </div>
 
         {/* Trust section */}
         <div className="mt-10">
