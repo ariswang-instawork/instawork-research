@@ -297,8 +297,25 @@ export function LocationDrawer({
   );
 }
 
-export function EligibilityCheckDrawer({ suppressed = false }: { suppressed?: boolean }) {
-  const [isOpen, setIsOpen] = useState(false);
+export function EligibilityCheckDrawer({
+  suppressed = false,
+  open: controlledOpen,
+  onOpenChange,
+  hideTrigger = false,
+}: {
+  suppressed?: boolean;
+  /** Optional controlled open state (e.g. opened from a header/landing link). */
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  /** Hide the built-in fixed footer trigger entirely. */
+  hideTrigger?: boolean;
+}) {
+  const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
+  const isOpen = controlledOpen ?? uncontrolledOpen;
+  const setIsOpen = (v: boolean) => {
+    setUncontrolledOpen(v);
+    onOpenChange?.(v);
+  };
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [resultMsg, setResultMsg] = useState<{ text: string, type: 'success' | 'error' | 'neutral' | 'blocked' } | null>(null);
@@ -329,7 +346,7 @@ export function EligibilityCheckDrawer({ suppressed = false }: { suppressed?: bo
       {/* Same viewport-fixed CTA container as the Landing "Find a session near me" footer.
           Removed entirely while this drawer or any other modal is open so it
           can't be seen, clicked, or focused behind the sheet. */}
-      {!isOpen && !suppressed && (
+      {!isOpen && !suppressed && !hideTrigger && (
         <footer className="fixed bottom-0 left-0 right-0 z-[1000] border-t border-[hsl(var(--border))] bg-white px-6 py-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
           <div className="max-w-md mx-auto w-full">
             <p className="text-[14px] font-normal text-foreground text-center mb-2">Already booked or completed a session?</p>

@@ -1,17 +1,24 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { useSiteStorage, type SiteOrigin } from "@/hooks/use-site";
-import { LocationDrawer } from "@/components/Drawers";
-import { BrandRow } from "@/components/BrandRow";
-import { SiteLeafletMap } from "@/components/SiteLeafletMap";
-import { DEFAULT_SITE, SIGNUP_FORM_URL } from "@/lib/constants";
-import { Sparkles, Mic, Wallet } from "lucide-react";
+import { LocationDrawer, EligibilityCheckDrawer } from "@/components/Drawers";
+import { DEFAULT_SITE } from "@/lib/constants";
+import {
+  Sparkles,
+  Mic,
+  Wallet,
+  MapPin,
+  Search,
+  Send,
+  ChevronRight,
+} from "lucide-react";
 import { PrimaryCtaButton } from "@/components/PrimaryCtaButton";
 
 export default function Landing() {
   const { site, setSite } = useSiteStorage();
   const [, setLocation] = useLocation();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [eligibilityOpen, setEligibilityOpen] = useState(false);
 
   const displaySite = site || DEFAULT_SITE;
 
@@ -21,6 +28,11 @@ export default function Landing() {
     setIsDrawerOpen(true);
   };
 
+  const handleBrowseNearby = () => {
+    if (!site) setSite(DEFAULT_SITE.key, DEFAULT_SITE.label);
+    setLocation("/sessions");
+  };
+
   const handleSiteSelected = (key: string, label: string, origin?: SiteOrigin) => {
     setSite(key, label, origin);
     setIsDrawerOpen(false);
@@ -28,68 +40,113 @@ export default function Landing() {
   };
 
   return (
-    <div className="flex min-h-[100dvh] flex-col bg-white">
-      <main className="flex-1 overflow-y-auto px-6 pt-8 pb-[calc(10.5rem+env(safe-area-inset-bottom)+24px)] space-y-8 max-w-md mx-auto w-full animate-in fade-in slide-in-from-bottom-3 duration-500">
-        
-        <BrandRow />
-
-        <div>
-          <h2 className="text-[26px] leading-[1.12] font-bold tracking-tight text-gray-900 mb-4">
-            Get paid to record your voice.
-          </h2>
-          <p className="text-base text-gray-900">
-            Earn <span className="font-bold text-primary">$66–$111</span> for a 3-hour session.
-          </p>
-          <p className="text-base text-gray-600 mt-2">
-            Visit a nearby location and complete simple voice recording tasks.
-          </p>
+    <div className="flex min-h-0 flex-1 flex-col bg-white">
+      <main className="flex-1 overflow-y-auto px-6 pt-6 pb-[calc(2rem+env(safe-area-inset-bottom))] max-w-md mx-auto w-full animate-in fade-in slide-in-from-bottom-3 duration-500">
+        {/* Location row */}
+        <div className="flex items-center gap-2 mb-5">
+          <MapPin className="w-5 h-5 text-gray-900 shrink-0" strokeWidth={2} />
+          <span className="text-base font-bold text-gray-900">{displaySite.label}</span>
+          <button
+            type="button"
+            onClick={() => setIsDrawerOpen(true)}
+            className="text-base text-primary underline underline-offset-2"
+          >
+            Change city
+          </button>
         </div>
 
-        <SiteLeafletMap />
+        {/* Hero */}
+        <h2 className="text-[26px] leading-[1.12] font-bold tracking-tight text-gray-900 mb-4">
+          Get paid to record your voice.
+        </h2>
+        <p className="text-base text-gray-900 mb-6">
+          Earn <span className="font-bold text-primary">$66–$111</span> for a 3-hour
+          session. Visit a nearby location and complete simple voice recording tasks.
+        </p>
 
-        <div className="space-y-7 pt-2">
-          <div className="flex items-start gap-4">
-            <Sparkles className="w-5 h-5 text-muted-foreground shrink-0 mt-0.5" strokeWidth={1.75} />
-            <div>
-              <p className="text-base font-bold text-gray-900">No experience needed</p>
-              <p className="text-base text-gray-600 mt-0.5">We'll guide you through every step.</p>
-            </div>
-          </div>
-          <div className="flex items-start gap-4">
-            <Mic className="w-5 h-5 text-muted-foreground shrink-0 mt-0.5" strokeWidth={1.75} />
-            <div>
-              <p className="text-base font-bold text-gray-900">Simple guided session</p>
-              <p className="text-base text-gray-600 mt-0.5">Complete simple voice recording tasks.</p>
-            </div>
-          </div>
-          <div className="flex items-start gap-4">
-            <Wallet className="w-5 h-5 text-muted-foreground shrink-0 mt-0.5" strokeWidth={1.75} />
-            <div>
-              <p className="text-base font-bold text-gray-900">Paid through Instawork</p>
-              <p className="text-base text-gray-600 mt-0.5">Secure payment after your session.</p>
-            </div>
-          </div>
+        {/* Two search cards */}
+        <div className="space-y-4">
+          <button
+            type="button"
+            onClick={() => setIsDrawerOpen(true)}
+            className="w-full flex items-center gap-3 rounded-2xl border border-[hsl(var(--border))] bg-white px-4 py-4 text-left"
+          >
+            <MapPin className="w-5 h-5 text-primary shrink-0" strokeWidth={2} />
+            <span className="flex-1 text-base text-gray-600">Choose a city or ZIP code</span>
+            <Send className="w-5 h-5 text-primary shrink-0" strokeWidth={2} />
+          </button>
+
+          <button
+            type="button"
+            onClick={handleBrowseNearby}
+            className="w-full flex items-center gap-3 rounded-2xl border border-[hsl(var(--border))] bg-white px-4 py-4 text-left"
+          >
+            <Search className="w-5 h-5 text-primary shrink-0" strokeWidth={2} />
+            <span className="flex-1 text-base text-gray-900">Browse nearby sessions</span>
+            <ChevronRight className="w-5 h-5 text-primary shrink-0" strokeWidth={2} />
+          </button>
         </div>
 
-      </main>
+        {/* Primary CTA */}
+        <div className="mt-5">
+          <PrimaryCtaButton onClick={handleSeeSessions} className="rounded-2xl">
+            See sessions
+          </PrimaryCtaButton>
+        </div>
 
-      {/* Hidden entirely while the location sheet is open so it can't be seen,
-          clicked, or focused behind the modal. */}
-      {!isDrawerOpen && (
-      <footer className="fixed bottom-0 left-0 right-0 z-[1000] border-t border-[hsl(var(--border))] bg-white px-6 py-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
-        <PrimaryCtaButton onClick={handleSeeSessions}>
-          Find a session near me
-        </PrimaryCtaButton>
+        <button
+          type="button"
+          onClick={() => setEligibilityOpen(true)}
+          className="block mx-auto mt-4 text-base text-gray-900 underline underline-offset-2"
+        >
+          Log in to check your remaining sessions
+        </button>
+
         <p className="text-xs text-center text-gray-500 mt-3">
           Not currently available to residents of Texas, Washington, or Illinois.
         </p>
-      </footer>
-      )}
 
-      <LocationDrawer 
-        isOpen={isDrawerOpen} 
-        onOpenChange={setIsDrawerOpen} 
-        onSiteSelected={handleSiteSelected} 
+        {/* Trust section */}
+        <div className="mt-10">
+          <h2 className="text-[26px] leading-[1.12] font-bold tracking-tight text-gray-900 mb-6">
+            Why people choose Instawork Research
+          </h2>
+          <div className="space-y-7">
+            <div className="flex items-start gap-4">
+              <Sparkles className="w-5 h-5 text-muted-foreground shrink-0 mt-0.5" strokeWidth={1.75} />
+              <div>
+                <p className="text-base font-bold text-gray-900">No experience needed</p>
+                <p className="text-base text-gray-600 mt-0.5">We'll guide you through every step.</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-4">
+              <Mic className="w-5 h-5 text-muted-foreground shrink-0 mt-0.5" strokeWidth={1.75} />
+              <div>
+                <p className="text-base font-bold text-gray-900">Simple guided session</p>
+                <p className="text-base text-gray-600 mt-0.5">Complete simple voice recording tasks.</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-4">
+              <Wallet className="w-5 h-5 text-muted-foreground shrink-0 mt-0.5" strokeWidth={1.75} />
+              <div>
+                <p className="text-base font-bold text-gray-900">Paid through Instawork</p>
+                <p className="text-base text-gray-600 mt-0.5">Secure payment after your session.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <LocationDrawer
+        isOpen={isDrawerOpen}
+        onOpenChange={setIsDrawerOpen}
+        onSiteSelected={handleSiteSelected}
+      />
+
+      <EligibilityCheckDrawer
+        hideTrigger
+        open={eligibilityOpen}
+        onOpenChange={setEligibilityOpen}
       />
     </div>
   );
