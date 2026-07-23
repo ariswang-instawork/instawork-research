@@ -91,7 +91,7 @@ export default function Landing() {
         <div className="mt-5">
           <PrimaryCtaButton
             onClick={handleSeeSessions}
-            className="rounded-2xl h-14 py-0 bg-[#101828] text-white font-bold hover:bg-[#101828]/90"
+            className="rounded-2xl h-14 py-0 bg-[#294EB2] text-white font-bold hover:bg-[#294EB2]/90"
           >
             See sessions
           </PrimaryCtaButton>
