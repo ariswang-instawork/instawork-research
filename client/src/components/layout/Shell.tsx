@@ -128,17 +128,19 @@ export function Shell({ children }: { children: ReactNode }) {
             aria-label="Instawork Research home"
           >
             <img src={LOGO_URL} alt="" className="w-9 h-9 rounded-[10px] shrink-0" />
-            <span className="text-lg font-bold leading-none whitespace-nowrap">
+            <span className="text-lg font-bold leading-none whitespace-nowrap truncate min-w-0">
               <span className="text-white">Instawork</span>{" "}
               <span className="text-[#AFCBFF]">Research</span>
             </span>
           </button>
 
           <div className="flex items-center gap-3 shrink-0">
+            {/* Log in / Sign up live in the menu panel below md to avoid
+                overlapping the wordmark on narrow screens. */}
             <button
               type="button"
               onClick={handleAuthClick}
-              className="text-base font-medium text-white transition-opacity duration-150 active:opacity-85"
+              className="hidden md:block text-base font-medium text-white transition-opacity duration-150 active:opacity-85"
             >
               {isAuthenticated ? "Log out" : "Log in"}
             </button>
@@ -146,7 +148,7 @@ export function Shell({ children }: { children: ReactNode }) {
               href={SIGNUP_FORM_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="rounded-full bg-white text-[#101828] text-base font-medium px-4 py-2 leading-none inline-flex items-center h-9 transition-opacity duration-150 active:opacity-85"
+              className="hidden md:inline-flex rounded-full bg-white text-[#101828] text-base font-medium px-4 py-2 leading-none items-center h-9 transition-opacity duration-150 active:opacity-85"
             >
               Sign up
             </a>
