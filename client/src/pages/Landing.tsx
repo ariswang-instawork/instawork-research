@@ -107,7 +107,7 @@ const FAQ_ITEMS: { q: string; a: string }[] = [
   },
   {
     q: "Can I complete more than one session?",
-    a: "It depends on availability. Log in with your Instawork account to check how many sessions you can still book.",
+    a: "You may be eligible to complete multiple sessions. The number of sessions available to you depends on the location and project requirements. Log in to Instawork to see the sessions you're eligible to book.",
   },
   {
     q: "Where do I finish signing up?",
