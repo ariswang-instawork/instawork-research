@@ -1,0 +1,332 @@
+Update the Instawork Research landing page to make the earning value clearer without assuming that the visitor is in New York City.
+
+Do not redesign the entire page. Keep the existing Instawork visual style, typography, colors, navigation, session cards, map, and responsive layout. Focus on copy hierarchy, location selection, dynamic pay information, and conversion flow.
+
+GOAL
+
+The visitor should immediately understand:
+
+1. They can get paid to complete a simple voice recording session.
+2. The session takes approximately 3 hours.
+3. Pay varies by city and session.
+4. They need to select their location to see exact pay and available times.
+5. No experience is required.
+6. Payment is handled through Instawork.
+
+Do not display New York City as the default location unless the user has already selected it or it is provided by existing page data.
+
+--------------------------------------------------
+1. DEFAULT STATE: LOCATION NOT YET SELECTED
+--------------------------------------------------
+
+When the visitor has not selected a city, use this hero content:
+
+Eyebrow:
+Instawork Research
+
+Headline:
+Get paid to record your voice
+
+Supporting copy:
+Earn $66–$111 for a simple, guided 3-hour session.
+
+Secondary copy:
+Choose your city to see exact pay and available times near you.
+
+Add a prominent location input or selector with:
+
+Placeholder:
+Enter city or ZIP code
+
+Primary CTA:
+Find sessions
+
+Under the CTA, show:
+
+Already have an Instawork account? Log in
+
+Add small supporting text near the pay range:
+
+Pay varies by location and session.
+
+Do not show:
+- “New York, NY”
+- “Change city”
+- New York session cards
+- A New York-specific map
+
+until a city has actually been selected.
+
+If the app already has a location selector, reuse it rather than creating a duplicate component.
+
+--------------------------------------------------
+2. AFTER A CITY IS SELECTED
+--------------------------------------------------
+
+Once the visitor selects a city, dynamically update the hero using the selected city and available session data.
+
+Example for a city where all sessions pay $75:
+
+Headline:
+Get paid $75 to record your voice
+
+Supporting copy:
+Join a simple, guided 3-hour research session in New York City. No experience needed.
+
+Value summary:
+$75 total · 3 hours · Paid through Instawork
+
+Primary CTA:
+View available sessions
+
+If available sessions have different pay amounts, use:
+
+Headline:
+Get paid to record your voice
+
+Supporting copy:
+Earn $66–$111 for a simple, guided 3-hour research session in [City].
+
+Value summary:
+3 hours · No experience needed · Paid through Instawork
+
+The exact amount must come from the current city’s session data. Do not hard-code $75, New York, Boston, or any other city.
+
+Add a visible but secondary link:
+
+Change city
+
+--------------------------------------------------
+3. DYNAMIC PAY LOGIC
+--------------------------------------------------
+
+Use the available session data for the selected city.
+
+Calculate:
+
+minimumPay = lowest estimated total pay among available sessions
+maximumPay = highest estimated total pay among available sessions
+
+Display logic:
+
+- If minimumPay equals maximumPay:
+  Show “Get paid $[amount] to record your voice”
+
+- If minimumPay and maximumPay are different:
+  Show “Earn $[minimumPay]–$[maximumPay] for a 3-hour session”
+
+- If pay data is unavailable:
+  Show “Select a session to see exact pay”
+
+Format currency consistently to no more than two decimal places.
+
+Examples:
+- $75
+- $110.58
+- $66–$111
+
+Do not show an hourly rate in the hero unless hourly pay is the primary value stored in the session data. Prioritize total estimated pay.
+
+--------------------------------------------------
+4. AVAILABLE SESSION SECTION
+--------------------------------------------------
+
+After a city is selected, change the section title to:
+
+Available sessions in [City]
+
+Sort sessions by:
+1. Date ascending
+2. Start time ascending
+
+The morning session must appear before afternoon and evening sessions.
+
+Each session card should clearly show:
+
+- Date
+- Start and end time
+- Session length
+- Exact total estimated pay
+- A selection CTA
+
+Recommended compact card format:
+
+Mon, Jul 27
+8:30–11:30 AM · 3 hours
+
+Earn $75
+
+Button:
+Choose this session
+
+Use “Earn $75” or “$75 total” instead of displaying only “$75”.
+
+Initially show a limited number of upcoming sessions, such as the next 6–8 sessions.
+
+Add:
+
+See more dates
+
+to expand the rest of the sessions.
+
+Do not display dozens of nearly identical sessions in one long uninterrupted list by default.
+
+--------------------------------------------------
+5. VALUE SECTION
+--------------------------------------------------
+
+Replace the generic heading:
+
+Why people choose Instawork
+
+with:
+
+What to expect
+
+Use these three or four value points:
+
+Earn money in one session
+See the exact total pay before you book.
+
+No experience needed
+We guide you through every recording task.
+
+Simple guided session
+Sit at a computer and record short voice prompts.
+
+Paid through Instawork
+Manage your session and receive secure payment through the Instawork app.
+
+Keep this section concise and easy to scan.
+
+--------------------------------------------------
+6. ELIGIBILITY NOTICE
+--------------------------------------------------
+
+Keep the eligibility notice, but make it visually secondary:
+
+This opportunity is not currently available to residents of Texas, Washington, or Illinois.
+
+Do not place this notice between the main value proposition and the primary CTA.
+
+--------------------------------------------------
+7. BOOKING FLOW
+--------------------------------------------------
+
+When a visitor chooses a session, preserve the selected:
+
+- city
+- session ID
+- date
+- start time
+- pay
+- shift or booking link
+
+Then open the existing “Continue with Instawork” modal.
+
+Use this simplified modal copy:
+
+Title:
+Continue with Instawork
+
+Question:
+Do you already have an Instawork account?
+
+Primary button:
+Log in
+
+Secondary button:
+Create an account
+
+Keep the X close button.
+
+Remove:
+- “Yes, log in”
+- “No, I’m new to Instawork”
+- Supporting paragraphs
+- The Cancel button
+
+Both login and signup flows must preserve the selected session so the visitor can return directly to that session after authentication.
+
+--------------------------------------------------
+8. RESPONSIVE BEHAVIOR
+--------------------------------------------------
+
+On mobile:
+
+- Keep the main CTA visible without excessive scrolling.
+- Make the city input and Find sessions button full width.
+- Keep session cards compact.
+- Avoid a very tall hero.
+- Keep tap targets at least 44px high.
+
+On desktop:
+
+- Keep the current page width and overall layout.
+- Do not stretch text across the full screen.
+- Keep the value proposition and location selector visually prominent.
+
+--------------------------------------------------
+9. ANALYTICS
+--------------------------------------------------
+
+Use the project’s existing analytics implementation and track:
+
+- research_landing_viewed
+- location_selector_opened
+- research_city_selected
+- find_sessions_clicked
+- available_sessions_viewed
+- see_more_sessions_clicked
+- research_session_selected
+- instawork_login_selected
+- instawork_signup_selected
+
+Include these properties when available:
+
+- selected_city
+- selected_session_id
+- session_date
+- session_start_time
+- estimated_total_pay
+- source
+- campaign
+- utm_source
+- utm_medium
+- utm_campaign
+
+Do not add a new analytics library if one already exists.
+
+--------------------------------------------------
+10. IMPLEMENTATION REQUIREMENTS
+--------------------------------------------------
+
+- Reuse existing components and data structures.
+- Do not hard-code city names or session pay.
+- Preserve existing URLs, session IDs, booking logic, and authentication logic.
+- Do not remove the map; only show it after a location is selected.
+- Handle empty states when a city has no available sessions.
+- Do not show stale sessions that have already started.
+- Keep accessibility support for labels, keyboard navigation, focus states, and screen readers.
+
+For a city with no sessions, show:
+
+No sessions are currently available in [City].
+
+Supporting copy:
+Check another city or come back soon for new openings.
+
+Button:
+Choose another city
+
+After implementing, provide:
+
+1. A list of files changed.
+2. The exact dynamic pay calculation logic.
+3. The exact location-selection logic.
+4. Screenshots or previews of:
+   - No city selected
+   - City selected with one pay amount
+   - City selected with a pay range
+   - No sessions available
+5. Confirmation that New York and $75 are no longer hard-coded.

@@ -1,24 +1,12 @@
 import { useState } from "react";
-import { ArrowLeft, Calendar, CreditCard, MapPin, Mic, X } from "lucide-react";
+import { ArrowLeft, Calendar, CreditCard, MapPin, Mic } from "lucide-react";
 import { Link, useRoute } from "wouter";
 import { useGetSessionById, getGetSessionByIdQueryKey } from "@/lib/api-client";
 import { useSiteStorage } from "@/hooks/use-site";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerTitle,
-} from "@/components/ui/drawer";
-import {
-  EXCLUDED_STATES,
-  SESSION_CAP,
-  INSTAWORK_LOGIN_URL,
-  INSTAWORK_SIGNUP_URL,
-} from "@/lib/constants";
+import { ContinueWithInstaworkSheet } from "@/components/ContinueWithInstaworkSheet";
+import { EXCLUDED_STATES, SESSION_CAP } from "@/lib/constants";
 import { trackEvent } from "@/lib/analytics";
 
 export default function SessionDetail() {
@@ -63,15 +51,6 @@ export default function SessionDetail() {
   const mapLinkUrl = isIOS 
     ? `https://maps.apple.com/?q=${encAddress}` 
     : `https://maps.google.com/?q=${encAddress}`;
-
-  // The session's bookUrl is a universal link that deep-links straight to
-  // this shift in the Instawork app. Preserve it across login/signup so the
-  // user lands back on the same session.
-  const buildAuthUrl = (base: string) => {
-    if (!session.bookUrl) return base;
-    const sep = base.includes("?") ? "&" : "?";
-    return `${base}${sep}return_url=${encodeURIComponent(session.bookUrl)}`;
-  };
 
   const analyticsProps = {
     session_id: session.id,
@@ -204,50 +183,12 @@ export default function SessionDetail() {
         </div>
       </div>
 
-      <Drawer open={bookSheetOpen} onOpenChange={setBookSheetOpen}>
-        <DrawerContent className="max-w-md mx-auto">
-          <DrawerClose asChild>
-            <button
-              type="button"
-              aria-label="Close"
-              className="absolute right-4 top-4 p-1 rounded-full text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </DrawerClose>
-          <DrawerHeader className="text-left px-6 pt-2">
-            <DrawerTitle className="text-[20px]">Continue with Instawork</DrawerTitle>
-            <DrawerDescription className="text-[15px]">
-              Do you already have an Instawork account?
-            </DrawerDescription>
-          </DrawerHeader>
-          <div className="px-6 pt-2 pb-[calc(1.5rem+env(safe-area-inset-bottom))] flex flex-col gap-3">
-            <Button
-              className="w-full h-[52px] rounded-xl text-[17px] font-semibold bg-primary hover:bg-primary/90 shadow-none"
-              onClick={() => {
-                trackEvent("existing_user_selected", analyticsProps);
-                trackEvent("instawork_redirect_started", { ...analyticsProps, destination: "login" });
-                window.open(buildAuthUrl(INSTAWORK_LOGIN_URL), "_blank", "noopener,noreferrer");
-                setBookSheetOpen(false);
-              }}
-            >
-              Log in
-            </Button>
-            <Button
-              variant="outline"
-              className="w-full h-[52px] rounded-xl text-[17px] font-semibold border-primary text-primary hover:bg-primary/5 shadow-none"
-              onClick={() => {
-                trackEvent("new_user_selected", analyticsProps);
-                trackEvent("instawork_redirect_started", { ...analyticsProps, destination: "signup" });
-                window.open(buildAuthUrl(INSTAWORK_SIGNUP_URL), "_blank", "noopener,noreferrer");
-                setBookSheetOpen(false);
-              }}
-            >
-              Create an account
-            </Button>
-          </div>
-        </DrawerContent>
-      </Drawer>
+      <ContinueWithInstaworkSheet
+        open={bookSheetOpen}
+        onOpenChange={setBookSheetOpen}
+        bookUrl={session.bookUrl}
+        analyticsProps={analyticsProps}
+      />
     </div>
   );
 }

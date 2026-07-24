@@ -24,12 +24,15 @@ export function LocationCombobox({
   autoFocus = false,
   focusSignal = 0,
   className = "",
+  onOpened,
 }: {
   onSiteSelected: (key: string, label: string, origin?: SiteOrigin) => void;
   autoFocus?: boolean;
   /** Increment to programmatically focus the field and open the dropdown. */
   focusSignal?: number;
   className?: string;
+  /** Fired whenever the dropdown transitions from closed to open (any path). */
+  onOpened?: () => void;
 }) {
   const { data, isLoading } = useGetSites();
   const { site } = useSiteStorage();
@@ -52,6 +55,13 @@ export function LocationCombobox({
   const rootRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const listId = useId();
+
+  // Notify on every closed -> open transition, regardless of trigger path.
+  const wasOpenRef = useRef(false);
+  useEffect(() => {
+    if (open && !wasOpenRef.current) onOpened?.();
+    wasOpenRef.current = open;
+  }, [open, onOpened]);
 
   const availableSites = useMemo(
     () =>
@@ -295,7 +305,7 @@ export function LocationCombobox({
           aria-activedescendant={activeIndex >= 0 ? optionId(activeIndex) : undefined}
           aria-label="Choose a city or ZIP code"
           autoComplete="off"
-          placeholder="Choose a city or ZIP code"
+          placeholder="Enter city or ZIP code"
           value={query}
           onFocus={(e) => {
             setOpen(true);
