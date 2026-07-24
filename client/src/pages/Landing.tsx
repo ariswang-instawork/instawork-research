@@ -65,22 +65,10 @@ function utmProps(): Record<string, string | null> {
 }
 
 const HOW_IT_WORKS_STEPS = [
-  {
-    title: "Pick a session",
-    body: "Choose an available date and time near you.",
-  },
-  {
-    title: "Book in Instawork",
-    body: "Complete the short sign-up form and reserve your session in the Instawork app.",
-  },
-  {
-    title: "Record your voice",
-    body: "Visit the location, sit at a computer, and follow simple on-screen prompts.",
-  },
-  {
-    title: "Get paid",
-    body: "Your session payment is processed through Instawork.",
-  },
+  "Pick an available date and time near you.",
+  "Complete the short sign-up form and reserve your session in the Instawork app.",
+  "Visit the location, sit at a computer, and follow simple on-screen prompts.",
+  "Your session payment is processed through Instawork.",
 ];
 
 const FAQ_ITEMS: { q: string; a: string }[] = [
@@ -177,10 +165,16 @@ export default function Landing() {
       : `${formatPay(payStats.min)}–${formatPay(payStats.max)}`
     : null;
 
-  const sessionPayText = (s: Session) => {
-    const n = parseFloat(s.payAmount);
-    return Number.isFinite(n) ? formatPay(n) : s.payLabel || "";
-  };
+  // Hourly rate — leads the hero headline instead of the total.
+  const rateStats = useMemo(() => {
+    const rates = sessions
+      .map((s) => s.payRateUsd)
+      .filter((n): n is number => typeof n === "number" && Number.isFinite(n));
+    if (rates.length === 0) return null;
+    return { min: Math.min(...rates), max: Math.max(...rates) };
+  }, [sessions]);
+
+  const singleRate = rateStats && rateStats.min === rateStats.max ? rateStats.min : null;
 
   useEffect(() => {
     trackEvent("research_landing_viewed", { selected_city: site?.label ?? null, ...utmProps() });
@@ -251,10 +245,6 @@ export default function Landing() {
     setSheetOpen(true);
   };
 
-  // ---- Hero copy ----------------------------------------------------------
-  // The pay amount is highlighted in coral for editorial emphasis.
-  const headlinePay = singlePay != null ? formatPay(singlePay) : payText ?? "money";
-
   const visibleSessions = showAll ? sessions : sessions.slice(0, INITIAL_SESSION_COUNT);
   const hiddenCount = sessions.length - visibleSessions.length;
 
@@ -263,86 +253,73 @@ export default function Landing() {
       <main className="flex-1 overflow-y-auto w-full pb-16">
         {/* ============ HERO ============ */}
         <div className="bg-gradient-to-b from-[#F8FBFF] via-[#FAFBFD] to-white">
-        <div className="max-w-[1200px] mx-auto px-5 md:px-12 pt-8 md:pt-14 pb-2 animate-in fade-in slide-in-from-bottom-3 duration-500">
-          <div className="grid md:grid-cols-[1fr_minmax(0,460px)] md:items-center gap-8 md:gap-12">
-            <div className="max-w-[560px]">
-              <p className="text-[13px] font-bold uppercase tracking-wide text-[#23409A] mb-3">
-                Paid voice recording
-              </p>
-              <h1 className="text-[34px] md:text-[48px] leading-[1.08] font-extrabold tracking-[-0.03em] text-[#101828]">
-                Earn <span className="text-[#E05B4E]">{headlinePay}</span> in one 3-hour
-                session
-              </h1>
-              <p className="text-[17px] leading-[1.5] text-[#475467] mt-4">
-                Read short voice prompts at a nearby location. No experience needed.
-              </p>
-
-              {/* Compact benefit badges */}
-              <div className="mt-5 flex flex-wrap items-center gap-2">
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#FFF7DF] px-3 py-1.5 text-[14px] font-semibold text-[#7A5A12]">
-                  <BadgeDollarSign className="w-4 h-4 text-[#B9861F]" strokeWidth={2} />
-                  {hasCity && isLoading ? (
-                    <Skeleton className="h-4 w-20 bg-muted inline-block" />
-                  ) : (
-                    <>{payText ?? "Competitive"} estimated pay</>
-                  )}
+        <div className="max-w-[640px] mx-auto px-5 md:px-12 pt-10 md:pt-16 pb-4 text-center animate-in fade-in slide-in-from-bottom-3 duration-500">
+          <p className="text-[13px] font-bold uppercase tracking-wide text-[#23409A] mb-3">
+            Paid voice recording
+          </p>
+          <h1 className="text-[34px] md:text-[46px] leading-[1.1] font-extrabold tracking-[-0.03em] text-[#101828]">
+            {rateStats == null ? (
+              "Get paid for a 3-hour voice recording session"
+            ) : singleRate != null ? (
+              <>
+                ${Math.trunc(singleRate)}
+                <span className="text-[0.5em] align-top">
+                  {(singleRate % 1).toFixed(2).slice(1)}
                 </span>
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#F4F2FF] px-3 py-1.5 text-[14px] font-semibold text-[#5D4FC7]">
-                  <Clock className="w-4 h-4" strokeWidth={2} />
-                  In-person · About 3 hours
-                </span>
-              </div>
+                /hour · 3-hour sessions
+              </>
+            ) : (
+              <>
+                ${rateStats.min.toFixed(2)}–${rateStats.max.toFixed(2)}/hour · 3-hour sessions
+              </>
+            )}
+          </h1>
+          <p className="text-[17px] leading-[1.5] text-[#475467] mt-4">
+            Read short voice prompts at a nearby location. A team member guides you
+            through it.
+          </p>
 
-              {/* Mobile image sits between details and location selector */}
-              <div className="mt-6 md:hidden rounded-[16px] overflow-hidden bg-[#EAF6EE] p-2">
-                <img
-                  src={`${import.meta.env.BASE_URL}hero-voice-recording.png`}
-                  alt="A participant wearing headphones records voice prompts at a computer"
-                  width={1024}
-                  height={683}
-                  className="w-full h-auto object-cover max-h-[260px]"
-                />
-              </div>
-
-              <div className="mt-6">
-                <LocationSelector
-                  label={site?.label ?? null}
-                  focusSignal={pickerFocus}
-                  onSiteSelected={handleSiteSelected}
-                  onOpened={() =>
-                    trackEvent("location_selector_opened", {
-                      selected_city: site?.label ?? null,
-                      ...utmProps(),
-                    })
-                  }
-                />
-              </div>
-
-              <button
-                type="button"
-                onClick={handleSeeSessions}
-                className="mt-4 w-full h-[54px] rounded-[14px] bg-[#23409A] text-white text-[16px] font-semibold transition-[transform,background-color] duration-150 active:scale-[0.99] active:bg-[#1a3179] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#23409A]/40"
-              >
-                View sessions near me
-              </button>
-
-              <p className="text-[14px] text-[#475467] mt-3 text-center">
-                Exact time, location, and pay shown before booking.
-              </p>
-            </div>
-
-            <div className="hidden md:block">
-              <div className="rounded-[18px] overflow-hidden bg-[#EAF6EE] p-3">
-                <img
-                  src={`${import.meta.env.BASE_URL}hero-voice-recording.png`}
-                  alt="A participant wearing headphones records voice prompts at a computer"
-                  width={1024}
-                  height={683}
-                  className="w-full h-auto object-cover max-h-[440px]"
-                />
-              </div>
-            </div>
+          {/* Compact benefit badges */}
+          <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#FFF7DF] px-3 py-1.5 text-[14px] font-semibold text-[#7A5A12]">
+              <BadgeDollarSign className="w-4 h-4 text-[#B9861F]" strokeWidth={2} />
+              {hasCity && isLoading ? (
+                <Skeleton className="h-4 w-20 bg-muted inline-block" />
+              ) : (
+                <>{payText ?? "Competitive"} estimated pay</>
+              )}
+            </span>
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#F4F2FF] px-3 py-1.5 text-[14px] font-semibold text-[#5D4FC7]">
+              <Clock className="w-4 h-4" strokeWidth={2} />
+              In-person · About 3 hours
+            </span>
           </div>
+
+          <div className="mt-6 text-left">
+            <LocationSelector
+              label={site?.label ?? null}
+              focusSignal={pickerFocus}
+              onSiteSelected={handleSiteSelected}
+              onOpened={() =>
+                trackEvent("location_selector_opened", {
+                  selected_city: site?.label ?? null,
+                  ...utmProps(),
+                })
+              }
+            />
+          </div>
+
+          <button
+            type="button"
+            onClick={handleSeeSessions}
+            className="mt-4 w-full h-[54px] rounded-[14px] bg-[#23409A] text-white text-[16px] font-semibold transition-[transform,background-color] duration-150 active:scale-[0.99] active:bg-[#1a3179] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#23409A]/40"
+          >
+            View sessions near me
+          </button>
+
+          <p className="text-[14px] text-[#475467] mt-3 text-center">
+            Exact time, location, and pay shown before booking.
+          </p>
         </div>
         </div>
 
@@ -378,15 +355,15 @@ export default function Landing() {
                   <button
                     type="button"
                     onClick={openPicker}
-                    className="mt-4 inline-flex items-center justify-center h-12 px-6 rounded-[14px] bg-[#23409A] text-white font-semibold text-[15px] active:opacity-90"
+                    className="mt-4 inline-flex items-center justify-center h-12 px-6 rounded-[14px] border border-[#23409A] text-[#23409A] font-semibold text-[15px] active:opacity-80"
                   >
                     Enter your city
                   </button>
                 </div>
               ) : isLoading ? (
-                <div className="grid md:grid-cols-2 gap-4">
+                <div className="space-y-3.5 divide-y divide-[#e4e7ec] border-t border-b border-[#e4e7ec]">
                   {[1, 2, 3, 4].map((i) => (
-                    <Skeleton key={i} className="h-[190px] w-full rounded-[16px] bg-muted" />
+                    <Skeleton key={i} className="h-[52px] w-full bg-muted" />
                   ))}
                 </div>
               ) : sessions.length === 0 ? (
@@ -408,7 +385,7 @@ export default function Landing() {
                         onClick={() =>
                           handleSiteSelected(closestOpenMarket.key, closestOpenMarket.label)
                         }
-                        className="inline-flex items-center justify-center h-12 px-6 rounded-[14px] bg-[#23409A] text-white font-semibold text-[15px] active:opacity-90"
+                        className="inline-flex items-center justify-center h-12 px-6 rounded-[14px] border border-[#23409A] text-[#23409A] font-semibold text-[15px] active:opacity-80"
                       >
                         View sessions in {closestOpenMarket.label}
                       </button>
@@ -417,16 +394,15 @@ export default function Landing() {
                 </div>
               ) : (
                 <>
-                  <div className="grid md:grid-cols-2 gap-4">
+                  <ul className="divide-y divide-[#e4e7ec] border-t border-b border-[#e4e7ec]">
                     {visibleSessions.map((session) => (
                       <SessionCard
                         key={session.id}
                         session={session}
-                        payText={sessionPayText(session)}
                         onBook={() => handleBook(session)}
                       />
                     ))}
-                  </div>
+                  </ul>
                   {hiddenCount > 0 && (
                     <div className="mt-6 text-center">
                       <button
@@ -464,26 +440,18 @@ export default function Landing() {
         </section>
 
         {/* ============ HOW IT WORKS ============ */}
-        <section id="how-it-works" className="scroll-mt-20 py-14 md:py-20">
+        <section id="how-it-works" className="scroll-mt-20 py-10 md:py-14">
           <div className="max-w-[1200px] mx-auto px-5 md:px-12">
             <h2 className="text-[26px] md:text-[30px] leading-[1.15] font-bold tracking-tight text-[#101828]">
-              Easy from start to finish
+              How it works
             </h2>
-            <ol className="mt-8 grid md:grid-cols-4 gap-8 md:gap-6">
+            <ol className="mt-6 max-w-[640px] space-y-3">
               {HOW_IT_WORKS_STEPS.map((step, i) => (
-                <li key={step.title} className="flex md:flex-col gap-4">
-                  <span
-                    className="shrink-0 w-9 h-9 rounded-full bg-[#23409A] text-white text-[15px] font-bold flex items-center justify-center"
-                    aria-hidden="true"
-                  >
-                    {i + 1}
+                <li key={step} className="flex gap-3 text-[16px] leading-[1.5] text-[#101828]">
+                  <span className="font-bold text-[#23409A] shrink-0" aria-hidden="true">
+                    {i + 1}.
                   </span>
-                  <div>
-                    <p className="text-[17px] font-bold text-[#101828]">{step.title}</p>
-                    <p className="text-[15px] leading-[1.5] text-[#475467] mt-1">
-                      {step.body}
-                    </p>
-                  </div>
+                  {step}
                 </li>
               ))}
             </ol>
@@ -491,7 +459,7 @@ export default function Landing() {
         </section>
 
         {/* ============ WHAT WILL I ACTUALLY DO ============ */}
-        <section className="bg-[#FAFBFD] py-14 md:py-20">
+        <section className="bg-white border-t border-[#eef0f3] py-16 md:py-24">
           <div className="max-w-[1200px] mx-auto px-5 md:px-12">
             <div className="max-w-[720px]">
               <span
@@ -531,7 +499,7 @@ export default function Landing() {
         </section>
 
         {/* ============ EXPLORE OTHER LOCATIONS ============ */}
-        <section className="py-14 md:py-20">
+        <section className="bg-[#F8FBFF] py-14 md:py-20">
           <div className="max-w-[1200px] mx-auto px-5 md:px-12">
             <h2 className="text-[26px] md:text-[30px] leading-[1.15] font-bold tracking-tight text-[#101828]">
               Explore other locations
@@ -546,7 +514,7 @@ export default function Landing() {
         </section>
 
         {/* ============ FAQ ============ */}
-        <section id="faq" className="scroll-mt-20 bg-[#F8FBFF] py-14 md:py-20">
+        <section id="faq" className="scroll-mt-20 bg-white py-16 md:py-24">
           <div className="max-w-[1200px] mx-auto px-5 md:px-12">
             <div className="max-w-[720px]">
               <h2 className="text-[26px] md:text-[30px] leading-[1.15] font-bold tracking-tight text-[#101828]">
