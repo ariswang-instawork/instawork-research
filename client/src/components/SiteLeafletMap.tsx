@@ -47,16 +47,16 @@ const LABEL_POS: Record<string, LabelPos> = {
   "philadelphia-pa": "below",
 };
 
-/** Compact pin: blue dot + white pill showing ONLY the open count. */
+/** Compact pin: blue dot + white pill labeled with the city name. */
 function badgeIcon(site: SiteWithCoords) {
   const isOpen = site.openCount > 0;
   const dotColor = isOpen ? PRIMARY : "#C7CAD6";
   const numColor = isOpen ? "#111827" : "#9CA3AF";
-  const count = escapeHtml(String(site.openCount));
+  const label = escapeHtml(site.city || site.label);
   const pos: LabelPos = LABEL_POS[site.key] ?? "right";
   const dot = `<span style="width:12px;height:12px;border-radius:9999px;background:${dotColor};border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.3);flex:none;"></span>`;
-  const badge = `<span style="background:#fff;border-radius:9999px;padding:4px 12px;font-size:15px;line-height:1;font-weight:700;color:${numColor};box-shadow:0 1px 2px rgba(0,0,0,.15);display:inline-flex;align-items:center;justify-content:center;">${count}</span>`;
-  const pillWidth = 24 + count.length * 9;
+  const badge = `<span style="background:#fff;border-radius:9999px;padding:4px 10px;font-size:13px;line-height:1;font-weight:700;color:${numColor};box-shadow:0 1px 2px rgba(0,0,0,.15);display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;">${label}</span>`;
+  const pillWidth = 20 + label.length * 7;
 
   if (pos === "above" || pos === "below") {
     const width = Math.max(pillWidth, 12);

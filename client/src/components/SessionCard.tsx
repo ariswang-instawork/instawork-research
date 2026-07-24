@@ -1,19 +1,13 @@
 import type { SessionItem } from "@/lib/api-client/generated/api.schemas";
 
-/** Marketplace-style session card with its own booking CTA. */
+/** Compact session row: date, time, spots remaining, one text-link action. */
 export function SessionCard({
   session,
-  payText,
   onBook,
 }: {
   session: SessionItem;
-  payText: string;
   onBook: () => void;
 }) {
-  const rate =
-    session.payRateUsd != null && Number.isFinite(session.payRateUsd)
-      ? `$${session.payRateUsd.toFixed(2)}/hr × ${session.billableHours ?? 3} hours`
-      : null;
   const spots =
     typeof session.open === "number" && session.open > 0
       ? session.open === 1
@@ -22,40 +16,28 @@ export function SessionCard({
       : null;
 
   return (
-    <div className="rounded-[16px] border border-[#e4e7ec] bg-white p-4 flex flex-col gap-2">
-      <div className="flex items-baseline justify-between gap-2">
-        <div>
-          <p className="text-[15px] font-bold text-[#101828]">{session.date}</p>
-          <p className="text-[14px] text-[#475467]">{session.time}</p>
-        </div>
+    <li className="flex items-center justify-between gap-4 py-3.5">
+      <div className="min-w-0">
+        <p className="text-[15px] font-semibold text-[#101828] truncate">
+          {session.date} · {session.time}
+        </p>
         {spots && (
-          <span
-            className={`inline-flex items-center rounded-full px-2 py-0.5 text-[13px] font-semibold shrink-0 ${
-              session.open === 1
-                ? "bg-[#FFF1EE] text-[#C2402F]"
-                : "bg-[#ECFDF3] text-[#2E8A50]"
+          <p
+            className={`text-[13px] mt-0.5 ${
+              session.open === 1 ? "text-[#C2402F]" : "text-[#475467]"
             }`}
           >
             {spots}
-          </span>
+          </p>
         )}
-      </div>
-      <div>
-        <p className="text-[18px] font-extrabold tracking-tight text-[#101828]">
-          <span className="inline-flex items-center rounded-[8px] bg-[#FFF7DF] px-2 py-0.5">
-            {payText}
-          </span>{" "}
-          <span className="text-[13px] font-medium text-[#475467]">estimated pay</span>
-        </p>
-        {rate && <p className="text-[13px] text-[#667085] mt-0.5">{rate}</p>}
       </div>
       <button
         type="button"
         onClick={onBook}
-        className="mt-1 w-full h-12 rounded-[12px] bg-[#23409A] text-white text-[15px] font-semibold transition-[transform,background-color] duration-150 active:scale-[0.99] active:bg-[#1a3179] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#23409A]/40"
+        className="shrink-0 text-[14px] font-semibold text-[#23409A] underline underline-offset-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#23409A]/40 rounded-sm py-2"
       >
         View session
       </button>
-    </div>
+    </li>
   );
 }
