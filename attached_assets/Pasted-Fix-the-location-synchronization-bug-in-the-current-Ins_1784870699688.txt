@@ -1,0 +1,151 @@
+Fix the location synchronization bug in the current Instawork Research app.
+
+BUG
+
+When I click a city marker on the map, such as New York, and then click “View openings,” the page still displays sessions for Boston.
+
+The map popup correctly shows:
+
+New York
+1234 openings
+
+But the hero, available-sessions section, location selector, or session results continue using Boston.
+
+Do not redesign the page. Diagnose and fix the underlying state and routing issue.
+
+EXPECTED BEHAVIOR
+
+When a user clicks “View openings” for New York:
+
+1. The selected application location becomes New York.
+2. The location selector displays “New York, NY.”
+3. The sessions heading displays:
+   “Available sessions near New York, NY”
+4. The session list is filtered to New York.
+5. The hero pay range is recalculated using New York sessions.
+6. The URL reflects the selected market, when the app already supports location query parameters or routes.
+7. Refreshing or navigating back should preserve New York rather than reverting immediately to Boston.
+8. Boston must not remain visible anywhere unless Boston is actively selected.
+
+ROOT-CAUSE INVESTIGATION
+
+Inspect the current implementation and trace the full interaction:
+
+- Map marker click
+- Map popup state
+- “View openings” click handler
+- Selected city or selected market state
+- Location selector state
+- URL query parameters or route state
+- Session filtering
+- Hero pay calculation
+- Any default-location initialization logic
+- Any useEffect that resets the location to Boston
+
+Look specifically for:
+
+- Separate state variables for mapSelectedLocation and selectedLocation
+- A popup that stores only a display label but not the market ID
+- A hardcoded Boston fallback
+- An event handler that scrolls to the sessions section without updating location
+- A location initialization effect that runs after the click and overwrites New York
+- Market names that do not match session-data keys
+- Incorrect city-to-market mapping
+- Stale closures in the map popup button handler
+- URL state and React state becoming inconsistent
+
+IMPLEMENTATION REQUIREMENTS
+
+Use a single canonical selected-location object throughout the application.
+
+It should contain the identifiers needed by the existing data model, for example:
+
+{
+  marketId,
+  city,
+  state,
+  displayName,
+  latitude,
+  longitude
+}
+
+Do not rely only on the visible city label.
+
+The “View openings” button must update the canonical location before scrolling or navigating.
+
+For example, the flow should conceptually be:
+
+handleViewOpenings(market) {
+  setSelectedLocation(market)
+  update URL or route if supported
+  close popup
+  filter sessions using market.marketId
+  scroll to the sessions section
+}
+
+Adapt this to the existing framework and architecture rather than copying it blindly.
+
+Do not create duplicate sources of truth.
+
+If the URL is the source of truth, update the URL and derive selectedLocation from it.
+
+If application state is the source of truth, ensure every component reads from the same state or context.
+
+DEFAULT LOCATION LOGIC
+
+Boston may be used only as an initial fallback when:
+
+- no location exists in the URL
+- no saved location exists
+- no browser-derived location exists
+- the user has not selected a location
+
+Once the user selects New York, default initialization must not overwrite it.
+
+If an initialization effect currently resets the location, add appropriate guards so it only runs when no valid user-selected location exists.
+
+DATA FILTERING
+
+Filter sessions using a stable market or location ID, not loose string matching when possible.
+
+Confirm that New York map markers reference the same market identifier used by the New York session records.
+
+Do not use the marker opening count as the selected location ID.
+
+VERIFICATION
+
+After implementing the fix, test this exact sequence:
+
+1. Load the page with Boston initially selected.
+2. Open the map.
+3. Click the New York marker.
+4. Confirm the popup says New York.
+5. Click “View openings.”
+6. Confirm the location selector says New York, NY.
+7. Confirm the heading says “Available sessions near New York, NY.”
+8. Confirm only New York sessions appear.
+9. Confirm the hero pay range reflects New York session data.
+10. Refresh the page and confirm the selected market remains New York if URL persistence is supported.
+11. Select Philadelphia afterward and confirm all UI updates to Philadelphia.
+12. Confirm browser back navigation restores the previous location when URL routing is used.
+
+Also test mobile behavior.
+
+Add or update automated tests for:
+
+- Clicking a map market updates selected location
+- Session filtering uses the selected market
+- Default Boston logic does not overwrite a user selection
+- URL location state and UI state remain synchronized
+
+Run the existing test and build commands and fix any errors.
+
+Do not respond that the behavior is already implemented. Reproduce the bug in the current rendered preview, fix it, and visually verify the result.
+
+At the end, report:
+
+- Root cause
+- Files changed
+- State or routing changes made
+- Tests performed
+- Build result

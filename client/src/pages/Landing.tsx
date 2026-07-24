@@ -206,6 +206,13 @@ export default function Landing() {
     return () => window.removeEventListener("iw:view-sessions", onViewSessions);
   }, [site]);
 
+  // Reset per-city choices whenever the canonical site changes, no matter
+  // where the change came from (picker, map popup, another tab).
+  useEffect(() => {
+    setSelectedSession(null);
+    setShowAll(false);
+  }, [site?.key]);
+
   const openPicker = () => setPickerFocus((n) => n + 1);
 
   const handleSeeSessions = () => {
