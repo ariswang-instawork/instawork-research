@@ -1,0 +1,83 @@
+Update the “Book in the Instawork app” button on the Session Details page.
+
+Do not redesign the existing page. Keep the current layout, styling, spacing, colors, and sticky bottom CTA exactly as they are.
+
+When the user clicks “Book in the Instawork app,” open a mobile-friendly bottom sheet modal instead of immediately redirecting them.
+
+Modal content:
+
+Title:
+Continue with Instawork
+
+Body:
+Do you already have an Instawork account?
+
+Primary option:
+Yes, log in
+
+Button label:
+Log in to Instawork
+
+Supporting text:
+Log in, then continue directly to this research session.
+
+Secondary option:
+No, I’m new to Instawork
+
+Button label:
+Create an Instawork account
+
+Supporting text:
+Create your account, complete the sign-up form in the Instawork app, and return to this research session.
+
+Also include:
+- A close “X” icon in the top-right
+- A “Cancel” text button
+- Close the modal when the user taps outside it
+- Prevent the page behind the modal from scrolling while it is open
+- Add smooth opening and closing animations
+- Make the modal accessible with proper focus management and keyboard support
+
+Redirect logic:
+
+1. “Log in to Instawork”
+Redirect existing users to the Instawork login flow.
+
+2. “Create an Instawork account”
+Redirect new users to the Instawork signup flow.
+
+For both paths, preserve the current research session or shift information so that after login or signup, the user is sent directly back to the same session in the Instawork app.
+
+Pass the current session ID, shift ID, or return URL as a query parameter. Use the existing shift data already loaded on the page.
+
+Example structure:
+
+Login:
+LOGIN_URL?return_url=ENCODED_SHIFT_DEEP_LINK
+
+Signup:
+SIGNUP_URL?return_url=ENCODED_SHIFT_DEEP_LINK
+
+Create reusable constants or environment variables for:
+- INSTAWORK_LOGIN_URL
+- INSTAWORK_SIGNUP_URL
+- INSTAWORK_APP_DEEP_LINK_BASE
+
+Do not hard-code production URLs if they do not already exist in the codebase. If the URLs are not available, create clearly labeled placeholder constants and tell me exactly where to replace them.
+
+If opening the Instawork mobile app through a deep link fails, fall back to the appropriate Instawork web login or signup page.
+
+Track these events using the project’s existing analytics system:
+- book_cta_clicked
+- account_choice_modal_opened
+- existing_user_selected
+- new_user_selected
+- instawork_redirect_started
+
+Include the current session ID, location, date, and source page in the analytics properties when available.
+
+After implementing:
+1. Tell me which files you changed.
+2. Show me the exact login, signup, and return URL logic.
+3. Confirm that the original Session Details page design was not otherwise changed.
+4. Test the flow on both mobile and desktop screen sizes.

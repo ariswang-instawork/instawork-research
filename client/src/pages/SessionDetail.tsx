@@ -1,15 +1,31 @@
-import { ArrowLeft, Calendar, CreditCard, MapPin, Mic } from "lucide-react";
+import { useState } from "react";
+import { ArrowLeft, Calendar, CreditCard, MapPin, Mic, X } from "lucide-react";
 import { Link, useRoute } from "wouter";
 import { useGetSessionById, getGetSessionByIdQueryKey } from "@/lib/api-client";
 import { useSiteStorage } from "@/hooks/use-site";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { EXCLUDED_STATES, SESSION_CAP } from "@/lib/constants";
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
+import {
+  EXCLUDED_STATES,
+  SESSION_CAP,
+  INSTAWORK_LOGIN_URL,
+  INSTAWORK_SIGNUP_URL,
+} from "@/lib/constants";
+import { trackEvent } from "@/lib/analytics";
 
 export default function SessionDetail() {
   const [, params] = useRoute("/sessions/:id");
   const id = params?.id;
   const { site } = useSiteStorage();
+  const [bookSheetOpen, setBookSheetOpen] = useState(false);
 
   const { data: session, isLoading } = useGetSessionById(id || "", { 
     query: { enabled: !!id, queryKey: getGetSessionByIdQueryKey(id || "") } 
@@ -47,6 +63,22 @@ export default function SessionDetail() {
   const mapLinkUrl = isIOS 
     ? `https://maps.apple.com/?q=${encAddress}` 
     : `https://maps.google.com/?q=${encAddress}`;
+
+  // The session's bookUrl is a universal link that deep-links straight to
+  // this shift in the Instawork app. Preserve it across login/signup so the
+  // user lands back on the same session.
+  const buildAuthUrl = (base: string) => {
+    if (!session.bookUrl) return base;
+    const sep = base.includes("?") ? "&" : "?";
+    return `${base}${sep}return_url=${encodeURIComponent(session.bookUrl)}`;
+  };
+
+  const analyticsProps = {
+    session_id: session.id,
+    location: session.fullAddress || session.label || null,
+    date: session.dateISO || session.date || null,
+    source_page: "session_detail",
+  };
 
   return (
     <div className="flex-1 flex flex-col bg-white pb-32">
@@ -162,16 +194,80 @@ export default function SessionDetail() {
           <Button 
             className="w-full h-[52px] rounded-xl text-[17px] font-semibold bg-primary hover:bg-primary/90 shadow-none"
             onClick={() => {
-              // Deep link straight to this shift: the Instawork booking URL is
-              // a universal link, so it opens the app when installed and the
-              // web flow otherwise.
-              if (session.bookUrl) window.open(session.bookUrl, '_blank');
+              trackEvent("book_cta_clicked", analyticsProps);
+              setBookSheetOpen(true);
+              trackEvent("account_choice_modal_opened", analyticsProps);
             }}
           >
             Book in the Instawork app
           </Button>
         </div>
       </div>
+
+      <Drawer open={bookSheetOpen} onOpenChange={setBookSheetOpen}>
+        <DrawerContent className="max-w-md mx-auto">
+          <DrawerClose asChild>
+            <button
+              type="button"
+              aria-label="Close"
+              className="absolute right-4 top-4 p-1 rounded-full text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </DrawerClose>
+          <DrawerHeader className="text-left px-6 pt-2">
+            <DrawerTitle className="text-[20px]">Continue with Instawork</DrawerTitle>
+            <DrawerDescription className="text-[15px]">
+              Do you already have an Instawork account?
+            </DrawerDescription>
+          </DrawerHeader>
+          <div className="px-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] flex flex-col gap-5">
+            <div>
+              <p className="text-[15px] font-semibold text-foreground mb-2">Yes, log in</p>
+              <Button
+                className="w-full h-[52px] rounded-xl text-[17px] font-semibold bg-primary hover:bg-primary/90 shadow-none"
+                onClick={() => {
+                  trackEvent("existing_user_selected", analyticsProps);
+                  trackEvent("instawork_redirect_started", { ...analyticsProps, destination: "login" });
+                  window.open(buildAuthUrl(INSTAWORK_LOGIN_URL), "_blank", "noopener,noreferrer");
+                  setBookSheetOpen(false);
+                }}
+              >
+                Log in to Instawork
+              </Button>
+              <p className="text-[13px] text-muted-foreground mt-2">
+                Log in, then continue directly to this research session.
+              </p>
+            </div>
+            <div>
+              <p className="text-[15px] font-semibold text-foreground mb-2">No, I&apos;m new to Instawork</p>
+              <Button
+                variant="outline"
+                className="w-full h-[52px] rounded-xl text-[17px] font-semibold border-primary text-primary hover:bg-primary/5 shadow-none"
+                onClick={() => {
+                  trackEvent("new_user_selected", analyticsProps);
+                  trackEvent("instawork_redirect_started", { ...analyticsProps, destination: "signup" });
+                  window.open(buildAuthUrl(INSTAWORK_SIGNUP_URL), "_blank", "noopener,noreferrer");
+                  setBookSheetOpen(false);
+                }}
+              >
+                Create an Instawork account
+              </Button>
+              <p className="text-[13px] text-muted-foreground mt-2">
+                Create your account, complete the sign-up form in the Instawork app, and return to this research session.
+              </p>
+            </div>
+            <DrawerClose asChild>
+              <button
+                type="button"
+                className="text-[15px] font-medium text-muted-foreground hover:text-foreground self-center py-1"
+              >
+                Cancel
+              </button>
+            </DrawerClose>
+          </div>
+        </DrawerContent>
+      </Drawer>
     </div>
   );
 }
