@@ -19,9 +19,9 @@ import { trackEvent } from "@/lib/analytics";
 
 const INITIAL_SESSION_COUNT = 6;
 
-/** "$75" for whole amounts, "$110.58" otherwise. */
+/** Currency, always to exactly two decimals — e.g. "$110.58". */
 function formatPay(amount: number): string {
-  return Number.isInteger(amount) ? `$${amount}` : `$${amount.toFixed(2)}`;
+  return `$${amount.toFixed(2)}`;
 }
 
 /** Minutes since midnight for the session's start time, e.g. "8:30 AM – 11:30 AM". */
@@ -158,23 +158,13 @@ export default function Landing() {
   }, [sessions]);
 
   const singlePay = payStats && payStats.min === payStats.max ? payStats.min : null;
-  // "$75" or "$66–$111"; null when unknown.
+  // Total estimated pay for the selected location — a single "$110.58" when
+  // every open session pays the same, or a clean "$79.50–$79.56" range.
   const payText = payStats
     ? singlePay != null
       ? formatPay(singlePay)
       : `${formatPay(payStats.min)}–${formatPay(payStats.max)}`
     : null;
-
-  // Hourly rate — leads the hero headline instead of the total.
-  const rateStats = useMemo(() => {
-    const rates = sessions
-      .map((s) => s.payRateUsd)
-      .filter((n): n is number => typeof n === "number" && Number.isFinite(n));
-    if (rates.length === 0) return null;
-    return { min: Math.min(...rates), max: Math.max(...rates) };
-  }, [sessions]);
-
-  const singleRate = rateStats && rateStats.min === rateStats.max ? rateStats.min : null;
 
   useEffect(() => {
     trackEvent("research_landing_viewed", { selected_city: site?.label ?? null, ...utmProps() });
@@ -253,73 +243,102 @@ export default function Landing() {
       <main className="flex-1 overflow-y-auto w-full pb-16">
         {/* ============ HERO ============ */}
         <div className="bg-gradient-to-b from-[#F8FBFF] via-[#FAFBFD] to-white">
-        <div className="max-w-[640px] mx-auto px-5 md:px-12 pt-10 md:pt-16 pb-4 text-center animate-in fade-in slide-in-from-bottom-3 duration-500">
-          <p className="text-[13px] font-bold uppercase tracking-wide text-[#23409A] mb-3">
-            Paid voice recording
-          </p>
-          <h1 className="text-[34px] md:text-[46px] leading-[1.1] font-extrabold tracking-[-0.03em] text-[#101828]">
-            {rateStats == null ? (
-              "Get paid for a 3-hour voice recording session"
-            ) : singleRate != null ? (
-              <>
-                ${Math.trunc(singleRate)}
-                <span className="text-[0.5em] align-top">
-                  {(singleRate % 1).toFixed(2).slice(1)}
+        <div className="max-w-[1200px] mx-auto px-5 md:px-12 pt-8 md:pt-12 pb-8 md:pb-10 animate-in fade-in slide-in-from-bottom-3 duration-500">
+          <div className="grid md:grid-cols-[1fr_minmax(0,44%)] md:items-center gap-8 md:gap-10">
+            {/* Left column — copy, pills, location, CTA */}
+            <div className="max-w-[560px]">
+              <p className="text-[13px] font-bold uppercase tracking-wide text-[#23409A] mb-3">
+                Paid voice recording
+              </p>
+              <h1 className="text-[34px] md:text-[40px] lg:text-[46px] leading-[1.08] font-extrabold tracking-[-0.03em] text-[#101828]">
+                {payText ? (
+                  <>
+                    Earn <span className="whitespace-nowrap">{payText}</span>
+                    <br />
+                    in one 3-hour session
+                  </>
+                ) : hasCity && isLoading ? (
+                  <>
+                    Earn{" "}
+                    <Skeleton className="h-[0.8em] w-[2.4em] bg-black/10 inline-block align-middle rounded-md" />
+                    <br />
+                    in one 3-hour session
+                  </>
+                ) : (
+                  "Get paid for a 3-hour voice session"
+                )}
+              </h1>
+              <p className="text-[17px] leading-[1.5] text-[#475467] mt-4">
+                Sit at a computer and read short voice prompts. No experience needed.
+              </p>
+
+              {/* Participant image — mobile only, between copy and pills */}
+              <div className="mt-6 md:hidden rounded-[16px] overflow-hidden bg-[#EAF6EE] p-2">
+                <img
+                  src={`${import.meta.env.BASE_URL}hero-voice-recording.png`}
+                  alt="A participant wearing headphones records voice prompts at a computer"
+                  width={1024}
+                  height={683}
+                  className="w-full h-auto object-cover rounded-[10px] max-h-[240px]"
+                />
+              </div>
+
+              {/* Two compact info pills: total pay + duration */}
+              <div className="mt-5 flex flex-wrap items-center gap-2">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#FFF7DF] px-3 py-1.5 text-[14px] font-semibold text-[#7A5A12]">
+                  <BadgeDollarSign className="w-4 h-4 text-[#B9861F]" strokeWidth={2} />
+                  {hasCity && isLoading ? (
+                    <Skeleton className="h-4 w-20 bg-muted inline-block" />
+                  ) : (
+                    <>{payText ?? "Competitive"} estimated pay</>
+                  )}
                 </span>
-                /hour · 3-hour sessions
-              </>
-            ) : (
-              <>
-                ${rateStats.min.toFixed(2)}–${rateStats.max.toFixed(2)}/hour · 3-hour sessions
-              </>
-            )}
-          </h1>
-          <p className="text-[17px] leading-[1.5] text-[#475467] mt-4">
-            Read short voice prompts at a nearby location. A team member guides you
-            through it.
-          </p>
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#F4F2FF] px-3 py-1.5 text-[14px] font-semibold text-[#5D4FC7]">
+                  <Clock className="w-4 h-4" strokeWidth={2} />
+                  In person · About 3 hours
+                </span>
+              </div>
 
-          {/* Compact benefit badges */}
-          <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#FFF7DF] px-3 py-1.5 text-[14px] font-semibold text-[#7A5A12]">
-              <BadgeDollarSign className="w-4 h-4 text-[#B9861F]" strokeWidth={2} />
-              {hasCity && isLoading ? (
-                <Skeleton className="h-4 w-20 bg-muted inline-block" />
-              ) : (
-                <>{payText ?? "Competitive"} estimated pay</>
-              )}
-            </span>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#F4F2FF] px-3 py-1.5 text-[14px] font-semibold text-[#5D4FC7]">
-              <Clock className="w-4 h-4" strokeWidth={2} />
-              In-person · About 3 hours
-            </span>
+              <div className="mt-6">
+                <LocationSelector
+                  label={site?.label ?? null}
+                  focusSignal={pickerFocus}
+                  onSiteSelected={handleSiteSelected}
+                  onOpened={() =>
+                    trackEvent("location_selector_opened", {
+                      selected_city: site?.label ?? null,
+                      ...utmProps(),
+                    })
+                  }
+                />
+              </div>
+
+              <button
+                type="button"
+                onClick={handleSeeSessions}
+                className="mt-4 w-full h-[54px] rounded-[14px] bg-[#23409A] text-white text-[16px] font-semibold transition-[transform,background-color] duration-150 active:scale-[0.99] active:bg-[#1a3179] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#23409A]/40"
+              >
+                View sessions near me
+              </button>
+
+              <p className="text-[14px] text-[#475467] mt-3">
+                Exact time, location, and pay shown before booking.
+              </p>
+            </div>
+
+            {/* Right column — participant image (desktop) */}
+            <div className="hidden md:block">
+              <div className="rounded-[18px] overflow-hidden bg-[#EAF6EE] p-3">
+                <img
+                  src={`${import.meta.env.BASE_URL}hero-voice-recording.png`}
+                  alt="A participant wearing headphones records voice prompts at a computer"
+                  width={1024}
+                  height={683}
+                  className="w-full h-auto object-cover rounded-[12px] max-h-[400px]"
+                />
+              </div>
+            </div>
           </div>
-
-          <div className="mt-6 text-left">
-            <LocationSelector
-              label={site?.label ?? null}
-              focusSignal={pickerFocus}
-              onSiteSelected={handleSiteSelected}
-              onOpened={() =>
-                trackEvent("location_selector_opened", {
-                  selected_city: site?.label ?? null,
-                  ...utmProps(),
-                })
-              }
-            />
-          </div>
-
-          <button
-            type="button"
-            onClick={handleSeeSessions}
-            className="mt-4 w-full h-[54px] rounded-[14px] bg-[#23409A] text-white text-[16px] font-semibold transition-[transform,background-color] duration-150 active:scale-[0.99] active:bg-[#1a3179] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#23409A]/40"
-          >
-            View sessions near me
-          </button>
-
-          <p className="text-[14px] text-[#475467] mt-3 text-center">
-            Exact time, location, and pay shown before booking.
-          </p>
         </div>
         </div>
 
@@ -327,7 +346,7 @@ export default function Landing() {
         <section
           id="sessions"
           ref={sessionsRef}
-          className="scroll-mt-20 mt-12 md:mt-16 bg-[#F8FBFF] py-12 md:py-16"
+          className="scroll-mt-20 bg-[#F8FBFF] py-12 md:py-16"
         >
           <div className="max-w-[1200px] mx-auto px-5 md:px-12">
             <h2 className="text-[26px] md:text-[30px] leading-[1.15] font-bold tracking-tight text-[#101828]">
