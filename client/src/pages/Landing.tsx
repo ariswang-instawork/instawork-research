@@ -212,7 +212,7 @@ export default function Landing() {
               <p className="text-[13px] font-bold uppercase tracking-wide text-[#1c387d] mb-3">
                 {eyebrow}
               </p>
-              <h1 className="text-[42px] md:text-[60px] leading-[1.08] font-extrabold tracking-[-0.03em] text-[#101828]">
+              <h1 className="text-[34px] md:text-[48px] leading-[1.08] font-extrabold tracking-[-0.03em] text-[#101828]">
                 {headline}
               </h1>
               <p className="text-[17px] leading-[1.5] text-[#475467] mt-4">
