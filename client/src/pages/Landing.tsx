@@ -19,10 +19,12 @@ import { trackEvent } from "@/lib/analytics";
 
 const INITIAL_SESSION_COUNT = 6;
 
-/** Currency, always to exactly two decimals — e.g. "$110.58". */
-function formatPay(amount: number): string {
-  return `$${amount.toFixed(2)}`;
-}
+/**
+ * Representative national total-pay figure (whole USD) shown in the hero
+ * before a location resolves, or if geolocation fails. Single source of
+ * truth — keep in sync with whatever number ads are running.
+ */
+const DEFAULT_NATIONAL_PAY_USD = 110;
 
 /** Minutes since midnight for the session's start time, e.g. "8:30 AM – 11:30 AM". */
 function parseStartMinutes(time: string | undefined): number {
@@ -157,14 +159,19 @@ export default function Landing() {
     return { min: Math.min(...amounts), max: Math.max(...amounts) };
   }, [sessions]);
 
-  const singlePay = payStats && payStats.min === payStats.max ? payStats.min : null;
-  // Total estimated pay for the selected location — a single "$110.58" when
-  // every open session pays the same, or a clean "$79.50–$79.56" range.
+  // Headline/chip pay: one whole-dollar figure, never a range, never cents.
+  // A spread under $5 is usually cents of variance and reads as a bug, so it
+  // collapses to "about $80"; a real spread floors to "$79+". Per-session
+  // figures in the sessions list keep full precision.
   const payText = payStats
-    ? singlePay != null
-      ? formatPay(singlePay)
-      : `${formatPay(payStats.min)}–${formatPay(payStats.max)}`
+    ? payStats.max - payStats.min < 5
+      ? `about $${Math.round(payStats.max)}`
+      : `$${Math.round(payStats.min)}+`
     : null;
+
+  // The hero never shows $0, a spinner, or an empty state: it opens on the
+  // national figure and swaps to the local number when data resolves.
+  const heroPayText = payText ?? `about $${DEFAULT_NATIONAL_PAY_USD}`;
 
   useEffect(() => {
     trackEvent("research_landing_viewed", { selected_city: site?.label ?? null, ...utmProps() });
@@ -251,47 +258,33 @@ export default function Landing() {
                 Paid voice recording
               </p>
               <h1 className="text-[34px] md:text-[40px] lg:text-[46px] leading-[1.08] font-extrabold tracking-[-0.03em] text-[#101828]">
-                {payText ? (
-                  <>
-                    Earn <span className="whitespace-nowrap">{payText}</span>
-                    <br />
-                    in one 3-hour session
-                  </>
-                ) : hasCity && isLoading ? (
-                  <>
-                    Earn{" "}
-                    <Skeleton className="h-[0.8em] w-[2.4em] bg-black/10 inline-block align-middle rounded-md" />
-                    <br />
-                    in one 3-hour session
-                  </>
-                ) : (
-                  "Get paid for a 3-hour voice session"
-                )}
+                Earn <span className="whitespace-nowrap">{heroPayText}</span>
+                <br />
+                in one 3-hour session
               </h1>
               <p className="text-[17px] leading-[1.5] text-[#475467] mt-4">
                 Sit at a computer and read short voice prompts. No experience needed.
               </p>
 
-              {/* Participant image — mobile only, between copy and pills */}
-              <div className="mt-6 md:hidden rounded-[16px] overflow-hidden bg-[#EAF6EE] p-2">
-                <img
-                  src={`${import.meta.env.BASE_URL}hero-voice-recording.png`}
-                  alt="A participant wearing headphones records voice prompts at a computer"
-                  width={1024}
-                  height={683}
-                  className="w-full h-auto object-cover rounded-[10px] max-h-[240px]"
-                />
+              {/* TODO(design): hero image. Needs an ordinary desk setup —
+                  laptop, simple headset, plain room, person reading from the
+                  screen. The removed asset (boom mic, studio headphones,
+                  mid-conversation gesture) read as a podcast studio and
+                  contradicted "no experience needed". Placeholder below is
+                  sized to the final 3:2 slot. */}
+              <div
+                role="img"
+                aria-label="Participant reading voice prompts at a laptop"
+                className="mt-6 md:hidden rounded-[16px] bg-[#EAF6EE] aspect-[3/2] max-h-[240px] w-full flex items-center justify-center"
+              >
+                <Mic className="w-8 h-8 text-[#8FAF9A]" strokeWidth={1.5} aria-hidden="true" />
               </div>
 
               {/* Two compact info pills: total pay + duration */}
               <div className="mt-5 flex flex-wrap items-center gap-2">
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-[#FFF7DF] px-3 py-1.5 text-[14px] font-semibold text-[#7A5A12]">
                   <BadgeDollarSign className="w-4 h-4 text-[#B9861F]" strokeWidth={2} />
-                  {hasCity && isLoading ? (
-                    <Skeleton className="h-4 w-20 bg-muted inline-block" />
-                  ) : (
-                    <>{payText ?? "Competitive"} estimated pay</>
-                  )}
+                  {heroPayText} estimated pay
                 </span>
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-[#F4F2FF] px-3 py-1.5 text-[14px] font-semibold text-[#5D4FC7]">
                   <Clock className="w-4 h-4" strokeWidth={2} />
@@ -326,16 +319,20 @@ export default function Landing() {
               </p>
             </div>
 
-            {/* Right column — participant image (desktop) */}
+            {/* Right column — participant image (desktop).
+                TODO(design): hero image. Needs an ordinary desk setup —
+                laptop, simple headset, plain room, person reading from the
+                screen. The removed asset (boom mic, studio headphones,
+                mid-conversation gesture) read as a podcast studio and
+                contradicted "no experience needed". Placeholder below is
+                sized to the final 3:2 slot. */}
             <div className="hidden md:block">
-              <div className="rounded-[18px] overflow-hidden bg-[#EAF6EE] p-3">
-                <img
-                  src={`${import.meta.env.BASE_URL}hero-voice-recording.png`}
-                  alt="A participant wearing headphones records voice prompts at a computer"
-                  width={1024}
-                  height={683}
-                  className="w-full h-auto object-cover rounded-[12px] max-h-[400px]"
-                />
+              <div
+                role="img"
+                aria-label="Participant reading voice prompts at a laptop"
+                className="rounded-[18px] bg-[#EAF6EE] aspect-[3/2] max-h-[400px] w-full flex items-center justify-center"
+              >
+                <Mic className="w-10 h-10 text-[#8FAF9A]" strokeWidth={1.5} aria-hidden="true" />
               </div>
             </div>
           </div>
