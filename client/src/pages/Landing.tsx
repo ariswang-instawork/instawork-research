@@ -87,8 +87,20 @@ const FAQ_ITEMS: { q: string; a: string }[] = [
     a: "Short voice prompts — reading sentences, answering simple questions, or repeating phrases while wearing a headset.",
   },
   {
+    // TODO — copy pending. Do not guess data usage or retention; needs
+    // real answer from the research/privacy team.
+    q: "How are my voice recordings used and stored?",
+    a: "TODO — copy pending",
+  },
+  {
     q: "How will I get paid?",
     a: "Your payment is processed through the Instawork app after your session.",
+  },
+  {
+    // TODO — copy pending. Do not guess the payment window; needs a real
+    // timing commitment (e.g. same day / within N business days).
+    q: "When do I get paid?",
+    a: "TODO — copy pending",
   },
   {
     q: "What should I bring?",
@@ -126,6 +138,28 @@ export default function Landing() {
   );
 
   const sessions = useMemo(() => upcomingSorted(data?.sessions ?? []), [data?.sessions]);
+
+  // Dev-only guard: two rows sharing date, time, AND location are a genuine
+  // duplicate (data or rendering bug), unlike look-alikes that differ only by
+  // venue. Surface them in the console rather than silently collapsing —
+  // whether same-address/same-time rows are legit (e.g. parallel rooms) is a
+  // data question, so we flag, not filter.
+  useEffect(() => {
+    if (!import.meta.env.DEV) return;
+    const seen = new Map<string, string>();
+    for (const s of sessions) {
+      const loc = s.neighborhoodLabel || s.fullAddress || "(no location)";
+      const key = `${s.dateISO}|${s.time}|${loc}`;
+      const prior = seen.get(key);
+      if (prior) {
+        console.warn(
+          `[sessions] duplicate row — same date, time, and location for ids ${prior} and ${s.id}: ${key}`,
+        );
+      } else {
+        seen.set(key, s.id);
+      }
+    }
+  }, [sessions]);
 
   // Sites list — used to suggest the closest market with open sessions.
   const { data: sitesData } = useGetSites();
@@ -251,90 +285,61 @@ export default function Landing() {
         {/* ============ HERO ============ */}
         <div className="bg-gradient-to-b from-[#F8FBFF] via-[#FAFBFD] to-white">
         <div className="max-w-[1200px] mx-auto px-5 md:px-12 pt-8 md:pt-12 pb-8 md:pb-10 animate-in fade-in slide-in-from-bottom-3 duration-500">
-          <div className="grid md:grid-cols-[1fr_minmax(0,44%)] md:items-center gap-8 md:gap-10">
-            {/* Left column — copy, pills, location, CTA */}
-            <div className="max-w-[560px]">
-              <p className="text-[13px] font-bold uppercase tracking-wide text-[#23409A] mb-3">
-                Paid voice recording
-              </p>
-              <h1 className="text-[34px] md:text-[40px] lg:text-[46px] leading-[1.08] font-extrabold tracking-[-0.03em] text-[#101828]">
-                Earn <span className="whitespace-nowrap">{heroPayText}</span>
-                <br />
-                in one 3-hour session
-              </h1>
-              <p className="text-[17px] leading-[1.5] text-[#475467] mt-4">
-                Sit at a computer and read short voice prompts. No experience needed.
-              </p>
+          {/* Single full-width text column. No hero image ships until a real
+              desk-setup asset exists (an empty placeholder reads worse than
+              none). To restore a two-column layout later, wrap this column and
+              an image column in `grid md:grid-cols-[1fr_minmax(0,44%)]` and
+              drop the max-w below — the copy block is otherwise unchanged. */}
+          <div className="max-w-[65ch]">
+            <p className="text-[13px] font-bold uppercase tracking-wide text-[#23409A] mb-3">
+              Paid voice recording
+            </p>
+            <h1 className="text-[34px] md:text-[40px] lg:text-[46px] leading-[1.08] font-extrabold tracking-[-0.03em] text-[#101828]">
+              Earn <span className="whitespace-nowrap">{heroPayText}</span>
+              <br />
+              in one 3-hour session
+            </h1>
+            <p className="text-[17px] leading-[1.5] text-[#475467] mt-4">
+              Sit at a computer and read short voice prompts. No experience needed.
+            </p>
 
-              {/* TODO(design): hero image. Needs an ordinary desk setup —
-                  laptop, simple headset, plain room, person reading from the
-                  screen. The removed asset (boom mic, studio headphones,
-                  mid-conversation gesture) read as a podcast studio and
-                  contradicted "no experience needed". Placeholder below is
-                  sized to the final 3:2 slot. */}
-              <div
-                role="img"
-                aria-label="Participant reading voice prompts at a laptop"
-                className="mt-6 md:hidden rounded-[16px] bg-[#EAF6EE] aspect-[3/2] max-h-[240px] w-full flex items-center justify-center"
-              >
-                <Mic className="w-8 h-8 text-[#8FAF9A]" strokeWidth={1.5} aria-hidden="true" />
-              </div>
-
-              {/* Two compact info pills: total pay + duration */}
-              <div className="mt-5 flex flex-wrap items-center gap-2">
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#FFF7DF] px-3 py-1.5 text-[14px] font-semibold text-[#7A5A12]">
-                  <BadgeDollarSign className="w-4 h-4 text-[#B9861F]" strokeWidth={2} />
-                  {heroPayText} estimated pay
-                </span>
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#F4F2FF] px-3 py-1.5 text-[14px] font-semibold text-[#5D4FC7]">
-                  <Clock className="w-4 h-4" strokeWidth={2} />
-                  In person · About 3 hours
-                </span>
-              </div>
-
-              <div className="mt-6">
-                <LocationSelector
-                  label={site?.label ?? null}
-                  focusSignal={pickerFocus}
-                  onSiteSelected={handleSiteSelected}
-                  onOpened={() =>
-                    trackEvent("location_selector_opened", {
-                      selected_city: site?.label ?? null,
-                      ...utmProps(),
-                    })
-                  }
-                />
-              </div>
-
-              <button
-                type="button"
-                onClick={handleSeeSessions}
-                className="mt-4 w-full h-[54px] rounded-[14px] bg-[#23409A] text-white text-[16px] font-semibold transition-[transform,background-color] duration-150 active:scale-[0.99] active:bg-[#1a3179] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#23409A]/40"
-              >
-                View sessions near me
-              </button>
-
-              <p className="text-[14px] text-[#475467] mt-3">
-                Exact time, location, and pay shown before booking.
-              </p>
+            {/* Two compact info pills: total pay + duration */}
+            <div className="mt-5 flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-[#FFF7DF] px-3 py-1.5 text-[14px] font-semibold text-[#7A5A12]">
+                <BadgeDollarSign className="w-4 h-4 text-[#B9861F]" strokeWidth={2} />
+                {heroPayText} estimated pay
+              </span>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-[#F4F2FF] px-3 py-1.5 text-[14px] font-semibold text-[#5D4FC7]">
+                <Clock className="w-4 h-4" strokeWidth={2} />
+                In person · About 3 hours
+              </span>
             </div>
 
-            {/* Right column — participant image (desktop).
-                TODO(design): hero image. Needs an ordinary desk setup —
-                laptop, simple headset, plain room, person reading from the
-                screen. The removed asset (boom mic, studio headphones,
-                mid-conversation gesture) read as a podcast studio and
-                contradicted "no experience needed". Placeholder below is
-                sized to the final 3:2 slot. */}
-            <div className="hidden md:block">
-              <div
-                role="img"
-                aria-label="Participant reading voice prompts at a laptop"
-                className="rounded-[18px] bg-[#EAF6EE] aspect-[3/2] max-h-[400px] w-full flex items-center justify-center"
-              >
-                <Mic className="w-10 h-10 text-[#8FAF9A]" strokeWidth={1.5} aria-hidden="true" />
-              </div>
+            <div className="mt-6 max-w-[560px]">
+              <LocationSelector
+                label={site?.label ?? null}
+                focusSignal={pickerFocus}
+                onSiteSelected={handleSiteSelected}
+                onOpened={() =>
+                  trackEvent("location_selector_opened", {
+                    selected_city: site?.label ?? null,
+                    ...utmProps(),
+                  })
+                }
+              />
             </div>
+
+            <button
+              type="button"
+              onClick={handleSeeSessions}
+              className="mt-4 w-full max-w-[560px] h-[54px] rounded-[14px] bg-[#23409A] text-white text-[16px] font-semibold transition-[transform,background-color] duration-150 active:scale-[0.99] active:bg-[#1a3179] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#23409A]/40"
+            >
+              View sessions near me
+            </button>
+
+            <p className="text-[14px] text-[#475467] mt-3">
+              Exact time, location, and pay shown before booking.
+            </p>
           </div>
         </div>
         </div>
@@ -343,7 +348,7 @@ export default function Landing() {
         <section
           id="sessions"
           ref={sessionsRef}
-          className="scroll-mt-20 bg-[#F8FBFF] py-12 md:py-16"
+          className="scroll-mt-[var(--header-height)] bg-[#F8FBFF] py-12 md:py-16"
         >
           <div className="max-w-[1200px] mx-auto px-5 md:px-12">
             <h2 className="text-[26px] md:text-[30px] leading-[1.15] font-bold tracking-tight text-[#101828]">
@@ -456,7 +461,7 @@ export default function Landing() {
         </section>
 
         {/* ============ HOW IT WORKS ============ */}
-        <section id="how-it-works" className="scroll-mt-20 py-10 md:py-14">
+        <section id="how-it-works" className="scroll-mt-[var(--header-height)] py-10 md:py-14">
           <div className="max-w-[1200px] mx-auto px-5 md:px-12">
             <h2 className="text-[26px] md:text-[30px] leading-[1.15] font-bold tracking-tight text-[#101828]">
               How it works
@@ -515,7 +520,7 @@ export default function Landing() {
         </section>
 
         {/* ============ EXPLORE OTHER LOCATIONS ============ */}
-        <section className="bg-[#F8FBFF] py-14 md:py-20">
+        <section id="locations" className="scroll-mt-[var(--header-height)] bg-[#F8FBFF] py-14 md:py-20">
           <div className="max-w-[1200px] mx-auto px-5 md:px-12">
             <h2 className="text-[26px] md:text-[30px] leading-[1.15] font-bold tracking-tight text-[#101828]">
               Explore other locations
@@ -530,7 +535,7 @@ export default function Landing() {
         </section>
 
         {/* ============ FAQ ============ */}
-        <section id="faq" className="scroll-mt-20 bg-white py-16 md:py-24">
+        <section id="faq" className="scroll-mt-[var(--header-height)] bg-white py-16 md:py-24">
           <div className="max-w-[1200px] mx-auto px-5 md:px-12">
             <div className="max-w-[720px]">
               <h2 className="text-[26px] md:text-[30px] leading-[1.15] font-bold tracking-tight text-[#101828]">

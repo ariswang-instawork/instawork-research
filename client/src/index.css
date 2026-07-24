@@ -111,6 +111,17 @@
   --body-muted: 226 10% 38%; /* #5B6072 body muted text */
 
   --radius: 0.75rem; /* 12px */
+
+  /* Sticky header height. The header consumes this for its own height and
+     every anchor target consumes it as scroll-margin-top, so the two can
+     never drift. Change it here only. */
+  --header-height: 4rem; /* 64px */
+}
+
+@media (min-width: 768px) {
+  :root {
+    --header-height: 4.5rem; /* 72px */
+  }
 }
 
 .dark {

@@ -194,8 +194,14 @@ export function SiteLeafletMap() {
         ) : (
           <MapContainer
             style={{ height: "100%", width: "100%" }}
-            center={[39.5, -98.35]}
-            zoom={4}
+            // Fit the initial view to the actual pin set (this block only
+            // renders once sites are loaded) rather than a hardcoded US-wide
+            // view. FitAndSize re-fits after invalidateSize for the hidden-
+            // container sizing bug and handles the single-pin case.
+            bounds={L.latLngBounds(
+              sites.map((s) => [s.latitude, s.longitude] as [number, number]),
+            )}
+            boundsOptions={{ padding: [30, 30], maxZoom: 11 }}
             zoomSnap={0.25}
             zoomDelta={0.5}
             scrollWheelZoom={false}

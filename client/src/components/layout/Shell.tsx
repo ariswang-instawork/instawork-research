@@ -94,7 +94,7 @@ export function Shell({ children }: { children: ReactNode }) {
     <div className="min-h-[100dvh] w-full bg-background flex justify-center text-foreground font-sans selection:bg-primary/20 selection:text-primary">
       <div className="w-full bg-card min-h-[100dvh] flex flex-col relative">
         {/* Shared app header */}
-        <header className="sticky top-0 z-[1100] bg-white border-b border-[#e4e7ec] h-16 md:h-[72px] flex items-center">
+        <header className="sticky top-0 z-[1100] bg-white border-b border-[#e4e7ec] h-[var(--header-height)] flex items-center">
           <div className="w-full max-w-[1200px] mx-auto px-5 md:px-12 flex items-center justify-between gap-2">
             <button
               type="button"
@@ -154,7 +154,7 @@ export function Shell({ children }: { children: ReactNode }) {
           >
             <div className="w-full bg-background min-h-[100dvh] flex flex-col">
               {/* Menu header — mirrors the app header with X in place of the hamburger */}
-              <div className="bg-white border-b border-[#e4e7ec] h-16 shrink-0 flex items-center">
+              <div className="bg-white border-b border-[#e4e7ec] h-[var(--header-height)] shrink-0 flex items-center">
                 <div className="w-full max-w-[1200px] mx-auto px-5 flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2 min-w-0">
                     <img src={LOGO_URL} alt="" className="w-9 h-9 rounded-[10px] shrink-0" />

@@ -49,15 +49,6 @@ export async function getServableRows(): Promise<ShiftGroup[]> {
   return rows.filter((r) => isValidHttpsUrl(r.shiftLink));
 }
 
-/**
- * Upcoming rows for map/site aggregation. Includes overbook rows and rows
- * with 0 openings — per product decision, the map pin count is the sum of
- * open_shifts_count across ALL upcoming shift groups for a site.
- */
-export async function getSiteAggregateRows(): Promise<ShiftGroup[]> {
-  return prisma.shiftGroup.findMany({ where: { shiftDate: { gte: todayISO() } } });
-}
-
 export function formatDateLabel(dateISO: string): string {
   const d = new Date(`${dateISO}T12:00:00Z`);
   if (Number.isNaN(d.getTime())) return dateISO;

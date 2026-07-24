@@ -4,7 +4,6 @@ import { prisma } from "./db";
 import { normalizePhone, syncAll } from "./modeSync";
 import {
   getServableRows,
-  getSiteAggregateRows,
   getLastSyncedAt,
   getLastSyncRun,
   siteKey,
@@ -80,9 +79,11 @@ export function registerApiRoutes(app: Express) {
 
   app.get("/api/sites", async (_req, res) => {
     try {
-      // Pin count is SUM(open_shifts_count) across ALL upcoming shift groups
-      // per site, overbook included.
-      const [rows, syncedAt] = await Promise.all([getSiteAggregateRows(), getLastSyncedAt()]);
+      // Pin count is SUM(open_shifts_count) over the SAME servable rows the
+      // sessions list shows (non-overbook, open > 0, valid booking link), so a
+      // pin's number equals the sum of that city's per-session spots — not a
+      // broader site-wide total that would contradict the list below.
+      const [rows, syncedAt] = await Promise.all([getServableRows(), getLastSyncedAt()]);
       const byKey = new Map<
         string,
         {
