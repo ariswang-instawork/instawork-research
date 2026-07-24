@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useSiteStorage, type SiteOrigin } from "@/hooks/use-site";
+import { login } from "@/hooks/use-auth";
 import { EligibilityCheckDrawer } from "@/components/Drawers";
 import { LocationSelector } from "@/components/LocationSelector";
 import { SessionCard } from "@/components/SessionCard";
@@ -13,7 +14,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { BadgeDollarSign, Check, Clock, Mic } from "lucide-react";
+import { AlertCircle, BadgeDollarSign, Check, Clock, Mic, ShieldCheck } from "lucide-react";
 import { SiteLeafletMap } from "@/components/SiteLeafletMap";
 import { trackEvent } from "@/lib/analytics";
 
@@ -73,18 +74,28 @@ const HOW_IT_WORKS_STEPS = [
   "Your session payment is processed through Instawork.",
 ];
 
+/** Trust reassurances shown after "What will I actually do?". */
+const TRUST_POINTS = [
+  "Sessions are staffed and paid the same way as your other Instawork shifts",
+  "Covered under Instawork's standard worker protections",
+  "In-app support available if you have questions before or during your session",
+  "No recording or acting experience needed — you'll get simple on-screen prompts",
+];
+
+/** States where this opportunity is not currently offered (code → display name). */
+const RESTRICTED_STATES: Record<string, string> = {
+  TX: "Texas",
+  WA: "Washington",
+  IL: "Illinois",
+};
+
+/** Placeholder until the real help-center URL is available. */
+const HELP_CENTER_URL = "https://help.instawork.com";
+
 const FAQ_ITEMS: { q: string; a: string }[] = [
   {
     q: "Do I need experience?",
     a: "No. Every task is guided, and a team member walks you through the session.",
-  },
-  {
-    q: "Is this remote or in person?",
-    a: "In person. You'll visit a nearby location and complete the session on-site.",
-  },
-  {
-    q: "What will I be recording?",
-    a: "Short voice prompts — reading sentences, answering simple questions, or repeating phrases while wearing a headset.",
   },
   {
     // TODO — copy pending. Do not guess data usage or retention; needs
@@ -93,26 +104,8 @@ const FAQ_ITEMS: { q: string; a: string }[] = [
     a: "TODO — copy pending",
   },
   {
-    q: "How will I get paid?",
-    a: "Your payment is processed through the Instawork app after your session.",
-  },
-  {
-    // TODO — copy pending. Do not guess the payment window; needs a real
-    // timing commitment (e.g. same day / within N business days).
-    q: "When do I get paid?",
-    a: "TODO — copy pending",
-  },
-  {
-    q: "What should I bring?",
-    a: "A valid photo ID. Everything else, including equipment, is provided at the location.",
-  },
-  {
-    q: "Can I complete more than one session?",
-    a: "You may be eligible to complete multiple sessions. The number of sessions available to you depends on the location and project requirements. Log in to Instawork to see the sessions you're eligible to book.",
-  },
-  {
-    q: "Where do I finish signing up?",
-    a: "In the Instawork app. After you pick a session, you'll log in or create an account there to complete booking.",
+    q: "How and when do I get paid?",
+    a: "We pass along your full session earnings. Payment is processed automatically through Instawork's weekly pay — funds land in your bank by end of day Wednesday for sessions completed that week.",
   },
   {
     q: "What happens after I select a session?",
@@ -160,6 +153,13 @@ export default function Landing() {
       }
     }
   }, [sessions]);
+
+  // Eligibility: derive the 2-letter state from the selected site's label
+  // ("City, ST") and flag the restricted states so we can block proceeding.
+  const restrictedStateName = useMemo(() => {
+    const code = site?.label.split(",").pop()?.trim().toUpperCase();
+    return code && RESTRICTED_STATES[code] ? RESTRICTED_STATES[code] : null;
+  }, [site?.label]);
 
   // Sites list — used to suggest the closest market with open sessions.
   const { data: sitesData } = useGetSites();
@@ -225,11 +225,15 @@ export default function Landing() {
         setPickerFocus((n) => n + 1);
         return;
       }
+      if (restrictedStateName) {
+        openPicker();
+        return;
+      }
       scrollToSessions();
     };
     window.addEventListener("iw:view-sessions", onViewSessions);
     return () => window.removeEventListener("iw:view-sessions", onViewSessions);
-  }, [site]);
+  }, [site, restrictedStateName]);
 
   // Reset per-city choices whenever the canonical site changes, no matter
   // where the change came from (picker, map popup, another tab).
@@ -244,6 +248,16 @@ export default function Landing() {
     trackEvent("find_sessions_clicked", { selected_city: site?.label ?? null, ...utmProps() });
     if (!hasCity) {
       openPicker();
+      return;
+    }
+    // Restricted state — don't proceed; the inline notice by the location
+    // field explains why.
+    if (restrictedStateName) {
+      trackEvent("restricted_state_blocked", {
+        selected_city: site?.label ?? null,
+        restricted_state: restrictedStateName,
+        ...utmProps(),
+      });
       return;
     }
     trackEvent("available_sessions_viewed", { selected_city: site?.label ?? null, ...utmProps() });
@@ -315,6 +329,14 @@ export default function Landing() {
               </span>
             </div>
 
+            {/* Legitimacy signal near the pay pill: this is payroll W-2 work. */}
+            <div className="mt-2">
+              <span className="inline-flex items-center gap-1.5 rounded-md bg-[#F2F4F7] px-2 py-1 text-[12px] font-medium text-[#475467]">
+                <ShieldCheck className="w-3.5 h-3.5 text-[#667085]" strokeWidth={2} />
+                W-2 · paid through Instawork payroll.
+              </span>
+            </div>
+
             <div className="mt-6 max-w-[560px]">
               <LocationSelector
                 label={site?.label ?? null}
@@ -327,6 +349,18 @@ export default function Landing() {
                   })
                 }
               />
+              {restrictedStateName && (
+                <p
+                  role="alert"
+                  className="mt-3 flex items-start gap-2 text-[14px] leading-[1.5] text-[#B42318]"
+                >
+                  <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" strokeWidth={2} aria-hidden="true" />
+                  <span>
+                    Sessions aren't currently available to residents of {restrictedStateName}.
+                    Try a different location.
+                  </span>
+                </p>
+              )}
             </div>
 
             <button
@@ -339,6 +373,19 @@ export default function Landing() {
 
             <p className="text-[14px] text-[#475467] mt-3">
               Exact time, location, and pay shown before booking.
+            </p>
+            <p className="text-[14px] text-[#475467] mt-1.5">
+              Already an Instawork Pro?{" "}
+              <button
+                type="button"
+                onClick={() => {
+                  trackEvent("login_clicked", { source_page: "landing", ...utmProps() });
+                  login();
+                }}
+                className="text-[#23409A] font-semibold underline underline-offset-2 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#23409A]/40"
+              >
+                Log in to book instantly
+              </button>
             </p>
           </div>
         </div>
@@ -379,6 +426,22 @@ export default function Landing() {
                     className="mt-4 inline-flex items-center justify-center h-12 px-6 rounded-[14px] border border-[#23409A] text-[#23409A] font-semibold text-[15px] active:opacity-80"
                   >
                     Enter your city
+                  </button>
+                </div>
+              ) : restrictedStateName ? (
+                <div className="py-8 text-center max-w-[480px] mx-auto">
+                  <p className="text-[17px] font-semibold text-[#101828]">
+                    Sessions aren't currently available to residents of {restrictedStateName}.
+                  </p>
+                  <p className="text-[15px] text-[#475467] mt-1.5">
+                    Choose a different location to see available sessions.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={openPicker}
+                    className="mt-4 inline-flex items-center justify-center h-12 px-6 rounded-[14px] border border-[#23409A] text-[#23409A] font-semibold text-[15px] active:opacity-80"
+                  >
+                    Change location
                   </button>
                 </div>
               ) : isLoading ? (
@@ -519,6 +582,36 @@ export default function Landing() {
           </div>
         </section>
 
+        {/* ============ WE HAVE YOU COVERED ============ */}
+        <section className="bg-white border-t border-[#eef0f3] py-16 md:py-24">
+          <div className="max-w-[1200px] mx-auto px-5 md:px-12">
+            <div className="max-w-[720px]">
+              <span
+                className="inline-flex items-center justify-center w-10 h-10 rounded-[12px] bg-[#ECFDF3] mb-4"
+                aria-hidden="true"
+              >
+                <ShieldCheck className="w-5 h-5 text-[#2E8A50]" strokeWidth={1.75} />
+              </span>
+              <h2 className="text-[26px] md:text-[30px] leading-[1.15] font-bold tracking-tight text-[#101828]">
+                We have you covered
+              </h2>
+              <ul className="mt-6 space-y-3">
+                {TRUST_POINTS.map((point) => (
+                  <li key={point} className="flex items-start gap-3 text-[16px] text-[#101828]">
+                    <span
+                      className="mt-0.5 w-5 h-5 rounded-full bg-[#ECFDF3] flex items-center justify-center shrink-0"
+                      aria-hidden="true"
+                    >
+                      <Check className="w-3.5 h-3.5 text-[#2E8A50]" strokeWidth={2.5} />
+                    </span>
+                    {point}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </section>
+
         {/* ============ EXPLORE OTHER LOCATIONS ============ */}
         <section id="locations" className="scroll-mt-[var(--header-height)] bg-[#F8FBFF] py-14 md:py-20">
           <div className="max-w-[1200px] mx-auto px-5 md:px-12">
@@ -553,6 +646,17 @@ export default function Landing() {
                   </AccordionItem>
                 ))}
               </Accordion>
+              <p className="text-[15px] leading-[1.6] text-[#475467] mt-6">
+                Still have questions? Check out more FAQs in our help center.{" "}
+                <a
+                  href={HELP_CENTER_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[#23409A] font-semibold underline underline-offset-2 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#23409A]/40"
+                >
+                  Read more
+                </a>
+              </p>
             </div>
           </div>
         </section>
