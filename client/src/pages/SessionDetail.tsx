@@ -221,50 +221,30 @@ export default function SessionDetail() {
               Do you already have an Instawork account?
             </DrawerDescription>
           </DrawerHeader>
-          <div className="px-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] flex flex-col gap-5">
-            <div>
-              <p className="text-[15px] font-semibold text-foreground mb-2">Yes, log in</p>
-              <Button
-                className="w-full h-[52px] rounded-xl text-[17px] font-semibold bg-primary hover:bg-primary/90 shadow-none"
-                onClick={() => {
-                  trackEvent("existing_user_selected", analyticsProps);
-                  trackEvent("instawork_redirect_started", { ...analyticsProps, destination: "login" });
-                  window.open(buildAuthUrl(INSTAWORK_LOGIN_URL), "_blank", "noopener,noreferrer");
-                  setBookSheetOpen(false);
-                }}
-              >
-                Log in to Instawork
-              </Button>
-              <p className="text-[13px] text-muted-foreground mt-2">
-                Log in, then continue directly to this research session.
-              </p>
-            </div>
-            <div>
-              <p className="text-[15px] font-semibold text-foreground mb-2">No, I&apos;m new to Instawork</p>
-              <Button
-                variant="outline"
-                className="w-full h-[52px] rounded-xl text-[17px] font-semibold border-primary text-primary hover:bg-primary/5 shadow-none"
-                onClick={() => {
-                  trackEvent("new_user_selected", analyticsProps);
-                  trackEvent("instawork_redirect_started", { ...analyticsProps, destination: "signup" });
-                  window.open(buildAuthUrl(INSTAWORK_SIGNUP_URL), "_blank", "noopener,noreferrer");
-                  setBookSheetOpen(false);
-                }}
-              >
-                Create an Instawork account
-              </Button>
-              <p className="text-[13px] text-muted-foreground mt-2">
-                Create your account, complete the sign-up form in the Instawork app, and return to this research session.
-              </p>
-            </div>
-            <DrawerClose asChild>
-              <button
-                type="button"
-                className="text-[15px] font-medium text-muted-foreground hover:text-foreground self-center py-1"
-              >
-                Cancel
-              </button>
-            </DrawerClose>
+          <div className="px-6 pt-2 pb-[calc(1.5rem+env(safe-area-inset-bottom))] flex flex-col gap-3">
+            <Button
+              className="w-full h-[52px] rounded-xl text-[17px] font-semibold bg-primary hover:bg-primary/90 shadow-none"
+              onClick={() => {
+                trackEvent("existing_user_selected", analyticsProps);
+                trackEvent("instawork_redirect_started", { ...analyticsProps, destination: "login" });
+                window.open(buildAuthUrl(INSTAWORK_LOGIN_URL), "_blank", "noopener,noreferrer");
+                setBookSheetOpen(false);
+              }}
+            >
+              Log in
+            </Button>
+            <Button
+              variant="outline"
+              className="w-full h-[52px] rounded-xl text-[17px] font-semibold border-primary text-primary hover:bg-primary/5 shadow-none"
+              onClick={() => {
+                trackEvent("new_user_selected", analyticsProps);
+                trackEvent("instawork_redirect_started", { ...analyticsProps, destination: "signup" });
+                window.open(buildAuthUrl(INSTAWORK_SIGNUP_URL), "_blank", "noopener,noreferrer");
+                setBookSheetOpen(false);
+              }}
+            >
+              Create an account
+            </Button>
           </div>
         </DrawerContent>
       </Drawer>
