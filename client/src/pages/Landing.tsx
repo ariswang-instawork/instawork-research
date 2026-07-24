@@ -13,7 +13,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { BadgeDollarSign, Clock, MapPin } from "lucide-react";
+import { BadgeDollarSign, Check, Clock, MapPin, Mic } from "lucide-react";
 import { SiteLeafletMap } from "@/components/SiteLeafletMap";
 import { login } from "@/hooks/use-auth";
 import { trackEvent } from "@/lib/analytics";
@@ -259,7 +259,8 @@ export default function Landing() {
     <div className="flex min-h-0 flex-1 flex-col bg-white">
       <main className="flex-1 overflow-y-auto w-full pb-16">
         {/* ============ HERO ============ */}
-        <div className="max-w-[1200px] mx-auto px-5 md:px-12 pt-8 md:pt-14 animate-in fade-in slide-in-from-bottom-3 duration-500">
+        <div className="bg-gradient-to-b from-[#F7F9FC] via-[#FAFBFD] to-white">
+        <div className="max-w-[1200px] mx-auto px-5 md:px-12 pt-8 md:pt-14 pb-2 animate-in fade-in slide-in-from-bottom-3 duration-500">
           <div className="grid md:grid-cols-[1fr_minmax(0,460px)] md:items-center gap-8 md:gap-12">
             <div className="max-w-[560px]">
               <p className="text-[13px] font-bold uppercase tracking-wide text-[#1c387d] mb-3">
@@ -276,7 +277,7 @@ export default function Landing() {
               {/* Compact benefit items */}
               <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-[15px] font-medium text-[#101828]">
                 <span className="inline-flex items-center gap-1.5">
-                  <BadgeDollarSign className="w-[18px] h-[18px] text-[#1c387d]" strokeWidth={1.75} />
+                  <BadgeDollarSign className="w-[18px] h-[18px] text-[#B98A1F]" strokeWidth={1.75} />
                   {hasCity && isLoading ? (
                     <Skeleton className="h-4 w-24 bg-muted inline-block" />
                   ) : (
@@ -294,7 +295,7 @@ export default function Landing() {
               </div>
 
               {/* Mobile image sits between details and location selector */}
-              <div className="mt-6 md:hidden rounded-[16px] overflow-hidden">
+              <div className="mt-6 md:hidden rounded-[16px] overflow-hidden bg-[#E9EFE7] p-2">
                 <img
                   src={`${import.meta.env.BASE_URL}hero-voice-recording.png`}
                   alt="A participant wearing headphones records voice prompts at a computer"
@@ -342,7 +343,7 @@ export default function Landing() {
             </div>
 
             <div className="hidden md:block">
-              <div className="rounded-[18px] overflow-hidden">
+              <div className="rounded-[18px] overflow-hidden bg-[#E9EFE7] p-3">
                 <img
                   src={`${import.meta.env.BASE_URL}hero-voice-recording.png`}
                   alt="A participant wearing headphones records voice prompts at a computer"
@@ -354,12 +355,13 @@ export default function Landing() {
             </div>
           </div>
         </div>
+        </div>
 
         {/* ============ SESSIONS ============ */}
         <section
           id="sessions"
           ref={sessionsRef}
-          className="scroll-mt-20 mt-14 md:mt-20 bg-[#f8f7f5] py-12 md:py-16"
+          className="scroll-mt-20 mt-12 md:mt-16 bg-[#F7F9FC] py-12 md:py-16"
         >
           <div className="max-w-[1200px] mx-auto px-5 md:px-12">
             <h2 className="text-[26px] md:text-[30px] leading-[1.15] font-bold tracking-tight text-[#101828]">
@@ -502,9 +504,15 @@ export default function Landing() {
         </section>
 
         {/* ============ WHAT WILL I ACTUALLY DO ============ */}
-        <section className="bg-[#f8f7f5] py-14 md:py-20">
+        <section className="bg-[#FAFBFD] py-14 md:py-20">
           <div className="max-w-[1200px] mx-auto px-5 md:px-12">
             <div className="max-w-[720px]">
+              <span
+                className="inline-flex items-center justify-center w-10 h-10 rounded-[12px] bg-[#F4F2FF] mb-4"
+                aria-hidden="true"
+              >
+                <Mic className="w-5 h-5 text-[#6B5BE0]" strokeWidth={1.75} />
+              </span>
               <h2 className="text-[26px] md:text-[30px] leading-[1.15] font-bold tracking-tight text-[#101828]">
                 What will I actually do?
               </h2>
@@ -522,9 +530,11 @@ export default function Landing() {
                 ].map((point) => (
                   <li key={point} className="flex items-start gap-3 text-[16px] text-[#101828]">
                     <span
-                      className="mt-[7px] w-2 h-2 rounded-full bg-[#1c387d] shrink-0"
+                      className="mt-0.5 w-5 h-5 rounded-full bg-[#ECFDF3] flex items-center justify-center shrink-0"
                       aria-hidden="true"
-                    />
+                    >
+                      <Check className="w-3.5 h-3.5 text-[#38A169]" strokeWidth={2.5} />
+                    </span>
                     {point}
                   </li>
                 ))}
@@ -549,7 +559,7 @@ export default function Landing() {
         </section>
 
         {/* ============ FAQ ============ */}
-        <section id="faq" className="scroll-mt-20 bg-[#f8f7f5] py-14 md:py-20">
+        <section id="faq" className="scroll-mt-20 bg-[#F7F9FC] py-14 md:py-20">
           <div className="max-w-[1200px] mx-auto px-5 md:px-12">
             <div className="max-w-[720px]">
               <h2 className="text-[26px] md:text-[30px] leading-[1.15] font-bold tracking-tight text-[#101828]">

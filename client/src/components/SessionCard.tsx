@@ -31,7 +31,9 @@ export function SessionCard({
       </div>
       <div>
         <p className="text-[20px] font-extrabold tracking-tight text-[#101828]">
-          {payText}{" "}
+          <span className="inline-flex items-center rounded-[8px] bg-[#FFF7DF] px-2 py-0.5">
+            {payText}
+          </span>{" "}
           <span className="text-[14px] font-medium text-[#475467]">estimated pay</span>
         </p>
         {rate && <p className="text-[14px] text-[#475467] mt-0.5">{rate}</p>}
@@ -41,7 +43,15 @@ export function SessionCard({
         {spots && (
           <>
             <span aria-hidden="true">·</span>
-            <span className="text-[#1c387d] font-medium">{spots}</span>
+            <span
+              className={`inline-flex items-center rounded-full px-2 py-0.5 text-[13px] font-semibold ${
+                session.open === 1
+                  ? "bg-[#FFF1EE] text-[#C2402F]"
+                  : "bg-[#ECFDF3] text-[#27754F]"
+              }`}
+            >
+              {spots}
+            </span>
           </>
         )}
       </div>
