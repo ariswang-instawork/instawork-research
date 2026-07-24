@@ -20,7 +20,7 @@ L.Icon.Default.mergeOptions({
   shadowUrl: markerShadow,
 });
 
-const PRIMARY = "#1c387d";
+const PRIMARY = "#23409A";
 
 type SiteWithCoords = Site & { latitude: number; longitude: number };
 
@@ -156,7 +156,7 @@ export function SiteLeafletMap() {
               data-testid={`button-city-${site.key}`}
             >
               <span className="flex items-center gap-3 min-w-0">
-                <MapPin className="w-5 h-5 text-[#1c387d] shrink-0" strokeWidth={1.75} />
+                <MapPin className="w-5 h-5 text-[#23409A] shrink-0" strokeWidth={1.75} />
                 <span className="min-w-0">
                   <span className="block text-[16px] font-semibold text-[#101828] truncate">
                     {site.label}
@@ -166,7 +166,7 @@ export function SiteLeafletMap() {
                   </span>
                 </span>
               </span>
-              <span className="text-[14px] font-semibold text-[#1c387d] shrink-0">
+              <span className="text-[14px] font-semibold text-[#23409A] shrink-0">
                 View
               </span>
             </button>

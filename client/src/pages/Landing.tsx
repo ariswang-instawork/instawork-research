@@ -246,11 +246,8 @@ export default function Landing() {
   };
 
   // ---- Hero copy ----------------------------------------------------------
-  const headline = singlePay != null
-    ? `Earn ${formatPay(singlePay)} in one 3-hour session`
-    : payText
-      ? `Earn ${payText} in one 3-hour session`
-      : "Earn money in one 3-hour session";
+  // The pay amount is highlighted in coral for editorial emphasis.
+  const headlinePay = singlePay != null ? formatPay(singlePay) : payText ?? "money";
 
   const visibleSessions = showAll ? sessions : sessions.slice(0, INITIAL_SESSION_COUNT);
   const hiddenCount = sessions.length - visibleSessions.length;
@@ -259,43 +256,48 @@ export default function Landing() {
     <div className="flex min-h-0 flex-1 flex-col bg-white">
       <main className="flex-1 overflow-y-auto w-full pb-16">
         {/* ============ HERO ============ */}
-        <div className="bg-gradient-to-b from-[#F7F9FC] via-[#FAFBFD] to-white">
+        <div className="bg-gradient-to-b from-[#F8FBFF] via-[#FAFBFD] to-white">
         <div className="max-w-[1200px] mx-auto px-5 md:px-12 pt-8 md:pt-14 pb-2 animate-in fade-in slide-in-from-bottom-3 duration-500">
           <div className="grid md:grid-cols-[1fr_minmax(0,460px)] md:items-center gap-8 md:gap-12">
             <div className="max-w-[560px]">
-              <p className="text-[13px] font-bold uppercase tracking-wide text-[#1c387d] mb-3">
+              <p className="text-[13px] font-bold uppercase tracking-wide text-[#23409A] mb-3">
                 Paid voice recording
               </p>
               <h1 className="text-[34px] md:text-[48px] leading-[1.08] font-extrabold tracking-[-0.03em] text-[#101828]">
-                {headline}
+                Earn <span className="text-[#F26B63]">{headlinePay}</span> in one 3-hour
+                session
               </h1>
               <p className="text-[17px] leading-[1.5] text-[#475467] mt-4">
                 Sit at a computer, read short voice prompts, and get paid through
                 Instawork. No experience needed.
               </p>
 
-              {/* Compact benefit items */}
-              <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-[15px] font-medium text-[#101828]">
-                <span className="inline-flex items-center gap-1.5">
-                  <BadgeDollarSign className="w-[18px] h-[18px] text-[#B98A1F]" strokeWidth={1.75} />
+              {/* Compact benefit badges */}
+              <div className="mt-5 flex flex-wrap items-center gap-2">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#FFF7DF] px-3 py-1.5 text-[14px] font-semibold text-[#7A5A12]">
+                  <BadgeDollarSign className="w-4 h-4 text-[#B9861F]" strokeWidth={2} />
                   {hasCity && isLoading ? (
-                    <Skeleton className="h-4 w-24 bg-muted inline-block" />
+                    <Skeleton className="h-4 w-20 bg-muted inline-block" />
                   ) : (
                     <>{payText ?? "Competitive"} estimated pay</>
                   )}
                 </span>
-                <span className="inline-flex items-center gap-1.5">
-                  <Clock className="w-[18px] h-[18px] text-[#1c387d]" strokeWidth={1.75} />
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#F8FBFF] border border-[#dbe4f5] px-3 py-1.5 text-[14px] font-semibold text-[#23409A]">
+                  <Clock className="w-4 h-4" strokeWidth={2} />
                   About 3 hours
                 </span>
-                <span className="inline-flex items-center gap-1.5">
-                  <MapPin className="w-[18px] h-[18px] text-[#1c387d]" strokeWidth={1.75} />
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#F4F2FF] px-3 py-1.5 text-[14px] font-semibold text-[#5D4FC7]">
+                  <MapPin className="w-4 h-4" strokeWidth={2} />
                   In-person session
+                </span>
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#EAF6EE] px-3 py-1.5 text-[14px] font-semibold text-[#2E8A50]">
+                  <Check className="w-4 h-4" strokeWidth={2.5} />
+                  No experience needed
                 </span>
               </div>
 
               {/* Mobile image sits between details and location selector */}
-              <div className="mt-6 md:hidden rounded-[16px] overflow-hidden bg-[#E9EFE7] p-2">
+              <div className="mt-6 md:hidden rounded-[16px] overflow-hidden bg-[#EAF6EE] p-2">
                 <img
                   src={`${import.meta.env.BASE_URL}hero-voice-recording.png`}
                   alt="A participant wearing headphones records voice prompts at a computer"
@@ -322,7 +324,7 @@ export default function Landing() {
               <button
                 type="button"
                 onClick={handleSeeSessions}
-                className="mt-4 w-full h-[54px] rounded-[14px] bg-[#1c387d] text-white text-[16px] font-semibold transition-[transform,background-color] duration-150 active:scale-[0.99] active:bg-[#16295e] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1c387d]/40"
+                className="mt-4 w-full h-[54px] rounded-[14px] bg-[#23409A] text-white text-[16px] font-semibold transition-[transform,background-color] duration-150 active:scale-[0.99] active:bg-[#1a3179] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#23409A]/40"
               >
                 View sessions near me
               </button>
@@ -332,7 +334,7 @@ export default function Landing() {
                 <button
                   type="button"
                   onClick={() => login()}
-                  className="text-[#1c387d] underline underline-offset-2 font-medium"
+                  className="text-[#23409A] underline underline-offset-2 font-medium"
                 >
                   Log in
                 </button>
@@ -343,7 +345,7 @@ export default function Landing() {
             </div>
 
             <div className="hidden md:block">
-              <div className="rounded-[18px] overflow-hidden bg-[#E9EFE7] p-3">
+              <div className="rounded-[18px] overflow-hidden bg-[#EAF6EE] p-3">
                 <img
                   src={`${import.meta.env.BASE_URL}hero-voice-recording.png`}
                   alt="A participant wearing headphones records voice prompts at a computer"
@@ -361,7 +363,7 @@ export default function Landing() {
         <section
           id="sessions"
           ref={sessionsRef}
-          className="scroll-mt-20 mt-12 md:mt-16 bg-[#F7F9FC] py-12 md:py-16"
+          className="scroll-mt-20 mt-12 md:mt-16 bg-[#F8FBFF] py-12 md:py-16"
         >
           <div className="max-w-[1200px] mx-auto px-5 md:px-12">
             <h2 className="text-[26px] md:text-[30px] leading-[1.15] font-bold tracking-tight text-[#101828]">
@@ -374,7 +376,7 @@ export default function Landing() {
                 <button
                   type="button"
                   onClick={openPicker}
-                  className="text-[#1c387d] underline underline-offset-2 font-medium ml-1.5"
+                  className="text-[#23409A] underline underline-offset-2 font-medium ml-1.5"
                 >
                   Change location
                 </button>
@@ -390,7 +392,7 @@ export default function Landing() {
                   <button
                     type="button"
                     onClick={openPicker}
-                    className="mt-4 inline-flex items-center justify-center h-12 px-6 rounded-[14px] bg-[#1c387d] text-white font-semibold text-[15px] active:opacity-90"
+                    className="mt-4 inline-flex items-center justify-center h-12 px-6 rounded-[14px] bg-[#23409A] text-white font-semibold text-[15px] active:opacity-90"
                   >
                     Enter your city
                   </button>
@@ -410,7 +412,7 @@ export default function Landing() {
                     <button
                       type="button"
                       onClick={openPicker}
-                      className="inline-flex items-center justify-center h-12 px-6 rounded-[14px] border border-[#1c387d] text-[#1c387d] font-semibold text-[15px] active:opacity-80"
+                      className="inline-flex items-center justify-center h-12 px-6 rounded-[14px] border border-[#23409A] text-[#23409A] font-semibold text-[15px] active:opacity-80"
                     >
                       Change location
                     </button>
@@ -420,7 +422,7 @@ export default function Landing() {
                         onClick={() =>
                           handleSiteSelected(closestOpenMarket.key, closestOpenMarket.label)
                         }
-                        className="inline-flex items-center justify-center h-12 px-6 rounded-[14px] bg-[#1c387d] text-white font-semibold text-[15px] active:opacity-90"
+                        className="inline-flex items-center justify-center h-12 px-6 rounded-[14px] bg-[#23409A] text-white font-semibold text-[15px] active:opacity-90"
                       >
                         View sessions in {closestOpenMarket.label}
                       </button>
@@ -467,7 +469,7 @@ export default function Landing() {
                 <button
                   type="button"
                   onClick={() => setEligibilityOpen(true)}
-                  className="text-[#1c387d] underline underline-offset-2"
+                  className="text-[#23409A] underline underline-offset-2"
                 >
                   Check remaining sessions
                 </button>
@@ -486,7 +488,7 @@ export default function Landing() {
               {HOW_IT_WORKS_STEPS.map((step, i) => (
                 <li key={step.title} className="flex md:flex-col gap-4">
                   <span
-                    className="shrink-0 w-9 h-9 rounded-full bg-[#1c387d] text-white text-[15px] font-bold flex items-center justify-center"
+                    className="shrink-0 w-9 h-9 rounded-full bg-[#23409A] text-white text-[15px] font-bold flex items-center justify-center"
                     aria-hidden="true"
                   >
                     {i + 1}
@@ -511,7 +513,7 @@ export default function Landing() {
                 className="inline-flex items-center justify-center w-10 h-10 rounded-[12px] bg-[#F4F2FF] mb-4"
                 aria-hidden="true"
               >
-                <Mic className="w-5 h-5 text-[#6B5BE0]" strokeWidth={1.75} />
+                <Mic className="w-5 h-5 text-[#8C7CFF]" strokeWidth={1.75} />
               </span>
               <h2 className="text-[26px] md:text-[30px] leading-[1.15] font-bold tracking-tight text-[#101828]">
                 What will I actually do?
@@ -533,7 +535,7 @@ export default function Landing() {
                       className="mt-0.5 w-5 h-5 rounded-full bg-[#ECFDF3] flex items-center justify-center shrink-0"
                       aria-hidden="true"
                     >
-                      <Check className="w-3.5 h-3.5 text-[#38A169]" strokeWidth={2.5} />
+                      <Check className="w-3.5 h-3.5 text-[#2E8A50]" strokeWidth={2.5} />
                     </span>
                     {point}
                   </li>
@@ -559,7 +561,7 @@ export default function Landing() {
         </section>
 
         {/* ============ FAQ ============ */}
-        <section id="faq" className="scroll-mt-20 bg-[#F7F9FC] py-14 md:py-20">
+        <section id="faq" className="scroll-mt-20 bg-[#F8FBFF] py-14 md:py-20">
           <div className="max-w-[1200px] mx-auto px-5 md:px-12">
             <div className="max-w-[720px]">
               <h2 className="text-[26px] md:text-[30px] leading-[1.15] font-bold tracking-tight text-[#101828]">

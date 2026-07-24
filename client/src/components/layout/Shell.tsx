@@ -105,7 +105,7 @@ export function Shell({ children }: { children: ReactNode }) {
               <img src={LOGO_URL} alt="" className="w-9 h-9 rounded-[10px] shrink-0" />
               <span className="text-xl font-bold leading-none whitespace-nowrap truncate min-w-0">
                 <span className="text-black">Instawork</span>{" "}
-                <span className="text-[#1c387d]">Research</span>
+                <span className="text-[#23409A]">Research</span>
               </span>
             </button>
 
@@ -126,7 +126,7 @@ export function Shell({ children }: { children: ReactNode }) {
               <button
                 type="button"
                 onClick={findSessions}
-                className="rounded-[12px] bg-[#1c387d] text-white text-[15px] font-semibold px-5 h-11 inline-flex items-center transition-opacity duration-150 active:opacity-85"
+                className="rounded-[12px] bg-[#23409A] text-white text-[15px] font-semibold px-5 h-11 inline-flex items-center transition-opacity duration-150 active:opacity-85"
               >
                 View sessions
               </button>
@@ -160,7 +160,7 @@ export function Shell({ children }: { children: ReactNode }) {
                     <img src={LOGO_URL} alt="" className="w-9 h-9 rounded-[10px] shrink-0" />
                     <span className="text-xl font-bold leading-none whitespace-nowrap truncate min-w-0">
                       <span className="text-black">Instawork</span>{" "}
-                      <span className="text-[#1c387d]">Research</span>
+                      <span className="text-[#23409A]">Research</span>
                     </span>
                   </div>
                   <button

@@ -47,7 +47,7 @@ export function SessionCard({
               className={`inline-flex items-center rounded-full px-2 py-0.5 text-[13px] font-semibold ${
                 session.open === 1
                   ? "bg-[#FFF1EE] text-[#C2402F]"
-                  : "bg-[#ECFDF3] text-[#27754F]"
+                  : "bg-[#ECFDF3] text-[#2E8A50]"
               }`}
             >
               {spots}
@@ -58,7 +58,7 @@ export function SessionCard({
       <button
         type="button"
         onClick={onBook}
-        className="mt-auto w-full h-12 rounded-[14px] bg-[#1c387d] text-white text-[15px] font-semibold transition-[transform,background-color] duration-150 active:scale-[0.99] active:bg-[#16295e] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1c387d]/40"
+        className="mt-auto w-full h-12 rounded-[14px] bg-[#23409A] text-white text-[15px] font-semibold transition-[transform,background-color] duration-150 active:scale-[0.99] active:bg-[#1a3179] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#23409A]/40"
       >
         Book in the Instawork app
       </button>

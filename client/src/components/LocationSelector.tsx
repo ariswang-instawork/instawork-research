@@ -51,9 +51,9 @@ export function LocationSelector({
         setEditing(true);
         setComboFocus((n) => n + 1);
       }}
-      className="w-full min-h-[52px] flex items-center gap-3 rounded-[14px] border border-[#e4e7ec] bg-white px-4 py-3 text-left transition-colors hover:border-[#c9cfd9] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1c387d]/40"
+      className="w-full min-h-[52px] flex items-center gap-3 rounded-[14px] border border-[#e4e7ec] bg-white px-4 py-3 text-left transition-colors hover:border-[#c9cfd9] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#23409A]/40"
     >
-      <MapPin className="w-5 h-5 text-[#1c387d] shrink-0" strokeWidth={2} />
+      <MapPin className="w-5 h-5 text-[#23409A] shrink-0" strokeWidth={2} />
       <span
         className={`flex-1 min-w-0 truncate text-base ${
           label ? "font-semibold text-[#101828]" : "text-[#667085]"
@@ -61,7 +61,7 @@ export function LocationSelector({
       >
         {label ?? "Enter your city"}
       </span>
-      <span className="text-sm font-semibold text-[#1c387d] shrink-0 inline-flex items-center gap-0.5">
+      <span className="text-sm font-semibold text-[#23409A] shrink-0 inline-flex items-center gap-0.5">
         {label ? "Change" : "Select"}
         <ChevronDown className="w-4 h-4" strokeWidth={2} />
       </span>
