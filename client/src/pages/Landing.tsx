@@ -327,6 +327,16 @@ export default function Landing() {
     <div className="flex min-h-0 flex-1 flex-col bg-white">
       <main className="flex-1 overflow-y-auto px-[clamp(24px,6vw,72px)] pt-[clamp(28px,5vw,56px)] pb-[calc(clamp(64px,10vw,112px)+env(safe-area-inset-bottom))] max-w-md mx-auto w-full [container-type:inline-size] animate-in fade-in slide-in-from-bottom-3 duration-500">
         <div>
+          {/* Hero illustration */}
+          <div className="rounded-2xl overflow-hidden mb-[clamp(28px,5vw,48px)]">
+            <img
+              src={`${import.meta.env.BASE_URL}hero-voice-recording.png`}
+              alt=""
+              loading="lazy"
+              className="w-full h-auto object-cover md:max-h-[420px]"
+            />
+          </div>
+
           {/* Eyebrow / location row */}
           {hasCity ? (
             <div className="flex items-center gap-2 mb-[clamp(20px,4vw,32px)]">
