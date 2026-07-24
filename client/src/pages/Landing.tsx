@@ -98,6 +98,10 @@ const FAQ_ITEMS: { q: string; a: string }[] = [
     a: "No. Every task is guided, and a team member walks you through the session.",
   },
   {
+    q: "What will I be recording?",
+    a: "Short voice prompts — reading sentences, answering simple questions, or repeating phrases while wearing a headset.",
+  },
+  {
     // TODO — copy pending. Do not guess data usage or retention; needs
     // real answer from the research/privacy team.
     q: "How are my voice recordings used and stored?",
