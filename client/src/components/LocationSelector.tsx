@@ -59,10 +59,10 @@ export function LocationSelector({
           label ? "font-semibold text-[#101828]" : "text-[#667085]"
         }`}
       >
-        {label ?? "Choose your city"}
+        {label ?? "Enter your city"}
       </span>
       <span className="text-sm font-semibold text-[#1c387d] shrink-0 inline-flex items-center gap-0.5">
-        Change
+        {label ? "Change" : "Select"}
         <ChevronDown className="w-4 h-4" strokeWidth={2} />
       </span>
     </button>

@@ -1,0 +1,370 @@
+Redesign the existing Instawork Research landing page to feel like a modern, conversion-focused consumer marketplace—not a generic corporate HR or SaaS website.
+
+Do not rebuild the app from scratch. First inspect the existing codebase, identify the current components, routes, session data, location logic, authentication links, map implementation, and responsive behavior. Preserve all working functionality and only improve the UI, hierarchy, copy, and interaction design.
+
+PRIMARY GOAL
+
+Help gig workers immediately understand:
+
+1. How much they can earn
+2. How long the session takes
+3. What they will actually do
+4. Where sessions are available
+5. How to book in the Instawork app
+
+The page should make users think:
+
+“This looks easy. I can earn $110 in three hours. Show me the sessions.”
+
+DESIGN DIRECTION
+
+Create a clean consumer marketplace experience inspired by the clarity and conversion patterns of Uber, Airbnb, Cash App, and modern gig-work apps.
+
+The design should feel:
+
+- Simple
+- Human
+- Energetic
+- Trustworthy
+- Mobile-first
+- Gig-worker friendly
+- Easy to scan
+- Focused on earning
+
+Avoid:
+
+- Corporate stock-template layouts
+- Excessive white space
+- Large generic feature cards
+- Academic “research study” language
+- SaaS-style navigation
+- Tiny gray text
+- Too many outlines and borders
+- Generic phrases such as “What to expect”
+- Making every section look equally important
+- Overly polished AI-generated corporate illustrations
+
+Use the existing Instawork brand colors and logo. Use dark navy text, Instawork blue for the primary CTA, white backgrounds, and subtle warm gray section backgrounds. Keep the design accessible and high contrast.
+
+DESKTOP HERO
+
+Create a two-column hero section.
+
+Left column:
+
+Eyebrow:
+PAID VOICE RECORDING
+
+Main headline:
+Earn $110.58 in one 3-hour session
+
+Supporting copy:
+Sit at a computer, read short voice prompts, and get paid through Instawork. No experience needed.
+
+Show three compact benefit items directly underneath:
+
+- $110.58 estimated pay
+- About 3 hours
+- In-person session
+
+Add a prominent location selector:
+
+Near:
+Boston, MA
+
+Include a “Change” control with a location icon.
+
+Primary CTA:
+View sessions near me
+
+The CTA should be large, visually dominant, and full-width within the left column.
+
+Under the CTA, add smaller supporting text:
+
+Already use Instawork? Log in
+
+Also add a short trust line:
+
+See the exact time, location, and pay before booking.
+
+Right column:
+
+Use a realistic, welcoming participant image showing an everyday adult sitting at a computer with headphones and a microphone while completing guided voice prompts.
+
+The person should look like a participant, not a podcast host, executive, customer-support worker, or corporate spokesperson.
+
+The image should feel approachable and believable. Use rounded corners, but do not over-style it.
+
+Do not make the image larger or more visually dominant than the earning headline and CTA.
+
+MOBILE HERO
+
+On mobile, use this order:
+
+1. Eyebrow
+2. Headline
+3. Supporting copy
+4. Pay and duration details
+5. Participant image
+6. Location selector
+7. Primary CTA
+8. Login link
+9. Trust line
+
+The CTA should remain visible without requiring excessive scrolling.
+
+Use large readable type and generous tap targets, but avoid oversized text that forces the user to scroll through one sentence at a time.
+
+SESSIONS SECTION
+
+Immediately after the hero, show:
+
+Available sessions near Boston
+
+Add supporting text:
+Choose a time that works for you. You’ll complete booking in the Instawork app.
+
+Do not lead with a nationwide map.
+
+Show actual session cards first. Each session card should contain:
+
+- Day and date
+- Start and end time
+- Exact estimated pay
+- Duration
+- Approximate area or city
+- Availability status
+- Primary button: Book in the Instawork app
+
+Example:
+
+Monday, July 27
+11:30 AM–2:30 PM
+
+$110.58 estimated pay
+$36.86/hr × 3 hours
+Boston, MA
+
+Book in the Instawork app
+
+Cards should be easy to scan and should not feel like enterprise dashboard components.
+
+On desktop, display sessions in a clean two-column grid.
+On mobile, use one card per row.
+
+If there are many sessions, initially show the first 4–6 and include:
+
+View more sessions
+
+LOCATION EXPERIENCE
+
+Users may arrive without a known location.
+
+Do not default every visitor to New York or Boston without explanation.
+
+Use this location flow:
+
+- If a location exists in the URL or app data, use it.
+- If the browser has previously granted location permission, use the nearest supported market.
+- Otherwise display a neutral selector labeled:
+  Enter your city
+- Do not automatically trigger a browser permission popup on page load.
+- Request location only after the user taps “Use my location.”
+- Always allow manual city selection.
+
+If there are no sessions nearby, show:
+
+No sessions are currently open near this location.
+
+Then provide:
+
+- Change location
+- View the closest available market
+
+HOW IT WORKS
+
+Replace generic feature cards with one compact, visual four-step section.
+
+Heading:
+Easy from start to finish
+
+Steps:
+
+1. Pick a session
+Choose an available date and time near you.
+
+2. Book in Instawork
+Complete the short sign-up form and reserve your session in the Instawork app.
+
+3. Record your voice
+Visit the location, sit at a computer, and follow simple on-screen prompts.
+
+4. Get paid
+Your session payment is processed through Instawork.
+
+Use numbered steps or a connected timeline. Avoid four large empty bordered cards.
+
+CLARIFY THE EXPERIENCE
+
+Add a section titled:
+
+What will I actually do?
+
+Copy:
+
+You’ll sit at a computer in a research location and complete a series of short, guided voice tasks. You may read sentences, answer simple prompts, or repeat phrases while wearing a headset. A team member will guide you through the session.
+
+Add three concise points:
+
+- No acting or recording experience required
+- Equipment is provided
+- You will receive instructions at the location
+
+FAQ
+
+Create a simple accordion with these questions:
+
+- Do I need experience?
+- Is this remote or in person?
+- What will I be recording?
+- How will I get paid?
+- What should I bring?
+- Can I complete more than one session?
+- Where do I finish signing up?
+- What happens after I select a session?
+
+Keep answers brief and practical.
+
+NAVIGATION
+
+Desktop navigation should contain only:
+
+- Instawork Research logo
+- Find sessions
+- How it works
+- FAQ
+- Log in
+
+Use one primary CTA in the header:
+View sessions
+
+Remove “Sign up” as a competing global CTA if the actual signup and booking happen inside the Instawork app.
+
+Mobile menu should be compact and contain:
+
+- Find sessions
+- How it works
+- Locations
+- FAQ
+- Log in
+
+Do not use large documentation-style accordion navigation inside the mobile menu.
+
+COPY RULES
+
+Use plain language for gig workers.
+
+Prefer:
+
+- Earn
+- Get paid
+- Pick a session
+- Book
+- Read short prompts
+- Sit at a computer
+- Near you
+
+Avoid:
+
+- Participate in a study
+- Research opportunity
+- Complete guided recording tasks at a research facility
+- Eligibility requirements
+- Openings nationwide
+- Academic or clinical language
+
+Do not imply the work is remote.
+
+Do not reveal the confidential end client or partner name.
+
+Do not promise payment timing unless that timing is supported by the existing product data.
+
+Use “estimated pay” wherever the final amount may vary.
+
+MAP
+
+The map should not dominate the landing page.
+
+Move it below the visible session cards into a section titled:
+
+Explore other locations
+
+Use the map only as a secondary discovery tool.
+
+Fix these current map issues:
+
+- Do not show misleading counts such as 1,217 openings unless they represent real bookable sessions.
+- Do not show zero-count markers.
+- Prevent labels and markers from overlapping.
+- Use market-level counts, not raw database row counts.
+- Make map popovers compact.
+- Ensure selected-market cards do not cover important controls.
+- On mobile, use a city list instead of forcing users to interact with a small map.
+
+VISUAL SYSTEM
+
+Use:
+
+- Maximum content width around 1180–1240px
+- Strong but not oversized headline
+- Clear spacing between sections
+- Border radius around 14–18px
+- Minimal shadows
+- Light section background changes
+- Consistent icon style
+- Buttons at least 48px tall
+- Mobile body text of at least 16px
+- Visible hover, focus, loading, empty, and disabled states
+
+Do not use excessive pill-shaped components.
+
+Do not add decorative gradients unless extremely subtle.
+
+The page should feel like a real booking marketplace, not a pitch deck.
+
+TECHNICAL REQUIREMENTS
+
+- Preserve the existing framework and component structure where reasonable.
+- Reuse existing session and location APIs.
+- Do not replace real data with hardcoded demo data.
+- Do not break existing login, signup, deep-link, or booking behavior.
+- Keep the existing Instawork app deep links.
+- Preserve analytics and tracking parameters.
+- Ensure all buttons have working destinations or handlers.
+- Add accessible labels to controls.
+- Support keyboard navigation.
+- Use semantic HTML.
+- Meet WCAG contrast standards.
+- Avoid layout shifts.
+- Optimize the hero image.
+- Ensure responsive behavior at mobile, tablet, laptop, and large desktop sizes.
+- Do not introduce unnecessary packages.
+- Remove dead or duplicated CSS after the redesign.
+
+IMPLEMENTATION PROCESS
+
+1. Audit the existing page and summarize the current component structure.
+2. Identify which functionality must be preserved.
+3. Create a brief implementation plan.
+4. Implement the redesign.
+5. Test every CTA, location selector, session card, accordion, login link, and map interaction.
+6. Test responsive layouts at:
+   - 390px
+   - 768px
+   - 1024px
+   - 1440px
+7. Fix horizontal overflow, text clipping, overlapping map controls, and excessive empty space.
+8. Run the existing tests and build command.
+9. Report which files were changed and any remaining limitations.
+
+Do not stop after creating a visual mockup. Implement the complete working redesign in the existing app.

@@ -128,15 +128,15 @@ export function SiteLeafletMap() {
     () =>
       (data?.sites ?? []).filter(
         (s): s is SiteWithCoords =>
-          typeof s.latitude === "number" && typeof s.longitude === "number",
+          typeof s.latitude === "number" &&
+          typeof s.longitude === "number" &&
+          s.openCount > 0, // never show zero-count markers
       ),
     [data],
   );
 
   const handleView = (site: Site) => {
     setSite(site.key, site.label);
-    // Session list lives inline on the landing page now.
-    localStorage.setItem("iw_sessions_expanded", "1");
     navigate("/");
     window.dispatchEvent(new CustomEvent("iw:view-sessions"));
   };
@@ -145,11 +145,48 @@ export function SiteLeafletMap() {
     // `relative z-0` creates an isolated stacking context so Leaflet's
     // high-z-index panes (400+) can never bleed over the fixed footer CTA.
     <div className="relative z-0 rounded-xl border border-gray-200 bg-white overflow-hidden" data-testid="card-site-map">
-      <div className="bg-white border-b border-gray-200 px-6 py-2.5 flex items-center gap-3">
+      {/* Mobile: simple city list instead of a small interactive map */}
+      <ul className="md:hidden divide-y divide-gray-200">
+        {(isLoading ? [] : sites).map((site) => (
+          <li key={site.key}>
+            <button
+              type="button"
+              onClick={() => handleView(site)}
+              className="w-full min-h-[56px] px-5 py-3 flex items-center justify-between gap-3 text-left active:bg-gray-50"
+              data-testid={`button-city-${site.key}`}
+            >
+              <span className="flex items-center gap-3 min-w-0">
+                <MapPin className="w-5 h-5 text-[#1c387d] shrink-0" strokeWidth={1.75} />
+                <span className="min-w-0">
+                  <span className="block text-[16px] font-semibold text-[#101828] truncate">
+                    {site.label}
+                  </span>
+                  <span className="block text-[14px] text-[#475467]">
+                    {openingsText(site.openCount)}
+                  </span>
+                </span>
+              </span>
+              <span className="text-[14px] font-semibold text-[#1c387d] shrink-0">
+                View
+              </span>
+            </button>
+          </li>
+        ))}
+        {isLoading && (
+          <li className="px-5 py-4 text-sm text-gray-500">Loading locations…</li>
+        )}
+        {!isLoading && sites.length === 0 && (
+          <li className="px-5 py-4 text-sm text-gray-500">
+            No locations with open sessions right now.
+          </li>
+        )}
+      </ul>
+
+      <div className="hidden md:block bg-white border-b border-gray-200 px-6 py-2.5 items-center gap-3 md:flex">
         <MapPin className="w-5 h-5 text-gray-500 shrink-0" strokeWidth={1.75} />
         <p className="text-[15px] font-medium leading-[1.4] text-gray-500">Tap a location to view open sessions.</p>
       </div>
-      <div className="h-[280px] w-full relative">
+      <div className="h-[280px] w-full relative hidden md:block">
         {isLoading || sites.length === 0 ? (
           <div className="absolute inset-0 flex items-center justify-center bg-gray-50 text-sm text-gray-500">
             Loading locations…
