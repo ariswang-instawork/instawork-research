@@ -1,26 +1,21 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useLocation } from "wouter";
 import { useSiteStorage, type SiteOrigin } from "@/hooks/use-site";
 import { EligibilityCheckDrawer } from "@/components/Drawers";
-import { LocationCombobox } from "@/components/LocationCombobox";
+import { LocationSelector } from "@/components/LocationSelector";
+import { ResearchSummary } from "@/components/ResearchSummary";
+import { DateGroup } from "@/components/DateGroup";
+import { SessionOption } from "@/components/SessionOption";
+import { StickyBookingBar } from "@/components/StickyBookingBar";
 import { ContinueWithInstaworkSheet } from "@/components/ContinueWithInstaworkSheet";
 import { useGetSessions, getGetSessionsQueryKey } from "@/lib/api-client";
 import type { SessionItem as Session } from "@/lib/api-client/generated/api.schemas";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Sparkles,
-  Mic,
-  Wallet,
-  MapPin,
-  BadgeDollarSign,
-  ChevronRight,
-} from "lucide-react";
-import { PrimaryCtaButton } from "@/components/PrimaryCtaButton";
+import { Sparkles, Mic, Wallet, BadgeDollarSign } from "lucide-react";
 import { SiteLeafletMap } from "@/components/SiteLeafletMap";
 import { login } from "@/hooks/use-auth";
 import { trackEvent } from "@/lib/analytics";
 
-const INITIAL_SESSION_COUNT = 6;
+const INITIAL_SESSION_COUNT = 8;
 
 /** "$75" for whole amounts, "$110.58" otherwise. */
 function formatPay(amount: number): string {
@@ -67,147 +62,28 @@ function utmProps(): Record<string, string | null> {
   };
 }
 
-function SessionsList({
-  sessions,
-  isLoading,
-  siteLabel,
-  onChoose,
-  onChooseAnotherCity,
-}: {
-  sessions: Session[];
-  isLoading: boolean;
-  siteLabel: string;
-  onChoose: (session: Session) => void;
-  onChooseAnotherCity: () => void;
-}) {
-  const [, setLocation] = useLocation();
-  const [showAll, setShowAll] = useState(false);
-
-  if (isLoading) {
-    return (
-      <div>
-        {[1, 2, 3].map((i) => (
-          <div
-            key={i}
-            className="flex items-center justify-between py-[18px] border-b border-[hsl(var(--border))] animate-pulse"
-          >
-            <div className="flex-1 space-y-2">
-              <Skeleton className="h-5 w-32 bg-muted" />
-              <Skeleton className="h-4 w-24 bg-muted" />
-            </div>
-            <Skeleton className="h-5 w-14 bg-muted" />
-          </div>
-        ))}
-      </div>
-    );
-  }
-
-  if (sessions.length === 0) {
-    return (
-      <div className="py-6 text-center">
-        <p className="text-base font-semibold text-[#101828]">
-          No sessions are currently available in {siteLabel}.
-        </p>
-        <p className="text-base text-[#475467] mt-1">
-          Check another city or come back soon for new openings.
-        </p>
-        <button
-          type="button"
-          onClick={onChooseAnotherCity}
-          className="mt-4 inline-flex items-center justify-center min-h-[44px] px-6 rounded-xl border border-[#1c387d] text-[#1c387d] font-semibold text-base active:opacity-80"
-        >
-          Choose another city
-        </button>
-      </div>
-    );
-  }
-
-  const visible = showAll ? sessions : sessions.slice(0, INITIAL_SESSION_COUNT);
-  const hiddenCount = sessions.length - visible.length;
-
-  return (
-    <div>
-      {visible.map((session) => {
-        const pay = parseFloat(session.payAmount);
-        const payText = Number.isFinite(pay) ? `Earn ${formatPay(pay)}` : session.payLabel;
-        const hours = session.billableHours != null ? `${session.billableHours} hours` : "3 hours";
-        return (
-          <div
-            key={session.id}
-            className="py-[18px] border-b border-[hsl(var(--border))]"
-          >
-            <div className="flex items-start justify-between gap-4">
-              <div
-                role="button"
-                tabIndex={0}
-                onClick={() => setLocation(`/sessions/${session.id}`)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    setLocation(`/sessions/${session.id}`);
-                  }
-                }}
-                className="flex-1 min-w-0 cursor-pointer rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
-                aria-label={`View details for ${session.date}, ${session.time}`}
-              >
-                <div className="font-bold text-[16px] mb-0.5">{session.date}</div>
-                <div className="text-muted-foreground text-[13px]">
-                  {session.time} · {hours}
-                </div>
-                <div className="font-bold text-[15px] mt-1.5">{payText}</div>
-              </div>
-              <button
-                type="button"
-                onClick={() => onChoose(session)}
-                className="shrink-0 min-h-[44px] px-4 rounded-xl bg-[#1c387d] text-white text-[14px] font-semibold active:bg-[#16295e] transition-colors self-center"
-              >
-                Choose this session
-              </button>
-            </div>
-          </div>
-        );
-      })}
-      {hiddenCount > 0 && (
-        <button
-          type="button"
-          onClick={() => {
-            setShowAll(true);
-            trackEvent("see_more_sessions_clicked", { selected_city: siteLabel, ...utmProps() });
-          }}
-          className="w-full min-h-[44px] mt-2 text-[#1c387d] font-semibold text-base underline underline-offset-2"
-        >
-          See more dates ({hiddenCount})
-        </button>
-      )}
-    </div>
-  );
-}
-
 export default function Landing() {
   const { site, setSite } = useSiteStorage();
   const [eligibilityOpen, setEligibilityOpen] = useState(false);
-  // Incremented to focus the inline location field and open its dropdown.
+  // Incremented to open the location selector.
   const [pickerFocus, setPickerFocus] = useState(0);
   // Inline sessions panel; restored across reloads and detail-page visits.
   const [sessionsOpen, setSessionsOpen] = useState(
     () => localStorage.getItem("iw_sessions_expanded") === "1",
   );
   const sessionsPanelRef = useRef<HTMLDivElement | null>(null);
-  // "Continue with Instawork" sheet for a chosen session.
-  const [chosenSession, setChosenSession] = useState<Session | null>(null);
+  const [selectedSession, setSelectedSession] = useState<Session | null>(null);
+  const [showAll, setShowAll] = useState(false);
+  const [sheetOpen, setSheetOpen] = useState(false);
 
   const hasCity = !!site;
 
-  // Sessions for the selected city power both the dynamic hero pay and the list.
   const { data, isLoading } = useGetSessions(
     { site: site?.key || "" },
     { query: { enabled: hasCity, queryKey: getGetSessionsQueryKey({ site: site?.key || "" }) } },
   );
 
-  const sessions = useMemo(
-    () => upcomingSorted(data?.sessions ?? []),
-    [data?.sessions],
-  );
+  const sessions = useMemo(() => upcomingSorted(data?.sessions ?? []), [data?.sessions]);
 
   // Dynamic pay: min/max of total estimated pay across available sessions.
   const payStats = useMemo(() => {
@@ -218,16 +94,27 @@ export default function Landing() {
     return { min: Math.min(...amounts), max: Math.max(...amounts) };
   }, [sessions]);
 
+  const singlePay = payStats && payStats.min === payStats.max ? payStats.min : null;
+  // "$75" or "$66–$111"; null when unknown.
+  const payText = payStats
+    ? singlePay != null
+      ? formatPay(singlePay)
+      : `${formatPay(payStats.min)}–${formatPay(payStats.max)}`
+    : null;
+
+  const sessionPayText = (s: Session) => {
+    const n = parseFloat(s.payAmount);
+    return Number.isFinite(n) ? formatPay(n) : s.payLabel || "";
+  };
+
   useEffect(() => {
     trackEvent("research_landing_viewed", { selected_city: site?.label ?? null, ...utmProps() });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Legacy entry points (map "View openings", menu "Find sessions") ask the
-  // landing page to reveal the inline sessions panel via this event.
+  // Legacy entry points (map "View openings", menu "Find sessions").
   useEffect(() => {
     const onViewSessions = () => {
-      // Without a city there is no panel to reveal — prompt for one instead.
       if (!site) {
         setPickerFocus((n) => n + 1);
         return;
@@ -241,12 +128,8 @@ export default function Landing() {
     return () => window.removeEventListener("iw:view-sessions", onViewSessions);
   }, [site]);
 
-  const openPicker = () => {
-    setPickerFocus((n) => n + 1);
-  };
+  const openPicker = () => setPickerFocus((n) => n + 1);
 
-  // Primary CTA. Without a city it focuses the location picker; with a city
-  // it reveals the inline sessions panel.
   const handleSeeSessions = () => {
     trackEvent("find_sessions_clicked", { selected_city: site?.label ?? null, ...utmProps() });
     if (!hasCity) {
@@ -261,16 +144,18 @@ export default function Landing() {
     });
   };
 
-  // Picking a city only updates the selection — never navigates, and
-  // collapses a previously revealed sessions panel.
+  // Picking a city updates the selection, collapses the panel, resets choice.
   const handleSiteSelected = (key: string, label: string, origin?: SiteOrigin) => {
     setSite(key, label, origin);
     setSessionsOpen(false);
+    setSelectedSession(null);
+    setShowAll(false);
     localStorage.removeItem("iw_sessions_expanded");
     trackEvent("research_city_selected", { selected_city: label, ...utmProps() });
   };
 
-  const handleChooseSession = (session: Session) => {
+  const handleSelectSession = (session: Session) => {
+    setSelectedSession(session);
     trackEvent("research_session_selected", {
       selected_city: site?.label ?? null,
       selected_session_id: session.id,
@@ -279,214 +164,290 @@ export default function Landing() {
       estimated_total_pay: session.payAmount,
       ...utmProps(),
     });
-    setChosenSession(session);
   };
 
-  // ---- Dynamic hero copy -------------------------------------------------
-  const singlePay = payStats && payStats.min === payStats.max ? payStats.min : null;
-  let headline = "Get paid to record your voice";
-  let supporting: React.ReactNode;
-  let valueSummary: string | null = null;
+  // ---- Hero copy ----------------------------------------------------------
+  const eyebrow = payText ? `${payText} PAID RESEARCH` : "PAID RESEARCH";
+  const headline = payText
+    ? `Get paid ${payText} for a 3-hour voice study`
+    : "Get paid for a 3-hour voice study";
 
-  if (!hasCity) {
-    supporting = (
-      <>
-        Earn <span className="font-bold text-[#101828] text-2xl">$66–$111</span> for a
-        simple, guided 3-hour session.
-      </>
-    );
-  } else if (isLoading || !payStats) {
-    supporting = isLoading ? (
-      <Skeleton className="h-6 w-64 bg-muted inline-block align-middle" />
-    ) : (
-      <>Select a session to see exact pay.</>
-    );
-    valueSummary = payStats ? null : isLoading ? null : "3 hours · No experience needed · Paid through Instawork";
-  } else if (singlePay != null) {
-    headline = `Get paid ${formatPay(singlePay)} to record your voice`;
-    supporting = (
-      <>
-        Join a simple, guided 3-hour research session in {site!.label}. No experience needed.
-      </>
-    );
-    valueSummary = `${formatPay(singlePay)} total · 3 hours · Paid through Instawork`;
-  } else {
-    supporting = (
-      <>
-        Earn{" "}
-        <span className="font-bold text-[#101828] text-2xl">
-          {formatPay(payStats.min)}–{formatPay(payStats.max)}
-        </span>{" "}
-        for a simple, guided 3-hour research session in {site!.label}.
-      </>
-    );
-    valueSummary = "3 hours · No experience needed · Paid through Instawork";
-  }
+  // ---- Session grouping ---------------------------------------------------
+  const visibleSessions = showAll ? sessions : sessions.slice(0, INITIAL_SESSION_COUNT);
+  const hiddenCount = sessions.length - visibleSessions.length;
+  const groups = useMemo(() => {
+    const out: { label: string; items: Session[] }[] = [];
+    for (const s of visibleSessions) {
+      const last = out[out.length - 1];
+      if (last && last.label === s.date) last.items.push(s);
+      else out.push({ label: s.date, items: [s] });
+    }
+    return out;
+  }, [visibleSessions]);
+
+  const showStickyBar = hasCity && sessionsOpen && !!selectedSession;
+
+  // Arrow-key navigation across the whole session list (radio-group model).
+  const handleListKeyDown = (e: React.KeyboardEvent) => {
+    if (!["ArrowDown", "ArrowUp", "ArrowRight", "ArrowLeft"].includes(e.key)) return;
+    e.preventDefault();
+    const list = visibleSessions;
+    if (list.length === 0) return;
+    const dir = e.key === "ArrowDown" || e.key === "ArrowRight" ? 1 : -1;
+    const idx = selectedSession ? list.findIndex((s) => s.id === selectedSession.id) : -1;
+    const next = list[(idx + dir + list.length) % list.length];
+    setSelectedSession(next);
+    document.getElementById(`session-option-${next.id}`)?.focus();
+  };
 
   return (
     <div className="flex min-h-0 flex-1 flex-col bg-white">
-      <main className="flex-1 overflow-y-auto px-[clamp(24px,6vw,72px)] pt-[clamp(28px,5vw,56px)] pb-[calc(clamp(64px,10vw,112px)+env(safe-area-inset-bottom))] max-w-md mx-auto w-full [container-type:inline-size] animate-in fade-in slide-in-from-bottom-3 duration-500">
-        <div>
-          {/* Hero illustration */}
-          <div className="rounded-2xl overflow-hidden mb-[clamp(28px,5vw,48px)]">
-            <img
-              src={`${import.meta.env.BASE_URL}hero-voice-recording.png`}
-              alt=""
-              loading="lazy"
-              className="w-full h-auto object-cover md:max-h-[420px]"
-            />
-          </div>
+      <main
+        className={`flex-1 overflow-y-auto w-full ${showStickyBar ? "pb-[140px]" : "pb-16"}`}
+      >
+        <div className="max-w-[1120px] mx-auto px-5 md:px-12 pt-8 md:pt-12 animate-in fade-in slide-in-from-bottom-3 duration-500">
+          {/* Hero — copy left, illustration right on desktop */}
+          <div className="grid md:grid-cols-2 md:items-center gap-8 md:gap-12">
+            <div className="order-2 md:order-1 max-w-[560px]">
+              <p className="text-[13px] font-bold uppercase tracking-wide text-[#1c387d] mb-3">
+                {eyebrow}
+              </p>
+              <h1 className="text-[42px] md:text-[60px] leading-[1.08] font-extrabold tracking-[-0.03em] text-[#101828]">
+                {headline}
+              </h1>
+              <p className="text-[17px] leading-[1.5] text-[#475467] mt-4">
+                Complete simple, guided recording tasks at a nearby research location. No
+                experience needed.
+              </p>
 
-          {/* Eyebrow / location row */}
-          {hasCity ? (
-            <div className="flex items-center gap-2 mb-[clamp(20px,4vw,32px)]">
-              <MapPin className="w-5 h-5 text-[#101828] shrink-0" strokeWidth={2} />
-              <span className="text-base font-bold text-[#101828]">{site!.label}</span>
+              <div className="mt-5">
+                {hasCity && isLoading ? (
+                  <Skeleton className="h-5 w-72 bg-muted" />
+                ) : (
+                  <ResearchSummary payText={payText} />
+                )}
+              </div>
+
+              <div className="mt-6">
+                <LocationSelector
+                  label={site?.label ?? null}
+                  focusSignal={pickerFocus}
+                  onSiteSelected={handleSiteSelected}
+                  onOpened={() =>
+                    trackEvent("location_selector_opened", {
+                      selected_city: site?.label ?? null,
+                      ...utmProps(),
+                    })
+                  }
+                />
+              </div>
+
               <button
                 type="button"
-                onClick={openPicker}
-                className="text-base text-[#1c387d] underline underline-offset-2"
+                onClick={handleSeeSessions}
+                className="mt-4 w-full h-[54px] rounded-[14px] bg-[#1c387d] text-white text-[16px] font-semibold transition-[transform,background-color] duration-150 active:scale-[0.99] active:bg-[#16295e] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1c387d]/40"
               >
-                Change city
+                View available sessions
               </button>
+
+              <p className="text-[15px] text-[#475467] mt-4 text-center">
+                Already have an Instawork account?{" "}
+                <button
+                  type="button"
+                  onClick={() => login()}
+                  className="text-[#1c387d] underline underline-offset-2 font-medium"
+                >
+                  Log in
+                </button>
+              </p>
             </div>
-          ) : (
-            <p className="text-sm font-bold uppercase tracking-wide text-[#1c387d] mb-[clamp(16px,3vw,24px)]">
-              Instawork Research
-            </p>
-          )}
 
-          {/* Hero */}
-          <h2 className="text-[clamp(36px,9cqw,56px)] leading-[1.08] font-extrabold tracking-[-0.03em] text-[#101828] mb-[clamp(24px,4vw,40px)]">
-            {headline}
-          </h2>
-          <p className="text-xl leading-[1.4] text-[#475467]">{supporting}</p>
-          {!hasCity && (
-            <p className="text-sm text-[#667085] mt-1.5">Pay varies by location and session.</p>
-          )}
-          {valueSummary && (
-            <p className="text-base font-semibold text-[#101828] mt-3">{valueSummary}</p>
-          )}
-          <p className="text-base leading-[1.5] text-[#475467] mt-2 mb-[clamp(24px,4vw,40px)]">
-            {hasCity
-              ? "Visit a nearby location and complete simple, guided recording tasks."
-              : "Choose your city to see exact pay and available times near you."}
-          </p>
-
-          {/* Location search */}
-          <div className="space-y-[clamp(16px,3vw,24px)]">
-            <LocationCombobox
-              focusSignal={pickerFocus}
-              onSiteSelected={handleSiteSelected}
-              onOpened={() =>
-                trackEvent("location_selector_opened", {
-                  selected_city: site?.label ?? null,
-                  ...utmProps(),
-                })
-              }
-            />
+            <div className="order-1 md:order-2">
+              <div className="rounded-2xl overflow-hidden">
+                <img
+                  src={`${import.meta.env.BASE_URL}hero-voice-recording.png`}
+                  alt=""
+                  loading="lazy"
+                  className="w-full h-auto object-cover max-h-[280px] md:max-h-[460px]"
+                />
+              </div>
+            </div>
           </div>
 
-          {/* Primary CTA */}
-          <div className="mt-[clamp(16px,3vw,24px)]">
-            <PrimaryCtaButton
-              onClick={handleSeeSessions}
-              className="rounded-2xl h-auto px-7 py-[18px] bg-[#1c387d] text-white font-bold hover:bg-[#1c387d]/90 transition-[transform,background-color] duration-150 active:scale-[0.98] active:bg-[#16295e]"
+          {/* Session picker — revealed by "View available sessions" */}
+          {hasCity && sessionsOpen && (
+            <div
+              ref={sessionsPanelRef}
+              className="mt-12 md:mt-16 scroll-mt-20 max-w-[720px] mx-auto animate-in fade-in slide-in-from-bottom-3 duration-300"
             >
-              {hasCity ? "View available sessions" : "Find sessions"}
-            </PrimaryCtaButton>
-          </div>
+              <h2 className="text-[26px] leading-[1.15] font-bold tracking-tight text-[#101828]">
+                Available sessions
+              </h2>
+              <p className="text-[15px] text-[#475467] mt-1.5">
+                {site!.label}
+                {payText ? ` · ${payText}` : ""} · 3 hours{" "}
+                <button
+                  type="button"
+                  onClick={openPicker}
+                  className="text-[#1c387d] underline underline-offset-2 font-medium ml-1"
+                >
+                  Change location
+                </button>
+              </p>
 
-          <p className="text-base text-[#475467] mt-[clamp(16px,3vw,24px)] text-center">
-            Already have an Instawork account?{" "}
-            <button
-              type="button"
-              onClick={() => login()}
-              className="text-[#1c387d] underline underline-offset-2 font-medium"
-            >
-              Log in
-            </button>
-          </p>
-        </div>
+              <div className="mt-6 space-y-6">
+                {isLoading ? (
+                  <div className="space-y-2">
+                    {[1, 2, 3, 4].map((i) => (
+                      <Skeleton key={i} className="h-[56px] w-full rounded-[14px] bg-muted" />
+                    ))}
+                  </div>
+                ) : sessions.length === 0 ? (
+                  <div className="py-6 text-center">
+                    <p className="text-base font-semibold text-[#101828]">
+                      No sessions are currently available in {site!.label}.
+                    </p>
+                    <p className="text-base text-[#475467] mt-1">
+                      Check another city or come back soon for new openings.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={openPicker}
+                      className="mt-4 inline-flex items-center justify-center min-h-[44px] px-6 rounded-[14px] border border-[#1c387d] text-[#1c387d] font-semibold text-base active:opacity-80"
+                    >
+                      Choose another city
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <div className="space-y-6" onKeyDown={handleListKeyDown}>
+                      {groups.map((group) => (
+                        <DateGroup key={group.label} label={group.label}>
+                          {group.items.map((session) => (
+                            <SessionOption
+                              key={session.id}
+                              session={session}
+                              payText={sessionPayText(session)}
+                              selected={selectedSession?.id === session.id}
+                              onSelect={() => handleSelectSession(session)}
+                              tabIndex={
+                                selectedSession
+                                  ? selectedSession.id === session.id
+                                    ? 0
+                                    : -1
+                                  : visibleSessions[0]?.id === session.id
+                                    ? 0
+                                    : -1
+                              }
+                            />
+                          ))}
+                        </DateGroup>
+                      ))}
+                    </div>
+                    {hiddenCount > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowAll(true);
+                          trackEvent("see_more_sessions_clicked", {
+                            selected_city: site?.label ?? null,
+                            ...utmProps(),
+                          });
+                        }}
+                        className="w-full min-h-[44px] text-[#1c387d] font-semibold text-[15px] underline underline-offset-2"
+                      >
+                        See more dates ({hiddenCount})
+                      </button>
+                    )}
+                  </>
+                )}
+              </div>
 
-        {/* Inline sessions panel — revealed by "View available sessions" */}
-        {hasCity && sessionsOpen && (
-          <div
-            ref={sessionsPanelRef}
-            className="mt-[clamp(32px,6vw,48px)] scroll-mt-20 animate-in fade-in slide-in-from-bottom-3 duration-300"
-          >
-            <h2 className="text-[24px] leading-[1.15] font-bold tracking-tight text-[#101828] mb-4">
-              Available sessions in {site!.label}
+              <p className="text-[13px] text-[#475467] mt-6">
+                Already booked or completed a session?{" "}
+                <button
+                  type="button"
+                  onClick={() => setEligibilityOpen(true)}
+                  className="text-[#1c387d] underline underline-offset-2"
+                >
+                  Check remaining sessions
+                </button>
+              </p>
+            </div>
+          )}
+
+          {/* Map card — only once a location has been selected */}
+          {hasCity && (
+            <div className="mt-12 md:mt-16 max-w-[720px] mx-auto rounded-2xl overflow-hidden border border-[hsl(var(--border))]">
+              <SiteLeafletMap />
+            </div>
+          )}
+
+          {/* Value section */}
+          <div className="mt-16 md:mt-24 max-w-[960px] mx-auto" id="trust-section">
+            <h2 className="text-[26px] leading-[1.15] font-bold tracking-tight text-[#101828] mb-6 md:mb-8">
+              What to expect
             </h2>
-            <SessionsList
-              sessions={sessions}
-              isLoading={isLoading}
-              siteLabel={site!.label}
-              onChoose={handleChooseSession}
-              onChooseAnotherCity={openPicker}
-            />
-            <p className="text-[13px] text-[#475467] mt-5">
-              Already booked or completed a session?{" "}
-              <button
-                type="button"
-                onClick={() => setEligibilityOpen(true)}
-                className="text-[#1c387d] underline underline-offset-2"
-              >
-                Check remaining sessions
-              </button>
-            </p>
+            <div className="grid sm:grid-cols-2 gap-4">
+              {[
+                {
+                  icon: BadgeDollarSign,
+                  title: "Earn money in one session",
+                  body: "See the exact total pay before you book.",
+                },
+                {
+                  icon: Sparkles,
+                  title: "No experience needed",
+                  body: "We guide you through every recording task.",
+                },
+                {
+                  icon: Mic,
+                  title: "Simple guided session",
+                  body: "Sit at a computer and record short voice prompts.",
+                },
+                {
+                  icon: Wallet,
+                  title: "Paid through Instawork",
+                  body: "Manage your session and receive secure payment through the Instawork app.",
+                },
+              ].map(({ icon: Icon, title, body }) => (
+                <div
+                  key={title}
+                  className="flex items-start gap-4 bg-white rounded-[16px] border border-[#e4e7ec] p-5"
+                >
+                  <Icon className="w-5 h-5 text-[#1c387d] shrink-0 mt-0.5" strokeWidth={1.75} />
+                  <div>
+                    <p className="text-[15px] font-bold text-gray-900">{title}</p>
+                    <p className="text-[15px] text-gray-600 mt-0.5">{body}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-        )}
 
-        {/* Map card — only once a location has been selected */}
-        {hasCity && (
-          <div className="my-[clamp(32px,6vw,48px)] rounded-2xl overflow-hidden border border-[hsl(var(--border))]">
-            <SiteLeafletMap />
-          </div>
-        )}
-
-        {/* Value section */}
-        <div className="mt-[clamp(64px,10vw,96px)]" id="trust-section">
-          <h2 className="text-[28px] leading-[1.15] font-bold tracking-tight text-[#101828] mb-[clamp(32px,5vw,48px)]">
-            What to expect
-          </h2>
-          <div className="space-y-[clamp(16px,3vw,24px)]">
-            <div className="flex items-start gap-4 bg-white rounded-2xl border border-[hsl(var(--border))] p-[clamp(24px,4vw,32px)]">
-              <BadgeDollarSign className="w-5 h-5 text-muted-foreground shrink-0 mt-0.5" strokeWidth={1.75} />
-              <div>
-                <p className="text-base font-bold text-gray-900">Earn money in one session</p>
-                <p className="text-base text-gray-600 mt-0.5">See the exact total pay before you book.</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-4 bg-white rounded-2xl border border-[hsl(var(--border))] p-[clamp(24px,4vw,32px)]">
-              <Sparkles className="w-5 h-5 text-muted-foreground shrink-0 mt-0.5" strokeWidth={1.75} />
-              <div>
-                <p className="text-base font-bold text-gray-900">No experience needed</p>
-                <p className="text-base text-gray-600 mt-0.5">We guide you through every recording task.</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-4 bg-white rounded-2xl border border-[hsl(var(--border))] p-[clamp(24px,4vw,32px)]">
-              <Mic className="w-5 h-5 text-muted-foreground shrink-0 mt-0.5" strokeWidth={1.75} />
-              <div>
-                <p className="text-base font-bold text-gray-900">Simple guided session</p>
-                <p className="text-base text-gray-600 mt-0.5">Sit at a computer and record short voice prompts.</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-4 bg-white rounded-2xl border border-[hsl(var(--border))] p-[clamp(24px,4vw,32px)]">
-              <Wallet className="w-5 h-5 text-muted-foreground shrink-0 mt-0.5" strokeWidth={1.75} />
-              <div>
-                <p className="text-base font-bold text-gray-900">Paid through Instawork</p>
-                <p className="text-base text-gray-600 mt-0.5">Manage your session and receive secure payment through the Instawork app.</p>
-              </div>
-            </div>
-          </div>
+          {/* Eligibility notice — intentionally low-emphasis, away from the CTA */}
+          <p className="text-xs text-gray-500 mt-10 max-w-[960px] mx-auto">
+            This opportunity is not currently available to residents of Texas, Washington, or
+            Illinois.
+          </p>
         </div>
-
-        {/* Eligibility notice — intentionally low-emphasis, away from the CTA */}
-        <p className="text-xs text-gray-500 mt-[clamp(32px,5vw,48px)]">
-          This opportunity is not currently available to residents of Texas, Washington, or Illinois.
-        </p>
       </main>
+
+      {showStickyBar && (
+        <StickyBookingBar
+          session={selectedSession}
+          payText={selectedSession ? sessionPayText(selectedSession) : null}
+          onContinue={() => {
+            if (!selectedSession) return;
+            trackEvent("book_cta_clicked", {
+              selected_city: site?.label ?? null,
+              selected_session_id: selectedSession.id,
+              ...utmProps(),
+            });
+            setSheetOpen(true);
+          }}
+        />
+      )}
 
       <EligibilityCheckDrawer
         hideTrigger
@@ -495,17 +456,15 @@ export default function Landing() {
       />
 
       <ContinueWithInstaworkSheet
-        open={!!chosenSession}
-        onOpenChange={(open) => {
-          if (!open) setChosenSession(null);
-        }}
-        bookUrl={chosenSession?.bookUrl}
+        open={sheetOpen}
+        onOpenChange={setSheetOpen}
+        bookUrl={selectedSession?.bookUrl}
         analyticsProps={{
           selected_city: site?.label ?? null,
-          selected_session_id: chosenSession?.id ?? null,
-          session_date: chosenSession?.dateISO || chosenSession?.date || null,
-          session_start_time: chosenSession?.time ?? null,
-          estimated_total_pay: chosenSession?.payAmount ?? null,
+          selected_session_id: selectedSession?.id ?? null,
+          session_date: selectedSession?.dateISO || selectedSession?.date || null,
+          session_start_time: selectedSession?.time ?? null,
+          estimated_total_pay: selectedSession?.payAmount ?? null,
           source_page: "landing",
           ...utmProps(),
         }}

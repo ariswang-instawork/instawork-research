@@ -1,0 +1,178 @@
+Redesign the existing Instawork Research landing page and session-selection page. Keep all current functionality, routes, live session data, location logic, login links, and Instawork app deep links. Do not change the backend, database, APIs, or booking logic.
+
+The current UI feels oversized, repetitive, and desktop-oriented. Rebuild it as a polished, mobile-first consumer booking experience inspired by Instawork, Uber, and Airbnb.
+
+GOALS
+- Make the page feel trustworthy, simple, and easy for gig workers to scan.
+- Prioritize pay, session duration, location, and available times.
+- Reduce repeated copy.
+- Use one clear primary action at a time.
+- Make the design responsive on mobile and desktop.
+
+GLOBAL DESIGN
+- Use the existing Instawork Research logo and brand colors.
+- Primary navy: use the existing dark Instawork blue.
+- Background: white.
+- Text: dark navy for headings and muted blue-gray for supporting text.
+- Use the current font if one already exists. Otherwise use Inter.
+- Maximum desktop content width: 1120px.
+- Mobile page horizontal padding: 20px.
+- Desktop page horizontal padding: 48px.
+- Use subtle borders, 14–16px corner radii, and very light shadows only where necessary.
+- Avoid oversized buttons, excessive empty space, and giant text.
+- Maintain strong accessibility, visible focus states, and at least 44px tap targets.
+
+HEADER
+- Make the header compact.
+- Height: approximately 64px on mobile and 72px on desktop.
+- Left side: Instawork Research logo.
+- Right side: menu icon.
+- Add a subtle bottom border.
+- Do not let the logo or menu touch the edges.
+
+LANDING PAGE HERO
+Replace the current hero content with this structure:
+
+Eyebrow:
+“$75 PAID RESEARCH”
+
+Headline:
+“Get paid $75 for a 3-hour voice study”
+
+Supporting text:
+“Complete simple, guided recording tasks at a nearby research location. No experience needed.”
+
+Key details row or compact information list:
+- “$75 total”
+- “3 hours”
+- “Paid through Instawork”
+
+Location selector:
+- Show a location-pin icon.
+- Show the currently selected city, such as “New York, NY”.
+- Add a small text action on the right: “Change”.
+- Make the entire selector clickable.
+- Do not use a paper-airplane icon.
+- It should look like a selector, not a large text-input field.
+
+Primary CTA:
+“View available sessions”
+
+Below the CTA:
+“Already have an Instawork account? Log in”
+
+Hero styling:
+- Mobile headline: approximately 42px, line-height 1.08.
+- Desktop headline: approximately 60px.
+- Do not make the headline taller than necessary.
+- Primary CTA height: 54–56px, not oversized.
+- Keep the full primary experience visible within or close to the first mobile viewport.
+- Remove repeated sentences about the same pay, duration, and recording tasks.
+
+SESSION-SELECTION PAGE
+Create a clean mobile-first session picker.
+
+Top content:
+Heading:
+“Available sessions”
+
+Summary line:
+“New York, NY · $75 · 3 hours”
+
+Include a small “Change location” action next to or below the location.
+
+GROUP SESSIONS BY DATE
+Do not repeat the date inside every session.
+
+Example:
+
+MON, JUL 27
+
+8:30 AM – 11:30 AM
+Earn $75
+
+11:30 AM – 2:30 PM
+Earn $75
+
+2:30 PM – 5:30 PM
+Earn $75
+
+5:30 PM – 8:30 PM
+Earn $75
+
+TUE, JUL 28
+...
+
+Sort all sessions chronologically.
+
+SESSION ROW DESIGN
+- Each session should be a full-width selectable card or row.
+- Show a radio indicator or selection checkmark on the left.
+- Show the time as the main text.
+- Show “Earn $75” as secondary text.
+- The full row must be clickable.
+- Do not put a large “Choose this session” button beside every session.
+- Unselected rows should have a light-gray border.
+- Selected rows should have a navy border and a subtle tinted background.
+- Use approximately 14px border radius.
+- Keep vertical spacing compact and easy to scan.
+- On desktop, keep the session list centered with a maximum width of approximately 720px rather than stretching it across the whole page.
+
+STICKY CONTINUE AREA
+After the user selects a session, show a sticky bottom action area.
+
+Display:
+“Mon, Jul 27 · 11:30 AM–2:30 PM”
+“Earn $75”
+
+Primary button:
+“Continue in the Instawork app”
+
+Behavior:
+- Keep the button disabled until a session is selected.
+- On mobile, make the action bar sticky to the bottom.
+- Include safe-area padding for iPhones.
+- On desktop, the action area may remain below the session list or appear as a compact sticky card.
+- Preserve the existing Instawork app deep-link behavior.
+- The user completes the sign-up form inside the Instawork app. Do not add a separate website sign-up flow.
+
+RESPONSIVE BEHAVIOR
+Mobile:
+- One-column layout.
+- Full-width session rows.
+- Sticky bottom CTA.
+- No side-by-side text and button rows.
+
+Desktop:
+- Use more whitespace but keep the content focused.
+- Hero may use a two-column layout only if it improves clarity.
+- Session selection should remain a centered, narrow list.
+- Do not simply enlarge the mobile components.
+
+MICROCOPY
+Use “Earn $75,” not “Estimated pay,” because the displayed session pay is exact.
+Use “Continue in the Instawork app,” not “Complete signup.”
+Keep the copy direct, friendly, and worker-focused.
+
+IMPLEMENTATION REQUIREMENTS
+- First inspect the existing project structure and reuse the current components where reasonable.
+- Preserve all existing dynamic fields and session data.
+- Do not hardcode New York or $75 if these values already come from the database or API.
+- Create reusable components for:
+  - Header
+  - LocationSelector
+  - ResearchSummary
+  - DateGroup
+  - SessionOption
+  - StickyBookingBar
+- Remove obsolete CSS and duplicate components after the redesign.
+- Test at widths of 375px, 430px, 768px, 1024px, and 1440px.
+- Ensure no text is clipped, no button overflows, and no horizontal scrolling occurs.
+- Make sure session selection and deep-link behavior still work.
+
+Before finishing:
+1. Run the app.
+2. Check both pages on mobile and desktop.
+3. Fix spacing, alignment, and responsiveness issues.
+4. Show me a summary of the files changed.
+5. Do not stop after changing only the text. Fully implement the redesigned layout and interaction.
