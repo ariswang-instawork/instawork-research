@@ -47,12 +47,12 @@ export function SessionCard({
           </span>{" "}
           <span className="text-[13px] font-medium text-[#475467]">estimated pay</span>
         </p>
-        {rate && <p className="text-[13px] text-[#475467] mt-0.5">{rate}</p>}
+        {rate && <p className="text-[13px] text-[#667085] mt-0.5">{rate}</p>}
       </div>
       <button
         type="button"
         onClick={onBook}
-        className="mt-1 w-full h-11 rounded-[12px] bg-[#23409A] text-white text-[15px] font-semibold transition-[transform,background-color] duration-150 active:scale-[0.99] active:bg-[#1a3179] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#23409A]/40"
+        className="mt-1 w-full h-12 rounded-[12px] bg-[#23409A] text-white text-[15px] font-semibold transition-[transform,background-color] duration-150 active:scale-[0.99] active:bg-[#1a3179] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#23409A]/40"
       >
         View session
       </button>

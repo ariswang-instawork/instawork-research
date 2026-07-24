@@ -263,7 +263,7 @@ export default function Landing() {
                 Paid voice recording
               </p>
               <h1 className="text-[34px] md:text-[48px] leading-[1.08] font-extrabold tracking-[-0.03em] text-[#101828]">
-                Earn <span className="text-[#F26B63]">{headlinePay}</span> in one 3-hour
+                Earn <span className="text-[#E05B4E]">{headlinePay}</span> in one 3-hour
                 session
               </h1>
               <p className="text-[17px] leading-[1.5] text-[#475467] mt-4">
@@ -280,7 +280,7 @@ export default function Landing() {
                     <>{payText ?? "Competitive"} estimated pay</>
                   )}
                 </span>
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#F8FBFF] border border-[#dbe4f5] px-3 py-1.5 text-[14px] font-semibold text-[#23409A]">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#F4F2FF] px-3 py-1.5 text-[14px] font-semibold text-[#5D4FC7]">
                   <Clock className="w-4 h-4" strokeWidth={2} />
                   In-person · About 3 hours
                 </span>

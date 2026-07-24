@@ -1,0 +1,141 @@
+Work from the CURRENT codebase and CURRENT rendered page only. Ignore all previous conversation claims about what has or has not been completed.
+
+Your job is to inspect the live page, make the required changes, and verify them visually. Do not stop at an audit or tell me that the work was already done without checking the current rendered UI.
+
+GOAL
+
+Reduce text density and make the landing page feel like a clean, conversion-focused consumer marketplace. The user should immediately notice:
+
+1. Estimated pay
+2. Session duration
+3. Location
+4. Available session times
+5. The primary action
+
+IMPLEMENT THESE CHANGES
+
+HERO
+
+Use exactly this structure:
+
+Eyebrow:
+PAID VOICE RECORDING
+
+Headline:
+Earn {dynamic estimated pay or pay range}
+in one 3-hour session
+
+Supporting copy:
+Read short voice prompts at a nearby location. No experience needed.
+
+Show only two benefit pills:
+
+1. {dynamic estimated pay or pay range} estimated pay
+2. In-person · About 3 hours
+
+Remove any separate pill for:
+“No experience needed”
+
+Remove the duplicate login line below the main CTA. Login should appear only in the header.
+
+Below the CTA, keep only this trust line:
+
+Exact time, location, and pay shown before booking.
+
+Do not hardcode Philadelphia or any pay amount. Continue using the existing dynamic location and pay data.
+
+SESSION SECTION
+
+Heading:
+Available sessions near {selected location}
+
+Supporting text:
+Choose a time and finish booking in Instawork.
+
+Keep “Change location” as a separate text link.
+
+Each session card should contain only:
+
+- Date
+- Time
+- Estimated total pay
+- Hourly rate × duration
+- Spots available
+- CTA
+
+Do not repeat the city inside every card because the location is already shown in the section heading.
+
+Change the card CTA to:
+
+View session
+
+Do not use:
+Book in the Instawork app
+
+The full booking wording can appear later on the session-detail or final booking step.
+
+CARD DESIGN
+
+Make the cards noticeably more compact:
+
+- Reduce vertical padding
+- Reduce empty space
+- Reduce button height to approximately 48–52px
+- Keep the total estimated pay as the strongest element
+- Make the hourly calculation smaller and lower contrast
+- Keep the availability badge small
+- Do not turn every line into a badge
+- Preserve a clear two-column desktop grid and one-column mobile layout
+
+VISUAL HIERARCHY
+
+The page currently gives too much visual weight to repeated labels and large buttons.
+
+Improve the hierarchy so the eye moves in this order:
+
+1. Pay
+2. Session duration
+3. Location selector
+4. Main CTA
+5. Available session cards
+
+Keep Instawork Blue as the primary CTA color.
+
+Use accent colors sparingly:
+
+- Gold for pay
+- Green for availability
+- Lavender for session type or duration
+- Coral only as a small editorial accent
+
+Do not make the pay headline look like an error or warning. If the current coral is too red, use a warmer muted coral or gold-toned accent with accessible contrast.
+
+Do not add more explanatory text.
+
+REQUIRED WORKFLOW
+
+1. Inspect the current source files and rendered page.
+2. Identify the exact components controlling the hero and session cards.
+3. Implement the changes in the existing components.
+4. Preserve all existing dynamic data, routing, analytics, login behavior, location behavior, and Instawork deep links.
+5. Open the rendered preview and verify the changes visually.
+6. Test desktop and mobile widths.
+7. Run the existing build and tests.
+8. Fix any type errors, layout overflow, broken links, or console errors.
+9. Report:
+   - Files changed
+   - What was changed
+   - Build/test results
+   - Any requirement that could not be completed
+
+IMPORTANT
+
+Do not respond with “this was already done” based on previous prompts.
+
+Only say an item is complete after confirming it in both:
+- the current source code
+- the current rendered UI
+
+If an item is already correct, leave it unchanged and continue implementing the remaining requirements.
+
+Do not stop after explaining the plan. Make the edits now.
