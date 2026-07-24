@@ -13,9 +13,8 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { BadgeDollarSign, Check, Clock, MapPin, Mic } from "lucide-react";
+import { BadgeDollarSign, Check, Clock, Mic } from "lucide-react";
 import { SiteLeafletMap } from "@/components/SiteLeafletMap";
-import { login } from "@/hooks/use-auth";
 import { trackEvent } from "@/lib/analytics";
 
 const INITIAL_SESSION_COUNT = 6;
@@ -268,8 +267,7 @@ export default function Landing() {
                 session
               </h1>
               <p className="text-[17px] leading-[1.5] text-[#475467] mt-4">
-                Sit at a computer, read short voice prompts, and get paid through
-                Instawork. No experience needed.
+                Read short voice prompts at a nearby location. No experience needed.
               </p>
 
               {/* Compact benefit badges */}
@@ -284,15 +282,7 @@ export default function Landing() {
                 </span>
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-[#F8FBFF] border border-[#dbe4f5] px-3 py-1.5 text-[14px] font-semibold text-[#23409A]">
                   <Clock className="w-4 h-4" strokeWidth={2} />
-                  About 3 hours
-                </span>
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#F4F2FF] px-3 py-1.5 text-[14px] font-semibold text-[#5D4FC7]">
-                  <MapPin className="w-4 h-4" strokeWidth={2} />
-                  In-person session
-                </span>
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#EAF6EE] px-3 py-1.5 text-[14px] font-semibold text-[#2E8A50]">
-                  <Check className="w-4 h-4" strokeWidth={2.5} />
-                  No experience needed
+                  In-person · About 3 hours
                 </span>
               </div>
 
@@ -329,18 +319,8 @@ export default function Landing() {
                 View sessions near me
               </button>
 
-              <p className="text-[15px] text-[#475467] mt-4 text-center">
-                Already use Instawork?{" "}
-                <button
-                  type="button"
-                  onClick={() => login()}
-                  className="text-[#23409A] underline underline-offset-2 font-medium"
-                >
-                  Log in
-                </button>
-              </p>
-              <p className="text-[14px] text-[#475467] mt-2 text-center">
-                See the exact time, location, and pay before booking.
+              <p className="text-[14px] text-[#475467] mt-3 text-center">
+                Exact time, location, and pay shown before booking.
               </p>
             </div>
 
@@ -370,8 +350,7 @@ export default function Landing() {
               {hasCity ? `Available sessions near ${site!.label}` : "Available sessions"}
             </h2>
             <p className="text-[16px] text-[#475467] mt-1.5">
-              Choose a time that works for you. You'll complete booking in the Instawork
-              app.
+              Choose a time and finish booking in Instawork.
               {hasCity && (
                 <button
                   type="button"
@@ -437,7 +416,6 @@ export default function Landing() {
                         key={session.id}
                         session={session}
                         payText={sessionPayText(session)}
-                        cityLabel={site!.label}
                         onBook={() => handleBook(session)}
                       />
                     ))}
