@@ -72,7 +72,7 @@ export default function SessionDetail() {
             {/* Header — title + location on the left, compact earnings pill on the right. */}
             <div className="flex items-end justify-between gap-4 mb-8">
               <div className="min-w-0">
-                <h1 className="text-[32px] font-bold tracking-tight mb-2 leading-tight">Session details</h1>
+                <h1 className="text-[32px] font-bold tracking-tight mb-2 leading-tight">Paid Research Participant</h1>
                 <p className="text-[14px] text-muted-foreground leading-snug">{session.label}</p>
                 {site?.origin && (
                   <p className="text-[14px] text-muted-foreground mt-1">{site.origin.distanceMiles} miles away</p>
