@@ -204,12 +204,10 @@ export default function Landing() {
             Paid voice recording
           </p>
           <h1 className="text-[34px] md:text-[46px] leading-[1.1] font-extrabold tracking-[-0.03em] text-[#11243e]">
-            Get paid <span className="text-emphasis">when you want</span> for a
-            3-hour voice recording session
+            Get paid for reading <span className="text-emphasis">short voice prompts</span>
           </h1>
           <p className="text-[17px] leading-[1.5] text-[#576270] mt-4">
-            Read short voice prompts at a nearby location. A team member guides you
-            through it.
+            Complete a 3-hour recording session at a nearby location.
           </p>
 
           {/* Compact benefit badges */}
