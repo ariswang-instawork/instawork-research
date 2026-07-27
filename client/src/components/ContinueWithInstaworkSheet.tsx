@@ -55,7 +55,7 @@ export function ContinueWithInstaworkSheet({
         </DrawerHeader>
         <div className="px-6 pt-2 pb-[calc(1.5rem+env(safe-area-inset-bottom))] flex flex-col gap-3">
           <Button
-            className="w-full h-[52px] rounded-xl text-[17px] font-semibold bg-primary hover:bg-primary/90 shadow-none"
+            className="w-full h-[52px] rounded-[8px] text-[17px] font-semibold bg-cta-gradient text-white hover:brightness-105 active:brightness-95 shadow-none"
             onClick={() => {
               trackEvent("existing_user_selected", analyticsProps);
               trackEvent("instawork_login_selected", analyticsProps);
@@ -68,7 +68,7 @@ export function ContinueWithInstaworkSheet({
           </Button>
           <Button
             variant="outline"
-            className="w-full h-[52px] rounded-xl text-[17px] font-semibold border-primary text-primary hover:bg-primary/5 shadow-none"
+            className="w-full h-[52px] rounded-[8px] text-[17px] font-semibold border-primary text-primary hover:bg-primary/5 shadow-none"
             onClick={() => {
               trackEvent("new_user_selected", analyticsProps);
               trackEvent("instawork_signup_selected", analyticsProps);

@@ -6,6 +6,7 @@ import { useSiteStorage } from "@/hooks/use-site";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ContinueWithInstaworkSheet } from "@/components/ContinueWithInstaworkSheet";
+import { PrimaryCtaButton } from "@/components/PrimaryCtaButton";
 import { EXCLUDED_STATES, SESSION_CAP } from "@/lib/constants";
 import { trackEvent } from "@/lib/analytics";
 
@@ -23,7 +24,7 @@ export default function SessionDetail() {
 
   if (isLoading) {
     return (
-      <div className="flex-1 flex flex-col bg-white">
+      <div className="flex-1 flex flex-col bg-background">
         <div className="px-6 pt-5 pb-10 space-y-6 max-w-md mx-auto w-full">
           <Skeleton className="w-10 h-10 rounded-full bg-muted" />
           <Skeleton className="w-24 h-5 rounded bg-muted" />
@@ -60,7 +61,7 @@ export default function SessionDetail() {
   };
 
   return (
-    <div className="flex-1 flex flex-col bg-white pb-32">
+    <div className="flex-1 flex flex-col bg-background pb-32">
       <main className="flex-1 px-6 pt-5 pb-10 overflow-y-auto max-w-md mx-auto w-full animate-in fade-in slide-in-from-bottom-3 duration-500">
         <Link href="/" className="inline-flex items-center mb-6 -ml-1">
           <ArrowLeft className="w-5 h-5 text-foreground" />
@@ -76,7 +77,7 @@ export default function SessionDetail() {
             )}
           </div>
           <div className="shrink-0 text-center">
-            <div className="inline-block rounded-lg border border-[hsl(var(--border))] bg-white px-4 py-2 text-[16px] font-bold shadow-sm">
+            <div className="inline-block rounded-[10px] border border-[hsl(var(--border))] bg-card px-4 py-2 text-[16px] font-bold shadow-sm">
               {session.payLabel || "$72"}
             </div>
             <p className="text-[13px] font-medium text-muted-foreground mt-1">Estimated pay</p>
@@ -168,10 +169,9 @@ export default function SessionDetail() {
         </div>
       </main>
 
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-[hsl(var(--border))] px-6 py-4 pb-[calc(1rem+env(safe-area-inset-bottom))] z-20">
+      <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-[hsl(var(--border))] px-6 py-4 pb-[calc(1rem+env(safe-area-inset-bottom))] z-20">
         <div className="max-w-md mx-auto w-full flex flex-col gap-2.5">
-          <Button 
-            className="w-full h-[52px] rounded-xl text-[17px] font-semibold bg-primary hover:bg-primary/90 shadow-none"
+          <PrimaryCtaButton
             onClick={() => {
               trackEvent("book_cta_clicked", analyticsProps);
               setBookSheetOpen(true);
@@ -179,7 +179,7 @@ export default function SessionDetail() {
             }}
           >
             Book in the Instawork app
-          </Button>
+          </PrimaryCtaButton>
         </div>
       </div>
 

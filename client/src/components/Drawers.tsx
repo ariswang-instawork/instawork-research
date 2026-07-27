@@ -199,7 +199,7 @@ export function LocationDrawer({
               {farResult.kind === "far" && (
                 <Button
                   size="lg"
-                  className="w-full h-14 rounded-xl text-[16px] font-semibold bg-primary hover:bg-primary/90 text-white shadow-none"
+                  className="w-full h-14 rounded-[8px] text-[16px] font-semibold bg-cta-gradient hover:brightness-105 active:brightness-95 text-white shadow-none"
                   onClick={() =>
                     onSiteSelected(farResult.key, farResult.label, {
                       label: farResult.originLabel,
@@ -213,7 +213,7 @@ export function LocationDrawer({
               <Button
                 variant="outline"
                 size="lg"
-                className="w-full h-14 rounded-xl text-[16px] font-semibold border-primary text-primary bg-white hover:bg-primary/5 hover:text-primary shadow-none"
+                className="w-full h-14 rounded-[8px] text-[16px] font-semibold border-primary text-primary bg-card hover:bg-primary/5 hover:text-primary shadow-none"
                 onClick={resetToInput}
               >
                 Try another ZIP code
@@ -245,7 +245,7 @@ export function LocationDrawer({
           <div className="w-full space-y-4">
             <Button
               size="lg"
-              className="w-full h-14 rounded-xl text-[16px] font-semibold bg-primary hover:bg-primary/90 text-white shadow-none"
+              className="w-full h-14 rounded-[8px] text-[16px] font-semibold bg-cta-gradient hover:brightness-105 active:brightness-95 text-white shadow-none"
               onClick={handleGeolocation}
               disabled={isSearching || isLoading}
             >
@@ -276,7 +276,7 @@ export function LocationDrawer({
                 placeholder="Enter ZIP code"
                 value={zip}
                 onChange={(e) => { setZip(e.target.value); setError(null); }}
-                className="h-12 rounded-xl text-[16px] bg-secondary/50 border-transparent focus-visible:bg-background focus-visible:ring-primary/20 transition-all"
+                className="h-12 rounded-[12px] text-[16px] bg-secondary/50 border-transparent focus-visible:bg-background focus-visible:ring-primary/20 transition-all"
                 type="text"
                 pattern="[0-9]*"
                 inputMode="numeric"
@@ -286,7 +286,7 @@ export function LocationDrawer({
               <Button
                 type="submit"
                 size="lg"
-                className="h-12 rounded-xl px-5 bg-secondary text-foreground hover:bg-secondary/80 shrink-0 font-semibold"
+                className="h-12 rounded-[8px] px-5 bg-secondary text-foreground hover:bg-secondary/80 shrink-0 font-semibold"
                 disabled={isLoading || isSearching || !zip}
               >
                 Search
@@ -325,7 +325,7 @@ export function LocationDrawer({
                       role="option"
                       aria-selected={selected}
                       onClick={() => onSiteSelected(s.key, s.label)}
-                      className={`w-full min-h-[44px] flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl text-left text-[16px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 ${
+                      className={`w-full min-h-[44px] flex items-center justify-between gap-3 px-3 py-2.5 rounded-[8px] text-left text-[16px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 ${
                         selected
                           ? "bg-primary/10 text-primary font-semibold"
                           : "text-gray-900 hover:bg-secondary/60"
@@ -383,7 +383,7 @@ export function EligibilityCheckDrawer({
           Removed entirely while this drawer or any other modal is open so it
           can't be seen, clicked, or focused behind the sheet. */}
       {!isOpen && !suppressed && !hideTrigger && (
-        <footer className="fixed bottom-0 left-0 right-0 z-[1000] border-t border-[hsl(var(--border))] bg-white px-6 py-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
+        <footer className="fixed bottom-0 left-0 right-0 z-[1000] border-t border-[hsl(var(--border))] bg-background px-6 py-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
           <div className="max-w-md mx-auto w-full">
             <p className="text-[14px] font-normal text-foreground text-center mb-2">Already booked or completed a session?</p>
             <PrimaryCtaButton onClick={() => setIsOpen(true)}>Check remaining sessions</PrimaryCtaButton>
@@ -410,18 +410,18 @@ export function EligibilityCheckDrawer({
                 <div className="h-14 rounded-xl bg-muted animate-pulse" />
               </div>
             ) : eligibility.isError ? (
-              <div className="p-4 rounded-xl text-sm font-medium border bg-destructive/10 text-destructive border-destructive/20">
+              <div className="p-4 rounded-[12px] text-sm font-medium border bg-destructive/10 text-destructive border-destructive/20">
                 Could not check eligibility right now.
               </div>
             ) : eligibility.data && eligibility.data.sites.length === 0 ? (
-              <div className="p-4 rounded-xl text-sm font-medium border bg-muted text-muted-foreground border-transparent">
+              <div className="p-4 rounded-[12px] text-sm font-medium border bg-muted text-muted-foreground border-transparent">
                 Looks like you haven't booked one yet — you can book up to 3.
               </div>
             ) : (
               eligibility.data?.sites.map((s) => (
                 <div
                   key={s.businessId}
-                  className={`p-4 rounded-xl border ${
+                  className={`p-4 rounded-[12px] border ${
                     s.isBlocked
                       ? "bg-amber-50 border-amber-200"
                       : "bg-white border-[hsl(var(--border))]"
@@ -447,7 +447,7 @@ export function EligibilityCheckDrawer({
           <DrawerFooter className="pb-safe pt-2">
             {!isAuthenticated && (
               <Button
-                className="w-full h-12 rounded-xl font-bold bg-primary hover:bg-primary/90 shadow-none"
+                className="w-full h-12 rounded-[8px] font-bold bg-cta-gradient hover:brightness-105 active:brightness-95 shadow-none"
                 onClick={login}
                 disabled={authLoading}
               >
@@ -455,7 +455,7 @@ export function EligibilityCheckDrawer({
               </Button>
             )}
             <DrawerClose asChild>
-              <Button variant="ghost" className="h-12 rounded-xl font-normal text-muted-foreground">Close</Button>
+              <Button variant="ghost" className="h-12 rounded-[8px] font-normal text-muted-foreground">Close</Button>
             </DrawerClose>
           </DrawerFooter>
         </div>

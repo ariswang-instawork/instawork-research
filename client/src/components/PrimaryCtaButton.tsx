@@ -12,7 +12,7 @@ export const PrimaryCtaButton = forwardRef<HTMLButtonElement, ButtonProps>(
     <Button
       ref={ref}
       className={cn(
-        "w-full h-auto rounded-lg bg-cta-gradient py-4 text-[17px] font-semibold text-white hover:brightness-105 shadow-none transition-[transform,filter] active:scale-[0.98] active:brightness-95",
+        "w-full h-auto rounded-[8px] bg-cta-gradient py-4 text-[17px] font-semibold text-white hover:brightness-105 shadow-none transition-[transform,filter] active:scale-[0.98] active:brightness-95",
         className,
       )}
       {...props}

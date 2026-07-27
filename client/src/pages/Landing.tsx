@@ -7,13 +7,7 @@ import { SessionCard } from "@/components/SessionCard";
 import { useGetSessions, getGetSessionsQueryKey, useGetSites } from "@/lib/api-client";
 import type { SessionItem as Session } from "@/lib/api-client/generated/api.schemas";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import { BadgeDollarSign, Check, Clock, Mic } from "lucide-react";
+import { BadgeDollarSign, Clock } from "lucide-react";
 import { SiteLeafletMap } from "@/components/SiteLeafletMap";
 import { trackEvent } from "@/lib/analytics";
 
@@ -63,48 +57,6 @@ function utmProps(): Record<string, string | null> {
     utm_campaign: params.get("utm_campaign"),
   };
 }
-
-const HOW_IT_WORKS_STEPS = [
-  "Pick an available date and time near you.",
-  "Complete the short sign-up form and reserve your session in the Instawork app.",
-  "Visit the location, sit at a computer, and follow simple on-screen prompts.",
-  "Your session payment is processed through Instawork.",
-];
-
-const FAQ_ITEMS: { q: string; a: string }[] = [
-  {
-    q: "Do I need experience?",
-    a: "No. Every task is guided, and a team member walks you through the session.",
-  },
-  {
-    q: "Is this remote or in person?",
-    a: "In person. You'll visit a nearby location and complete the session on-site.",
-  },
-  {
-    q: "What will I be recording?",
-    a: "Short voice prompts — reading sentences, answering simple questions, or repeating phrases while wearing a headset.",
-  },
-  {
-    q: "How will I get paid?",
-    a: "Your payment is processed through the Instawork app after your session.",
-  },
-  {
-    q: "What should I bring?",
-    a: "A valid photo ID. Everything else, including equipment, is provided at the location.",
-  },
-  {
-    q: "Can I complete more than one session?",
-    a: "You may be eligible to complete multiple sessions. The number of sessions available to you depends on the location and project requirements. Log in to Instawork to see the sessions you're eligible to book.",
-  },
-  {
-    q: "Where do I finish signing up?",
-    a: "In the Instawork app. After you pick a session, you'll log in or create an account there to complete booking.",
-  },
-  {
-    q: "What happens after I select a session?",
-    a: "You'll continue to Instawork to confirm your booking. You'll see the exact time, location, and pay before you commit.",
-  },
-];
 
 export default function Landing() {
   const [, setLocation] = useLocation();
@@ -420,65 +372,6 @@ export default function Landing() {
           </div>
         </section>
 
-        {/* ============ HOW IT WORKS ============ */}
-        <section id="how-it-works" className="scroll-mt-20 py-10 md:py-14">
-          <div className="max-w-[1200px] mx-auto px-5 md:px-12">
-            <h2 className="text-[26px] md:text-[30px] leading-[1.15] font-bold tracking-tight text-[#11243e]">
-              How it works
-            </h2>
-            <ol className="mt-6 max-w-[640px] space-y-3">
-              {HOW_IT_WORKS_STEPS.map((step, i) => (
-                <li key={step} className="flex gap-3 text-[16px] leading-[1.5] text-[#11243e]">
-                  <span className="font-bold text-[#3351E6] shrink-0" aria-hidden="true">
-                    {i + 1}.
-                  </span>
-                  {step}
-                </li>
-              ))}
-            </ol>
-          </div>
-        </section>
-
-        {/* ============ WHAT WILL I ACTUALLY DO ============ */}
-        <section className="bg-white border-t border-[#EEE9DD] py-16 md:py-24">
-          <div className="max-w-[1200px] mx-auto px-5 md:px-12">
-            <div className="max-w-[720px]">
-              <span
-                className="inline-flex items-center justify-center w-10 h-10 rounded-[12px] bg-[#EAEEFE] mb-4"
-                aria-hidden="true"
-              >
-                <Mic className="w-5 h-5 text-[#6388F5]" strokeWidth={1.75} />
-              </span>
-              <h2 className="text-[26px] md:text-[30px] leading-[1.15] font-bold tracking-tight text-[#11243e]">
-                What will I actually do?
-              </h2>
-              <p className="text-[16px] leading-[1.6] text-[#576270] mt-4">
-                You'll sit at a computer in a research location and complete a series of
-                short, guided voice tasks. You may read sentences, answer simple prompts,
-                or repeat phrases while wearing a headset. A team member will guide you
-                through the session.
-              </p>
-              <ul className="mt-6 space-y-3">
-                {[
-                  "No acting or recording experience required",
-                  "Equipment is provided",
-                  "You will receive instructions at the location",
-                ].map((point) => (
-                  <li key={point} className="flex items-start gap-3 text-[16px] text-[#11243e]">
-                    <span
-                      className="mt-0.5 w-5 h-5 rounded-full bg-[#E3FAF3] flex items-center justify-center shrink-0"
-                      aria-hidden="true"
-                    >
-                      <Check className="w-3.5 h-3.5 text-[#01A884]" strokeWidth={2.5} />
-                    </span>
-                    {point}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </section>
-
         {/* ============ EXPLORE OTHER LOCATIONS ============ */}
         <section className="bg-[#FCFBF9] py-14 md:py-20">
           <div className="max-w-[1200px] mx-auto px-5 md:px-12">
@@ -490,29 +383,6 @@ export default function Landing() {
             </p>
             <div className="mt-6 rounded-[16px] overflow-hidden border border-[#EEE9DD]">
               <SiteLeafletMap />
-            </div>
-          </div>
-        </section>
-
-        {/* ============ FAQ ============ */}
-        <section id="faq" className="scroll-mt-20 bg-white py-16 md:py-24">
-          <div className="max-w-[1200px] mx-auto px-5 md:px-12">
-            <div className="max-w-[720px]">
-              <h2 className="text-[26px] md:text-[30px] leading-[1.15] font-bold tracking-tight text-[#11243e]">
-                Frequently asked questions
-              </h2>
-              <Accordion type="single" collapsible className="mt-4">
-                {FAQ_ITEMS.map(({ q, a }) => (
-                  <AccordionItem key={q} value={q}>
-                    <AccordionTrigger className="text-left text-[16px] font-semibold text-[#11243e]">
-                      {q}
-                    </AccordionTrigger>
-                    <AccordionContent className="text-[15px] leading-[1.6] text-[#576270]">
-                      {a}
-                    </AccordionContent>
-                  </AccordionItem>
-                ))}
-              </Accordion>
             </div>
           </div>
         </section>

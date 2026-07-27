@@ -56,17 +56,6 @@ export function Shell({ children }: { children: ReactNode }) {
     setLocation(path);
   };
 
-  /** Navigate home (if needed) and scroll to a landing-page section. */
-  const goSection = (id: string) => {
-    closeMenu();
-    setLocation("/");
-    requestAnimationFrame(() =>
-      requestAnimationFrame(() => {
-        document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
-      }),
-    );
-  };
-
   const findSessions = () => {
     closeMenu();
     setLocation("/");
@@ -112,12 +101,6 @@ export function Shell({ children }: { children: ReactNode }) {
               <button type="button" onClick={findSessions} className={navLink}>
                 Find sessions
               </button>
-              <button type="button" onClick={() => goSection("how-it-works")} className={navLink}>
-                How it works
-              </button>
-              <button type="button" onClick={() => goSection("faq")} className={navLink}>
-                FAQ
-              </button>
               <button type="button" onClick={handleAuthClick} className={navLink}>
                 {isAuthenticated ? "Log out" : "Log in"}
               </button>
@@ -136,21 +119,23 @@ export function Shell({ children }: { children: ReactNode }) {
               onClick={toggleMenu}
               aria-label={menuOpen ? "Close menu" : "Open menu"}
               aria-expanded={menuOpen}
-              className="md:hidden p-1 text-[#11243e]"
+              className="md:hidden p-1 text-[#3351E6]"
             >
               <HamburgerIcon open={menuOpen} />
             </button>
           </div>
         </header>
 
-        {/* Mobile full-screen menu */}
+        {/* Mobile full-screen menu — mirrors instawork.com's mobile nav sheet:
+            light header strip, then a full-bleed dark navy gradient panel
+            with white nav links and outline action buttons. */}
         {menuMounted && (
           <div
-            className={`fixed inset-0 z-[1200] flex justify-center bg-black/20 transition-opacity duration-200 md:hidden ${
+            className={`fixed inset-0 z-[1200] flex justify-center transition-opacity duration-200 md:hidden ${
               menuOpen ? "opacity-100" : "opacity-0"
             }`}
           >
-            <div className="w-full bg-background min-h-[100dvh] flex flex-col">
+            <div className="w-full h-full flex flex-col">
               {/* Menu header — mirrors the app header with X in place of the hamburger */}
               <div className="bg-background border-b border-[#EEE9DD] h-16 shrink-0 flex items-center">
                 <div className="w-full max-w-[1200px] mx-auto px-5 flex items-center justify-between gap-2">
@@ -162,39 +147,52 @@ export function Shell({ children }: { children: ReactNode }) {
                     onClick={closeMenu}
                     aria-label="Close menu"
                     aria-expanded={menuOpen}
-                    className="p-1 text-[#11243e]"
+                    className="p-1 text-[#3351E6]"
                   >
                     <HamburgerIcon open={menuOpen} />
                   </button>
                 </div>
               </div>
 
-              <nav
-                aria-label="Mobile"
-                className={`flex-1 overflow-y-auto flex flex-col px-6 pt-6 pb-6 transition-[opacity,transform] duration-200 ease-out ${
+              <div
+                className={`flex-1 overflow-y-auto flex flex-col transition-[opacity,transform] duration-200 ease-out ${
                   menuOpen ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2"
                 }`}
+                style={{ backgroundImage: "linear-gradient(180deg, #1c2942 0%, #05070d 100%)" }}
               >
-                {[
-                  { label: "Find sessions", action: findSessions },
-                  { label: "How it works", action: () => goSection("how-it-works") },
-                  { label: "Locations", action: () => go("/") },
-                  { label: "FAQ", action: () => goSection("faq") },
-                  {
-                    label: isAuthenticated ? "Log out" : "Log in",
-                    action: handleAuthClick,
-                  },
-                ].map(({ label, action }) => (
+                <nav aria-label="Mobile" className="flex flex-col px-6 pt-4">
+                  {[
+                    { label: "Find sessions", action: findSessions },
+                    { label: "Locations", action: () => go("/") },
+                  ].map(({ label, action }) => (
+                    <button
+                      key={label}
+                      type="button"
+                      onClick={action}
+                      className="text-left text-[20px] leading-[1.15] font-semibold text-white py-4 border-b border-white/15 transition-colors duration-150 active:bg-white/5"
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </nav>
+
+                <div className="mt-auto px-6 pt-6 pb-[calc(24px+env(safe-area-inset-bottom))] flex flex-col gap-3">
                   <button
-                    key={label}
                     type="button"
-                    onClick={action}
-                    className="text-left text-[22px] leading-[1.15] font-bold tracking-tight text-gray-900 py-4 border-b border-[#EEE9DD] transition-colors duration-150 active:bg-black/[0.06]"
+                    onClick={handleAuthClick}
+                    className="w-full h-12 rounded-[10px] border border-white/70 text-white text-[16px] font-semibold transition-colors duration-150 active:bg-white/10"
                   >
-                    {label}
+                    {isAuthenticated ? "Log out" : "Log in"}
                   </button>
-                ))}
-              </nav>
+                  <button
+                    type="button"
+                    onClick={findSessions}
+                    className="w-full h-12 rounded-[10px] border border-white/70 text-white text-[16px] font-semibold transition-colors duration-150 active:bg-white/10"
+                  >
+                    View sessions
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         )}
