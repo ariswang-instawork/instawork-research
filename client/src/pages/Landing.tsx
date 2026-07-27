@@ -248,9 +248,6 @@ export default function Landing() {
             Book sessions near me
           </button>
 
-          <p className="text-[14px] text-[#576270] mt-3 text-center">
-            This opportunity is not currently available to residents of Texas, Washington, or Illinois.
-          </p>
         </div>
         </div>
 
