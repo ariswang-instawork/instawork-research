@@ -278,7 +278,7 @@ export default function Landing() {
             </span>
             <span className="inline-flex items-center gap-1.5 rounded-full bg-[#EAEEFE] px-3 py-1.5 text-[14px] font-semibold text-[#3351E6]">
               <Clock className="w-4 h-4" strokeWidth={2} />
-              In-person · About 3 hours
+              In-person
             </span>
           </div>
 
