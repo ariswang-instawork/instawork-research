@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useLocation } from "wouter";
 import { useSiteStorage, type SiteOrigin } from "@/hooks/use-site";
 import { EligibilityCheckDrawer } from "@/components/Drawers";
 import { LocationSelector } from "@/components/LocationSelector";
 import { SessionCard } from "@/components/SessionCard";
-import { ContinueWithInstaworkSheet } from "@/components/ContinueWithInstaworkSheet";
 import { useGetSessions, getGetSessionsQueryKey, useGetSites } from "@/lib/api-client";
 import type { SessionItem as Session } from "@/lib/api-client/generated/api.schemas";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -107,14 +107,13 @@ const FAQ_ITEMS: { q: string; a: string }[] = [
 ];
 
 export default function Landing() {
+  const [, setLocation] = useLocation();
   const { site, setSite } = useSiteStorage();
   const [eligibilityOpen, setEligibilityOpen] = useState(false);
   // Incremented to open the location selector.
   const [pickerFocus, setPickerFocus] = useState(0);
   const sessionsRef = useRef<HTMLDivElement | null>(null);
-  const [selectedSession, setSelectedSession] = useState<Session | null>(null);
   const [showAll, setShowAll] = useState(false);
-  const [sheetOpen, setSheetOpen] = useState(false);
 
   const hasCity = !!site;
 
@@ -203,7 +202,6 @@ export default function Landing() {
   // Reset per-city choices whenever the canonical site changes, no matter
   // where the change came from (picker, map popup, another tab).
   useEffect(() => {
-    setSelectedSession(null);
     setShowAll(false);
   }, [site?.key]);
 
@@ -222,13 +220,14 @@ export default function Landing() {
   // Picking a city updates the selection and resets choice.
   const handleSiteSelected = (key: string, label: string, origin?: SiteOrigin) => {
     setSite(key, label, origin);
-    setSelectedSession(null);
     setShowAll(false);
     trackEvent("research_city_selected", { selected_city: label, ...utmProps() });
   };
 
-  const handleBook = (session: Session) => {
-    setSelectedSession(session);
+  // "View session" navigates to the session detail page, which shows the
+  // full details card and its own "Book in the Instawork app" → "Continue
+  // with Instawork" flow. Actual booking intent is tracked there, not here.
+  const handleViewSession = (session: Session) => {
     trackEvent("research_session_selected", {
       selected_city: site?.label ?? null,
       selected_session_id: session.id,
@@ -237,12 +236,7 @@ export default function Landing() {
       estimated_total_pay: session.payAmount,
       ...utmProps(),
     });
-    trackEvent("book_cta_clicked", {
-      selected_city: site?.label ?? null,
-      selected_session_id: session.id,
-      ...utmProps(),
-    });
-    setSheetOpen(true);
+    setLocation(`/sessions/${session.id}`);
   };
 
   const visibleSessions = showAll ? sessions : sessions.slice(0, INITIAL_SESSION_COUNT);
@@ -403,7 +397,7 @@ export default function Landing() {
                       <SessionCard
                         key={session.id}
                         session={session}
-                        onBook={() => handleBook(session)}
+                        onBook={() => handleViewSession(session)}
                       />
                     ))}
                   </ul>
@@ -553,21 +547,6 @@ export default function Landing() {
         hideTrigger
         open={eligibilityOpen}
         onOpenChange={setEligibilityOpen}
-      />
-
-      <ContinueWithInstaworkSheet
-        open={sheetOpen}
-        onOpenChange={setSheetOpen}
-        bookUrl={selectedSession?.bookUrl}
-        analyticsProps={{
-          selected_city: site?.label ?? null,
-          selected_session_id: selectedSession?.id ?? null,
-          session_date: selectedSession?.dateISO || selectedSession?.date || null,
-          session_start_time: selectedSession?.time ?? null,
-          estimated_total_pay: selectedSession?.payAmount ?? null,
-          source_page: "landing",
-          ...utmProps(),
-        }}
       />
     </div>
   );
