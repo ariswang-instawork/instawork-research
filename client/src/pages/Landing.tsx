@@ -249,7 +249,7 @@ export default function Landing() {
           </button>
 
           <p className="text-[14px] text-[#576270] mt-3 text-center">
-            Exact time, location, and pay shown before booking.
+            This opportunity is not currently available to residents of Texas, Washington, or Illinois.
           </p>
         </div>
         </div>
