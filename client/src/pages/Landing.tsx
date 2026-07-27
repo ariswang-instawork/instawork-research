@@ -258,25 +258,8 @@ export default function Landing() {
             Paid voice recording
           </p>
           <h1 className="text-[34px] md:text-[46px] leading-[1.1] font-extrabold tracking-[-0.03em] text-[#11243e]">
-            {rateStats == null ? (
-              <>
-                Get paid <span className="text-emphasis">when you want</span> for a
-                3-hour voice recording session
-              </>
-            ) : singleRate != null ? (
-              <>
-                ${Math.trunc(singleRate)}
-                <span className="text-[0.5em] align-top">
-                  {(singleRate % 1).toFixed(2).slice(1)}
-                </span>
-                /hour · <span className="text-emphasis">3-hour sessions</span>
-              </>
-            ) : (
-              <>
-                ${rateStats.min.toFixed(2)}–${rateStats.max.toFixed(2)}/hour ·{" "}
-                <span className="text-emphasis">3-hour sessions</span>
-              </>
-            )}
+            Get paid <span className="text-emphasis">when you want</span> for a
+            3-hour voice recording session
           </h1>
           <p className="text-[17px] leading-[1.5] text-[#576270] mt-4">
             Read short voice prompts at a nearby location. A team member guides you
