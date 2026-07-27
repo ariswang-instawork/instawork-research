@@ -9,7 +9,7 @@ import {
   getLastSyncRun,
   siteKey,
   sanitizeLabel,
-  toSessionItem,
+  toPublicSessionItem,
   syncRunToJson,
   eligibilityEnabled,
 } from "./serving";
@@ -145,7 +145,7 @@ export function registerApiRoutes(app: Express) {
       res.json({
         syncedAt,
         site: { city, stateCode, label: `${city}, ${stateCode}` },
-        sessions: matching.map(toSessionItem),
+        sessions: matching.map(toPublicSessionItem),
       });
     } catch (err) {
       console.error("sessions failed:", err);
@@ -166,7 +166,7 @@ export function registerApiRoutes(app: Express) {
       const stateCode = sanitizeLabel(row.stateCode);
       res.set("Cache-Control", CACHE_HEADER);
       res.json({
-        ...toSessionItem(row),
+        ...toPublicSessionItem(row),
         city,
         stateCode,
         label: `${city}, ${stateCode}`,

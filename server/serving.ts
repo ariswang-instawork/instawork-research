@@ -143,6 +143,16 @@ export function toSessionItem(row: ShiftGroup): SessionItemJson {
   };
 }
 
+/**
+ * Redacts the exact street address and coordinates before a session is sent
+ * to public, unauthenticated endpoints. The precise location is only
+ * revealed after the visitor books through the Instawork app — sending it
+ * here would defeat that regardless of what the page itself renders.
+ */
+export function toPublicSessionItem(row: ShiftGroup): SessionItemJson {
+  return { ...toSessionItem(row), fullAddress: null, latitude: null, longitude: null };
+}
+
 export async function getLastSyncedAt(): Promise<string | null> {
   const row = await prisma.shiftGroup.findFirst({ orderBy: { syncedAt: "desc" } });
   return row ? row.syncedAt.toISOString() : null;

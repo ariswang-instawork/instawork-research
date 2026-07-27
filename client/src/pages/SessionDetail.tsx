@@ -47,15 +47,9 @@ export default function SessionDetail() {
     );
   }
 
-  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-  const encAddress = session.fullAddress ? encodeURIComponent(session.fullAddress) : "";
-  const mapLinkUrl = isIOS 
-    ? `https://maps.apple.com/?q=${encAddress}` 
-    : `https://maps.google.com/?q=${encAddress}`;
-
   const analyticsProps = {
     session_id: session.id,
-    location: session.fullAddress || session.label || null,
+    location: session.label || null,
     date: session.dateISO || session.date || null,
     source_page: "session_detail",
   };
@@ -100,21 +94,18 @@ export default function SessionDetail() {
                   <p className="text-[16px] text-muted-foreground mt-2">{session.time} (3 hours)</p>
                 </div>
               </div>
-              {session.fullAddress && (
+              {session.label && (
                 <div className="flex items-start gap-3.5 py-5 border-b border-[hsl(var(--border))]">
                   <MapPin className="w-5 h-5 text-muted-foreground shrink-0 mt-0.5" strokeWidth={1.75} />
                   <div className="min-w-0">
                     <p className="text-[17px] font-bold text-foreground">Location</p>
-                    <p className="text-[16px] text-muted-foreground leading-relaxed mt-2">{session.fullAddress}</p>
+                    <p className="text-[16px] text-muted-foreground leading-relaxed mt-2">{session.label}</p>
                     {site?.origin && (
                       <p className="text-[14px] text-muted-foreground mt-1">{site.origin.distanceMiles} miles away</p>
                     )}
-                    <button
-                      onClick={() => window.open(mapLinkUrl, '_blank')}
-                      className="text-primary text-[16px] font-semibold hover:underline mt-2 block"
-                    >
-                      Get directions
-                    </button>
+                    <p className="text-[14px] text-muted-foreground mt-2">
+                      Exact address is provided after you book in the Instawork app.
+                    </p>
                   </div>
                 </div>
               )}
