@@ -248,6 +248,9 @@ export default function Landing() {
             Book sessions near me
           </button>
 
+          <p className="text-[14px] text-[#576270] mt-3 text-center">
+            This opportunity is not currently available to residents of Texas, Washington, or Illinois.
+          </p>
         </div>
         </div>
 
@@ -382,13 +385,6 @@ export default function Landing() {
           </div>
         </section>
 
-        {/* Eligibility notice — intentionally low-emphasis */}
-        <div className="max-w-[1200px] mx-auto px-5 md:px-12">
-          <p className="text-[13px] text-gray-500 mt-10">
-            This opportunity is not currently available to residents of Texas, Washington,
-            or Illinois.
-          </p>
-        </div>
       </main>
 
       <EligibilityCheckDrawer
