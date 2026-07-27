@@ -249,47 +249,51 @@ export default function Landing() {
   const hiddenCount = sessions.length - visibleSessions.length;
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col bg-white">
+    <div className="flex min-h-0 flex-1 flex-col bg-background">
       <main className="flex-1 overflow-y-auto w-full pb-16">
         {/* ============ HERO ============ */}
-        <div className="bg-gradient-to-b from-[#F8FBFF] via-[#FAFBFD] to-white">
+        <div className="bg-background">
         <div className="max-w-[640px] mx-auto px-5 md:px-12 pt-10 md:pt-16 pb-4 text-center animate-in fade-in slide-in-from-bottom-3 duration-500">
-          <p className="text-[13px] font-bold uppercase tracking-wide text-[#23409A] mb-3">
+          <p className="text-[13px] font-bold uppercase tracking-wide text-[#3351E6] mb-3">
             Paid voice recording
           </p>
-          <h1 className="text-[34px] md:text-[46px] leading-[1.1] font-extrabold tracking-[-0.03em] text-[#101828]">
+          <h1 className="text-[34px] md:text-[46px] leading-[1.1] font-extrabold tracking-[-0.03em] text-[#11243e]">
             {rateStats == null ? (
-              "Get paid for a 3-hour voice recording session"
+              <>
+                Get paid <span className="text-emphasis">when you want</span> for a
+                3-hour voice recording session
+              </>
             ) : singleRate != null ? (
               <>
                 ${Math.trunc(singleRate)}
                 <span className="text-[0.5em] align-top">
                   {(singleRate % 1).toFixed(2).slice(1)}
                 </span>
-                /hour · 3-hour sessions
+                /hour · <span className="text-emphasis">3-hour sessions</span>
               </>
             ) : (
               <>
-                ${rateStats.min.toFixed(2)}–${rateStats.max.toFixed(2)}/hour · 3-hour sessions
+                ${rateStats.min.toFixed(2)}–${rateStats.max.toFixed(2)}/hour ·{" "}
+                <span className="text-emphasis">3-hour sessions</span>
               </>
             )}
           </h1>
-          <p className="text-[17px] leading-[1.5] text-[#475467] mt-4">
+          <p className="text-[17px] leading-[1.5] text-[#576270] mt-4">
             Read short voice prompts at a nearby location. A team member guides you
             through it.
           </p>
 
           {/* Compact benefit badges */}
           <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#FFF7DF] px-3 py-1.5 text-[14px] font-semibold text-[#7A5A12]">
-              <BadgeDollarSign className="w-4 h-4 text-[#B9861F]" strokeWidth={2} />
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#F8F1E2] px-3 py-1.5 text-[14px] font-semibold text-[#7C6534]">
+              <BadgeDollarSign className="w-4 h-4 text-[#A17D3F]" strokeWidth={2} />
               {hasCity && isLoading ? (
                 <Skeleton className="h-4 w-20 bg-muted inline-block" />
               ) : (
                 <>{payText ?? "Competitive"} estimated pay</>
               )}
             </span>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#F4F2FF] px-3 py-1.5 text-[14px] font-semibold text-[#5D4FC7]">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#EAEEFE] px-3 py-1.5 text-[14px] font-semibold text-[#3351E6]">
               <Clock className="w-4 h-4" strokeWidth={2} />
               In-person · About 3 hours
             </span>
@@ -312,12 +316,12 @@ export default function Landing() {
           <button
             type="button"
             onClick={handleSeeSessions}
-            className="mt-4 w-full h-[54px] rounded-[14px] bg-[#23409A] text-white text-[16px] font-semibold transition-[transform,background-color] duration-150 active:scale-[0.99] active:bg-[#1a3179] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#23409A]/40"
+            className="bg-cta-gradient mt-4 w-full h-[54px] rounded-[8px] text-white text-[16px] font-semibold transition-[transform,filter] duration-150 hover:brightness-105 active:scale-[0.99] active:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3351E6]/40"
           >
             View sessions near me
           </button>
 
-          <p className="text-[14px] text-[#475467] mt-3 text-center">
+          <p className="text-[14px] text-[#576270] mt-3 text-center">
             Exact time, location, and pay shown before booking.
           </p>
         </div>
@@ -327,19 +331,19 @@ export default function Landing() {
         <section
           id="sessions"
           ref={sessionsRef}
-          className="scroll-mt-20 mt-12 md:mt-16 bg-[#F8FBFF] py-12 md:py-16"
+          className="scroll-mt-20 mt-12 md:mt-16 bg-[#FCFBF9] py-12 md:py-16"
         >
           <div className="max-w-[1200px] mx-auto px-5 md:px-12">
-            <h2 className="text-[26px] md:text-[30px] leading-[1.15] font-bold tracking-tight text-[#101828]">
+            <h2 className="text-[26px] md:text-[30px] leading-[1.15] font-bold tracking-tight text-[#11243e]">
               {hasCity ? `Available sessions near ${site!.label}` : "Available sessions"}
             </h2>
-            <p className="text-[16px] text-[#475467] mt-1.5">
+            <p className="text-[16px] text-[#576270] mt-1.5">
               Choose a time and finish booking in Instawork.
               {hasCity && (
                 <button
                   type="button"
                   onClick={openPicker}
-                  className="text-[#23409A] underline underline-offset-2 font-medium ml-1.5"
+                  className="text-[#3351E6] underline underline-offset-2 font-medium ml-1.5"
                 >
                   Change location
                 </button>
@@ -349,33 +353,33 @@ export default function Landing() {
             <div className="mt-7">
               {!hasCity ? (
                 <div className="py-8 text-center max-w-[480px] mx-auto">
-                  <p className="text-[17px] font-semibold text-[#101828]">
+                  <p className="text-[17px] font-semibold text-[#11243e]">
                     Enter your city to see sessions near you.
                   </p>
                   <button
                     type="button"
                     onClick={openPicker}
-                    className="mt-4 inline-flex items-center justify-center h-12 px-6 rounded-[14px] border border-[#23409A] text-[#23409A] font-semibold text-[15px] active:opacity-80"
+                    className="mt-4 inline-flex items-center justify-center h-12 px-6 rounded-[8px] border border-[#3351E6] text-[#3351E6] font-semibold text-[15px] active:opacity-80"
                   >
                     Enter your city
                   </button>
                 </div>
               ) : isLoading ? (
-                <div className="space-y-3.5 divide-y divide-[#e4e7ec] border-t border-b border-[#e4e7ec]">
+                <div className="space-y-3.5 divide-y divide-[#EEE9DD] border-t border-b border-[#EEE9DD]">
                   {[1, 2, 3, 4].map((i) => (
                     <Skeleton key={i} className="h-[52px] w-full bg-muted" />
                   ))}
                 </div>
               ) : sessions.length === 0 ? (
                 <div className="py-8 text-center max-w-[480px] mx-auto">
-                  <p className="text-[17px] font-semibold text-[#101828]">
+                  <p className="text-[17px] font-semibold text-[#11243e]">
                     No sessions are currently open near this location.
                   </p>
                   <div className="mt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
                     <button
                       type="button"
                       onClick={openPicker}
-                      className="inline-flex items-center justify-center h-12 px-6 rounded-[14px] border border-[#23409A] text-[#23409A] font-semibold text-[15px] active:opacity-80"
+                      className="inline-flex items-center justify-center h-12 px-6 rounded-[8px] border border-[#3351E6] text-[#3351E6] font-semibold text-[15px] active:opacity-80"
                     >
                       Change location
                     </button>
@@ -385,7 +389,7 @@ export default function Landing() {
                         onClick={() =>
                           handleSiteSelected(closestOpenMarket.key, closestOpenMarket.label)
                         }
-                        className="inline-flex items-center justify-center h-12 px-6 rounded-[14px] border border-[#23409A] text-[#23409A] font-semibold text-[15px] active:opacity-80"
+                        className="inline-flex items-center justify-center h-12 px-6 rounded-[8px] border border-[#3351E6] text-[#3351E6] font-semibold text-[15px] active:opacity-80"
                       >
                         View sessions in {closestOpenMarket.label}
                       </button>
@@ -394,7 +398,7 @@ export default function Landing() {
                 </div>
               ) : (
                 <>
-                  <ul className="divide-y divide-[#e4e7ec] border-t border-b border-[#e4e7ec]">
+                  <ul className="divide-y divide-[#EEE9DD] border-t border-b border-[#EEE9DD]">
                     {visibleSessions.map((session) => (
                       <SessionCard
                         key={session.id}
@@ -414,7 +418,7 @@ export default function Landing() {
                             ...utmProps(),
                           });
                         }}
-                        className="inline-flex items-center justify-center min-h-[48px] px-6 rounded-[14px] border border-[#d0d5dd] bg-white text-[#101828] font-semibold text-[15px] active:opacity-80"
+                        className="inline-flex items-center justify-center min-h-[48px] px-6 rounded-[8px] border border-[#E0DCCF] bg-white text-[#11243e] font-semibold text-[15px] active:opacity-80"
                       >
                         View more sessions ({hiddenCount})
                       </button>
@@ -425,12 +429,12 @@ export default function Landing() {
             </div>
 
             {hasCity && (
-              <p className="text-[14px] text-[#475467] mt-6">
+              <p className="text-[14px] text-[#576270] mt-6">
                 Already booked or completed a session?{" "}
                 <button
                   type="button"
                   onClick={() => setEligibilityOpen(true)}
-                  className="text-[#23409A] underline underline-offset-2"
+                  className="text-[#3351E6] underline underline-offset-2"
                 >
                   Check remaining sessions
                 </button>
@@ -442,13 +446,13 @@ export default function Landing() {
         {/* ============ HOW IT WORKS ============ */}
         <section id="how-it-works" className="scroll-mt-20 py-10 md:py-14">
           <div className="max-w-[1200px] mx-auto px-5 md:px-12">
-            <h2 className="text-[26px] md:text-[30px] leading-[1.15] font-bold tracking-tight text-[#101828]">
+            <h2 className="text-[26px] md:text-[30px] leading-[1.15] font-bold tracking-tight text-[#11243e]">
               How it works
             </h2>
             <ol className="mt-6 max-w-[640px] space-y-3">
               {HOW_IT_WORKS_STEPS.map((step, i) => (
-                <li key={step} className="flex gap-3 text-[16px] leading-[1.5] text-[#101828]">
-                  <span className="font-bold text-[#23409A] shrink-0" aria-hidden="true">
+                <li key={step} className="flex gap-3 text-[16px] leading-[1.5] text-[#11243e]">
+                  <span className="font-bold text-[#3351E6] shrink-0" aria-hidden="true">
                     {i + 1}.
                   </span>
                   {step}
@@ -459,19 +463,19 @@ export default function Landing() {
         </section>
 
         {/* ============ WHAT WILL I ACTUALLY DO ============ */}
-        <section className="bg-white border-t border-[#eef0f3] py-16 md:py-24">
+        <section className="bg-white border-t border-[#EEE9DD] py-16 md:py-24">
           <div className="max-w-[1200px] mx-auto px-5 md:px-12">
             <div className="max-w-[720px]">
               <span
-                className="inline-flex items-center justify-center w-10 h-10 rounded-[12px] bg-[#F4F2FF] mb-4"
+                className="inline-flex items-center justify-center w-10 h-10 rounded-[12px] bg-[#EAEEFE] mb-4"
                 aria-hidden="true"
               >
-                <Mic className="w-5 h-5 text-[#8C7CFF]" strokeWidth={1.75} />
+                <Mic className="w-5 h-5 text-[#6388F5]" strokeWidth={1.75} />
               </span>
-              <h2 className="text-[26px] md:text-[30px] leading-[1.15] font-bold tracking-tight text-[#101828]">
+              <h2 className="text-[26px] md:text-[30px] leading-[1.15] font-bold tracking-tight text-[#11243e]">
                 What will I actually do?
               </h2>
-              <p className="text-[16px] leading-[1.6] text-[#475467] mt-4">
+              <p className="text-[16px] leading-[1.6] text-[#576270] mt-4">
                 You'll sit at a computer in a research location and complete a series of
                 short, guided voice tasks. You may read sentences, answer simple prompts,
                 or repeat phrases while wearing a headset. A team member will guide you
@@ -483,12 +487,12 @@ export default function Landing() {
                   "Equipment is provided",
                   "You will receive instructions at the location",
                 ].map((point) => (
-                  <li key={point} className="flex items-start gap-3 text-[16px] text-[#101828]">
+                  <li key={point} className="flex items-start gap-3 text-[16px] text-[#11243e]">
                     <span
-                      className="mt-0.5 w-5 h-5 rounded-full bg-[#ECFDF3] flex items-center justify-center shrink-0"
+                      className="mt-0.5 w-5 h-5 rounded-full bg-[#E3FAF3] flex items-center justify-center shrink-0"
                       aria-hidden="true"
                     >
-                      <Check className="w-3.5 h-3.5 text-[#2E8A50]" strokeWidth={2.5} />
+                      <Check className="w-3.5 h-3.5 text-[#01A884]" strokeWidth={2.5} />
                     </span>
                     {point}
                   </li>
@@ -499,15 +503,15 @@ export default function Landing() {
         </section>
 
         {/* ============ EXPLORE OTHER LOCATIONS ============ */}
-        <section className="bg-[#F8FBFF] py-14 md:py-20">
+        <section className="bg-[#FCFBF9] py-14 md:py-20">
           <div className="max-w-[1200px] mx-auto px-5 md:px-12">
-            <h2 className="text-[26px] md:text-[30px] leading-[1.15] font-bold tracking-tight text-[#101828]">
+            <h2 className="text-[26px] md:text-[30px] leading-[1.15] font-bold tracking-tight text-[#11243e]">
               Explore other locations
             </h2>
-            <p className="text-[16px] text-[#475467] mt-1.5">
+            <p className="text-[16px] text-[#576270] mt-1.5">
               Sessions run in cities across the country. Find one near you.
             </p>
-            <div className="mt-6 rounded-[16px] overflow-hidden border border-[#e4e7ec]">
+            <div className="mt-6 rounded-[16px] overflow-hidden border border-[#EEE9DD]">
               <SiteLeafletMap />
             </div>
           </div>
@@ -517,16 +521,16 @@ export default function Landing() {
         <section id="faq" className="scroll-mt-20 bg-white py-16 md:py-24">
           <div className="max-w-[1200px] mx-auto px-5 md:px-12">
             <div className="max-w-[720px]">
-              <h2 className="text-[26px] md:text-[30px] leading-[1.15] font-bold tracking-tight text-[#101828]">
+              <h2 className="text-[26px] md:text-[30px] leading-[1.15] font-bold tracking-tight text-[#11243e]">
                 Frequently asked questions
               </h2>
               <Accordion type="single" collapsible className="mt-4">
                 {FAQ_ITEMS.map(({ q, a }) => (
                   <AccordionItem key={q} value={q}>
-                    <AccordionTrigger className="text-left text-[16px] font-semibold text-[#101828]">
+                    <AccordionTrigger className="text-left text-[16px] font-semibold text-[#11243e]">
                       {q}
                     </AccordionTrigger>
-                    <AccordionContent className="text-[15px] leading-[1.6] text-[#475467]">
+                    <AccordionContent className="text-[15px] leading-[1.6] text-[#576270]">
                       {a}
                     </AccordionContent>
                   </AccordionItem>

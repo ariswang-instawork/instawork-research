@@ -65,84 +65,101 @@
   
   --color-success: hsl(var(--success));
   --color-brand-violet: hsl(var(--brand-violet));
+  --color-accent-coral: hsl(var(--accent-coral));
+  --color-brand-ink: hsl(var(--brand-ink));
 
-  --font-sans: 'HK Grotesk', Inter, -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', system-ui, sans-serif;
+  --font-sans: 'HK Grotesk', 'Hanken Grotesk', Inter, -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', system-ui, sans-serif;
+  /* Editorial emphasis voice — coral italic serif inside headlines. */
+  --font-emphasis: Georgia, 'Times New Roman', Times, serif;
 
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+  /* Instawork radii: buttons 8px (sm), inputs 12px (md), cards 20px (lg). */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-xl: 24px;
 }
 
 :root {
-  --background: 0 0% 100%; /* pure white */
-  --foreground: 222 40% 8%; /* #111318 near-black */
+  /* ===== Instawork palette (extracted from instawork.com/worker) ===== */
+  --background: 40 33% 98%; /* #fcfbf9 warm paper */
+  --foreground: 215 57% 15%; /* #11243e space-cadet navy ink */
 
-  --card: 0 0% 100%;
-  --card-foreground: 222 40% 8%;
-  --card-border: 228 12% 93%; /* #EEEEF2 */
+  --card: 0 0% 100%; /* #ffffff cards pop off the paper */
+  --card-foreground: 215 57% 15%;
+  --card-border: 43 33% 90%; /* #eee9dd tan hairline */
 
   --popover: 0 0% 100%;
-  --popover-foreground: 222 40% 8%;
-  --popover-border: 228 12% 93%;
+  --popover-foreground: 215 57% 15%;
+  --popover-border: 43 33% 90%;
 
-  --primary: 226 63% 37%; /* #23409A */
+  --primary: 230 78% 55%; /* #3351e6 sapphire — flat action blue */
   --primary-foreground: 0 0% 100%;
 
-  --secondary: 228 12% 93%; /* #EEEEF2 */
-  --secondary-foreground: 222 40% 8%;
+  --secondary: 43 33% 90%; /* #eee9dd tan surface */
+  --secondary-foreground: 215 57% 15%;
 
-  --muted: 228 12% 93%; /* #EEEEF2 */
-  --muted-foreground: 223 11% 40%; /* #5B6072 — AA contrast on white for essential secondary text */
+  --muted: 43 33% 90%; /* #eee9dd */
+  --muted-foreground: 214 13% 39%; /* #576270 dim grey */
 
-  --accent: 228 12% 93%;
-  --accent-foreground: 221 83% 53%; /* blue for accent text */
+  --accent: 43 33% 90%;
+  --accent-foreground: 230 78% 55%; /* sapphire for accent text */
 
-  --destructive: 0 84% 60%;
+  --accent-coral: 3 80% 63%; /* #ec5a53 editorial emphasis coral */
+  --brand-ink: 215 57% 15%; /* #11243e */
+
+  --destructive: 359 71% 59%; /* #e04b4d */
   --destructive-foreground: 0 0% 100%;
 
-  --border: 228 12% 93%; /* #EEEEF2 thin dividers */
-  --input: 228 12% 93%;
-  --ring: 221 83% 53%;
+  --border: 43 33% 90%; /* #eee9dd thin dividers */
+  --input: 43 33% 90%;
+  --ring: 230 78% 55%;
 
-  --success: 146 62% 32%; /* #1E8A4C green for earnings */
-  --brand-violet: 255 62% 58%;
-  
-  --body-muted: 226 10% 38%; /* #5B6072 body muted text */
+  --success: 166 98% 39%; /* #01c89a mint — earnings/positive */
+  --brand-violet: 230 78% 55%; /* folded into sapphire (Instawork has no violet) */
 
-  --radius: 0.75rem; /* 12px */
+  --body-muted: 214 13% 39%; /* #576270 body muted text */
+
+  --radius: 0.75rem; /* 12px base; buttons/cards overridden to 8/20 above */
 }
 
 .dark {
-  --background: 222 16% 11%;
-  --foreground: 216 24% 95%;
+  /* Instawork dark: deep navy surfaces, coral softened to #f7a9a9 */
+  --background: 215 57% 12%; /* #0d1b30 */
+  --foreground: 210 33% 96%; /* #f2f5f9 */
 
-  --card: 222 16% 11%;
-  --card-foreground: 216 24% 95%;
-  --card-border: 215 14% 47%;
+  --card: 215 45% 15%; /* #152238 */
+  --card-foreground: 210 33% 96%;
+  --card-border: 218 26% 28%; /* #3a4560 */
 
-  --popover: 222 16% 11%;
-  --popover-foreground: 216 24% 95%;
-  --popover-border: 215 14% 47%;
+  --popover: 215 45% 15%;
+  --popover-foreground: 210 33% 96%;
+  --popover-border: 218 26% 28%;
 
-  --primary: 226 63% 37%;
+  --primary: 230 78% 58%; /* sapphire, slightly lifted */
   --primary-foreground: 0 0% 100%;
 
-  --secondary: 215 14% 47%;
-  --secondary-foreground: 216 24% 95%;
+  --secondary: 217 41% 19%; /* #1c2b46 warm-navy surface */
+  --secondary-foreground: 210 33% 96%;
 
-  --muted: 215 14% 47%;
-  --muted-foreground: 214 18% 91%;
+  --muted: 217 41% 19%;
+  --muted-foreground: 214 16% 72%; /* #aab4c2 */
 
-  --accent: 215 14% 47%;
-  --accent-foreground: 216 24% 95%;
+  --accent: 217 41% 19%;
+  --accent-foreground: 210 33% 96%;
 
-  --destructive: 0 84% 60%;
+  --accent-coral: 0 84% 82%; /* #f7a9a9 softer coral on dark */
+  --brand-ink: 210 33% 96%;
+
+  --destructive: 359 71% 62%;
   --destructive-foreground: 0 0% 100%;
 
-  --border: 215 14% 47%;
-  --input: 215 14% 47%;
-  --ring: 221 83% 53%;
+  --border: 218 26% 28%;
+  --input: 218 26% 28%;
+  --ring: 230 78% 58%;
+
+  --success: 166 98% 42%;
+  --brand-violet: 230 78% 58%;
+  --body-muted: 214 16% 72%;
 }
 
 @layer base {
@@ -152,6 +169,26 @@
   body {
     @apply font-sans antialiased bg-background text-foreground selection:bg-primary/20 selection:text-primary;
     font-size: 14px;
+  }
+}
+
+@layer components {
+  /* Signature Instawork headline flourish: coral Georgia italic on a few words. */
+  .text-emphasis {
+    font-family: var(--font-emphasis);
+    font-style: italic;
+    font-weight: 400;
+    color: hsl(var(--accent-coral));
+    letter-spacing: 0.005em;
+  }
+
+  /* Primary action gradient — reserved for the single main CTA per view.
+     linear-gradient(160deg, #6388f5 10%, #0221cf 90%) from the live site. */
+  .bg-cta-gradient {
+    background-image: linear-gradient(160deg, #6388f5 10%, #0221cf 90%);
+  }
+  .dark .bg-cta-gradient {
+    background-image: linear-gradient(160deg, #6388f5 10%, #3351e6 90%);
   }
 }
 

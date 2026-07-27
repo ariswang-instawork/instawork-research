@@ -3,7 +3,7 @@ import { useLocation } from "wouter";
 import { EligibilityCheckDrawer } from "@/components/Drawers";
 import { useAuthStatus, useLogout, login } from "@/hooks/use-auth";
 
-const LOGO_URL = `${import.meta.env.BASE_URL}instawork_logo_white_background.png`;
+const LOGO_URL = `${import.meta.env.BASE_URL}iw-logo.svg`;
 
 /** Hamburger that morphs into an X (top/bottom rotate, middle fades). */
 function HamburgerIcon({ open }: { open: boolean }) {
@@ -88,25 +88,23 @@ export function Shell({ children }: { children: ReactNode }) {
   };
 
   const navLink =
-    "text-[15px] font-medium text-[#101828] transition-opacity duration-150 hover:opacity-70 active:opacity-85";
+    "text-[15px] font-medium text-[#11243e] transition-opacity duration-150 hover:opacity-70 active:opacity-85";
 
   return (
     <div className="min-h-[100dvh] w-full bg-background flex justify-center text-foreground font-sans selection:bg-primary/20 selection:text-primary">
       <div className="w-full bg-card min-h-[100dvh] flex flex-col relative">
-        {/* Shared app header */}
-        <header className="sticky top-0 z-[1100] bg-white border-b border-[#e4e7ec] h-16 md:h-[72px] flex items-center">
+        {/* Shared app header — mirrors instawork.com/worker's navbar: warm-paper
+            background, bare logo mark (no chip), navy wordmark, tan hairline,
+            gradient primary action. */}
+        <header className="sticky top-0 z-[1100] bg-background border-b border-[#EEE9DD] h-16 md:h-20 flex items-center">
           <div className="w-full max-w-[1200px] mx-auto px-5 md:px-12 flex items-center justify-between gap-2">
             <button
               type="button"
               onClick={() => go("/")}
-              className="flex items-center gap-2 min-w-0"
+              className="flex items-center min-w-0"
               aria-label="Instawork Research home"
             >
-              <img src={LOGO_URL} alt="" className="w-9 h-9 rounded-[10px] shrink-0" />
-              <span className="text-xl font-bold leading-none whitespace-nowrap truncate min-w-0">
-                <span className="text-black">Instawork</span>{" "}
-                <span className="text-[#23409A]">Research</span>
-              </span>
+              <img src={LOGO_URL} alt="Instawork" className="h-[22px] w-auto shrink-0" />
             </button>
 
             {/* Desktop nav */}
@@ -126,7 +124,7 @@ export function Shell({ children }: { children: ReactNode }) {
               <button
                 type="button"
                 onClick={findSessions}
-                className="rounded-[12px] bg-[#23409A] text-white text-[15px] font-semibold px-5 h-11 inline-flex items-center transition-opacity duration-150 active:opacity-85"
+                className="bg-cta-gradient rounded-[8px] text-white text-[15px] font-semibold px-5 h-11 inline-flex items-center transition-[filter] duration-150 hover:brightness-105 active:brightness-95"
               >
                 View sessions
               </button>
@@ -138,7 +136,7 @@ export function Shell({ children }: { children: ReactNode }) {
               onClick={toggleMenu}
               aria-label={menuOpen ? "Close menu" : "Open menu"}
               aria-expanded={menuOpen}
-              className="md:hidden p-1 text-[#101828]"
+              className="md:hidden p-1 text-[#11243e]"
             >
               <HamburgerIcon open={menuOpen} />
             </button>
@@ -154,21 +152,17 @@ export function Shell({ children }: { children: ReactNode }) {
           >
             <div className="w-full bg-background min-h-[100dvh] flex flex-col">
               {/* Menu header — mirrors the app header with X in place of the hamburger */}
-              <div className="bg-white border-b border-[#e4e7ec] h-16 shrink-0 flex items-center">
+              <div className="bg-background border-b border-[#EEE9DD] h-16 shrink-0 flex items-center">
                 <div className="w-full max-w-[1200px] mx-auto px-5 flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-2 min-w-0">
-                    <img src={LOGO_URL} alt="" className="w-9 h-9 rounded-[10px] shrink-0" />
-                    <span className="text-xl font-bold leading-none whitespace-nowrap truncate min-w-0">
-                      <span className="text-black">Instawork</span>{" "}
-                      <span className="text-[#23409A]">Research</span>
-                    </span>
+                  <div className="flex items-center min-w-0">
+                    <img src={LOGO_URL} alt="Instawork" className="h-[22px] w-auto shrink-0" />
                   </div>
                   <button
                     type="button"
                     onClick={closeMenu}
                     aria-label="Close menu"
                     aria-expanded={menuOpen}
-                    className="p-1 text-[#101828]"
+                    className="p-1 text-[#11243e]"
                   >
                     <HamburgerIcon open={menuOpen} />
                   </button>
@@ -195,7 +189,7 @@ export function Shell({ children }: { children: ReactNode }) {
                     key={label}
                     type="button"
                     onClick={action}
-                    className="text-left text-[22px] leading-[1.15] font-bold tracking-tight text-gray-900 py-4 border-b border-[#eef0f3] transition-colors duration-150 active:bg-black/[0.06]"
+                    className="text-left text-[22px] leading-[1.15] font-bold tracking-tight text-gray-900 py-4 border-b border-[#EEE9DD] transition-colors duration-150 active:bg-black/[0.06]"
                   >
                     {label}
                   </button>

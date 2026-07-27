@@ -20,7 +20,7 @@ L.Icon.Default.mergeOptions({
   shadowUrl: markerShadow,
 });
 
-const PRIMARY = "#23409A";
+const PRIMARY = "#3351E6";
 
 type SiteWithCoords = Site & { latitude: number; longitude: number };
 
@@ -50,8 +50,8 @@ const LABEL_POS: Record<string, LabelPos> = {
 /** Compact pin: blue dot + white pill labeled with the city name. */
 function badgeIcon(site: SiteWithCoords) {
   const isOpen = site.openCount > 0;
-  const dotColor = isOpen ? PRIMARY : "#C7CAD6";
-  const numColor = isOpen ? "#111827" : "#9CA3AF";
+  const dotColor = isOpen ? PRIMARY : "#D9D3C4";
+  const numColor = isOpen ? "#11243e" : "#8A94A3";
   const label = escapeHtml(site.city || site.label);
   const pos: LabelPos = LABEL_POS[site.key] ?? "right";
   const dot = `<span style="width:12px;height:12px;border-radius:9999px;background:${dotColor};border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.3);flex:none;"></span>`;
@@ -156,17 +156,17 @@ export function SiteLeafletMap() {
               data-testid={`button-city-${site.key}`}
             >
               <span className="flex items-center gap-3 min-w-0">
-                <MapPin className="w-5 h-5 text-[#23409A] shrink-0" strokeWidth={1.75} />
+                <MapPin className="w-5 h-5 text-[#3351E6] shrink-0" strokeWidth={1.75} />
                 <span className="min-w-0">
-                  <span className="block text-[16px] font-semibold text-[#101828] truncate">
+                  <span className="block text-[16px] font-semibold text-[#11243e] truncate">
                     {site.label}
                   </span>
-                  <span className="block text-[14px] text-[#475467]">
+                  <span className="block text-[14px] text-[#576270]">
                     {openingsText(site.openCount)}
                   </span>
                 </span>
               </span>
-              <span className="text-[14px] font-semibold text-[#23409A] shrink-0">
+              <span className="text-[14px] font-semibold text-[#3351E6] shrink-0">
                 View
               </span>
             </button>
@@ -215,7 +215,7 @@ export function SiteLeafletMap() {
                 <Popup>
                   <div style={{ minWidth: 116 }}>
                     <div style={{ fontWeight: 700, fontSize: 18, lineHeight: 1.2, marginBottom: 6 }}>{site.city}</div>
-                    <div style={{ color: "#4B5563", fontSize: 15, fontWeight: 500, lineHeight: 1.3, marginBottom: 16 }}>
+                    <div style={{ color: "#576270", fontSize: 15, fontWeight: 500, lineHeight: 1.3, marginBottom: 16 }}>
                       {openingsText(site.openCount)}
                     </div>
                     <button

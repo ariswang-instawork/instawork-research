@@ -69,7 +69,7 @@ export default function Admin() {
               </div>
               <Button 
                 type="submit" 
-                className="w-full h-12 rounded-[14px] font-bold"
+                className="w-full h-12 rounded-[8px] font-bold"
                 disabled={statusMutation.isPending || !password}
               >
                 {statusMutation.isPending ? "Checking..." : "Continue"}
