@@ -201,7 +201,7 @@ export default function Landing() {
         <div className="bg-background">
         <div className="max-w-[640px] mx-auto px-5 md:px-12 pt-10 md:pt-16 pb-4 text-center animate-in fade-in slide-in-from-bottom-3 duration-500">
           <p className="text-[13px] font-bold uppercase tracking-wide text-[#3351E6] mb-3">
-            Paid voice recording
+            Instawork Research
           </p>
           <h1 className="text-[34px] md:text-[46px] leading-[1.1] font-extrabold tracking-[-0.03em] text-[#11243e]">
             Get paid for reading <span className="text-emphasis">short voice prompts</span>
