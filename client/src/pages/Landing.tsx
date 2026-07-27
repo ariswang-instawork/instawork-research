@@ -245,7 +245,7 @@ export default function Landing() {
             onClick={handleSeeSessions}
             className="bg-cta-gradient mt-4 w-full h-[54px] rounded-[8px] text-white text-[16px] font-semibold transition-[transform,filter] duration-150 hover:brightness-105 active:scale-[0.99] active:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3351E6]/40"
           >
-            View sessions near me
+            Book sessions near me
           </button>
 
           <p className="text-[14px] text-[#576270] mt-3 text-center">
