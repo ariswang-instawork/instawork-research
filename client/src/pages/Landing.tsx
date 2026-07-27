@@ -58,6 +58,13 @@ function utmProps(): Record<string, string | null> {
   };
 }
 
+const FAQ_ITEMS: { q: string; a: string }[] = [
+  { q: "Do I need experience?", a: "No. Every task is guided, and a team member walks you through it." },
+  { q: "How will I get paid?", a: "Through the Instawork app after your session." },
+  { q: "What should I bring?", a: "A valid photo ID. Everything else is provided." },
+  { q: "Where do I finish signing up?", a: "In the Instawork app, after you pick a session." },
+];
+
 export default function Landing() {
   const [, setLocation] = useLocation();
   const { site, setSite } = useSiteStorage();
@@ -381,6 +388,25 @@ export default function Landing() {
             </p>
             <div className="mt-6 rounded-[16px] overflow-hidden border border-[#EEE9DD]">
               <SiteLeafletMap />
+            </div>
+          </div>
+        </section>
+
+        {/* ============ FAQ ============ */}
+        <section id="faq" className="scroll-mt-20 bg-white py-14 md:py-20">
+          <div className="max-w-[1200px] mx-auto px-5 md:px-12">
+            <div className="max-w-[640px]">
+              <h2 className="text-[26px] md:text-[30px] leading-[1.15] font-bold tracking-tight text-[#11243e]">
+                FAQ
+              </h2>
+              <div className="mt-4 divide-y divide-[#EEE9DD] border-t border-b border-[#EEE9DD]">
+                {FAQ_ITEMS.map(({ q, a }) => (
+                  <div key={q} className="py-4">
+                    <p className="text-[16px] font-semibold text-[#11243e]">{q}</p>
+                    <p className="text-[15px] text-[#576270] mt-1">{a}</p>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </section>
