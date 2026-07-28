@@ -72,16 +72,18 @@ export default function SessionDetail() {
                   <p className="text-[14px] text-muted-foreground mt-1">{site.origin.distanceMiles} miles away</p>
                 )}
               </div>
-              <div className="shrink-0 text-center">
-                <div className="inline-block rounded-[10px] border border-[hsl(var(--border))] bg-card px-4 py-2 text-[16px] font-bold shadow-sm">
-                  {session.payLabel || "$72"}
+              <div className="shrink-0">
+                <div className="inline-block rounded-[10px] border border-[hsl(var(--border))] bg-card px-6 py-4 text-center shadow-sm">
+                  <div className="text-[18px] font-bold text-foreground">
+                    {session.payLabel || "$72"}
+                  </div>
+                  <p className="text-[12px] font-medium text-muted-foreground mt-1">Estimated pay</p>
+                  {session.payRateUsd != null && session.billableHours != null && (
+                    <p className="text-[12px] text-[#8A8F9E] mt-0.5 whitespace-nowrap">
+                      ${Number.isInteger(session.payRateUsd) ? session.payRateUsd : session.payRateUsd.toFixed(2)}/hr × {session.billableHours} hours
+                    </p>
+                  )}
                 </div>
-                <p className="text-[13px] font-medium text-muted-foreground mt-1">Estimated pay</p>
-                {session.payRateUsd != null && session.billableHours != null && (
-                  <p className="text-[13px] text-muted-foreground mt-1 whitespace-nowrap">
-                    ${Number.isInteger(session.payRateUsd) ? session.payRateUsd : session.payRateUsd.toFixed(2)}/hr × {session.billableHours} hours
-                  </p>
-                )}
               </div>
             </div>
 
