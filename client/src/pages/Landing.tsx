@@ -60,9 +60,9 @@ function utmProps(): Record<string, string | null> {
 
 const FAQ_ITEMS: { q: string; a: string }[] = [
   { q: "Do I need experience?", a: "No. Every task is guided, and a team member walks you through it." },
-  { q: "How will I get paid?", a: "Through the Instawork app after your session." },
-  { q: "What should I bring?", a: "A valid photo ID. Everything else is provided." },
   { q: "Where do I finish signing up?", a: "In the Instawork app, after you pick a session." },
+  { q: "What should I bring?", a: "A valid photo ID. Everything else is provided." },
+  { q: "How will I get paid?", a: "Through the Instawork app after your session." },
 ];
 
 export default function Landing() {
