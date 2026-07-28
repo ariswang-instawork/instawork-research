@@ -93,7 +93,7 @@ export function Shell({ children }: { children: ReactNode }) {
               className="flex items-center min-w-0"
               aria-label="Instawork Research home"
             >
-              <img src={LOGO_URL} alt="Instawork" className="h-[22px] w-auto shrink-0" />
+              <img src={LOGO_URL} alt="Instawork" className="h-[28px] w-auto shrink-0" />
             </button>
 
             {/* Desktop nav */}
@@ -137,7 +137,7 @@ export function Shell({ children }: { children: ReactNode }) {
               <div className="bg-background border-b border-[#EEE9DD] h-16 shrink-0 flex items-center">
                 <div className="w-full max-w-[1200px] mx-auto px-5 flex items-center justify-between gap-2">
                   <div className="flex items-center min-w-0">
-                    <img src={LOGO_URL} alt="Instawork" className="h-[22px] w-auto shrink-0" />
+                    <img src={LOGO_URL} alt="Instawork" className="h-[28px] w-auto shrink-0" />
                   </div>
                   <button
                     type="button"
