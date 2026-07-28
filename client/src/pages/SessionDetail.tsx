@@ -128,7 +128,7 @@ export default function SessionDetail() {
             <div className="mb-8">
               <h3 className="text-[18px] font-semibold mb-3">Important to know</h3>
               <ul className="space-y-1.5 pl-5 list-disc text-[15px] text-[hsl(var(--body-muted))] leading-relaxed">
-                <li>Arrive 10 minutes early</li>
+                <li>Arrive on time</li>
                 <li>Bring a valid photo ID</li>
                 <li>Check your email for a follow-up form before your session</li>
                 <li>Not available to residents of {excludedStatesText}</li>
