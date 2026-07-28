@@ -395,16 +395,27 @@ export default function Landing() {
         {/* ============ FAQ ============ */}
         <section id="faq" className="scroll-mt-20 bg-white py-14 md:py-20">
           <div className="max-w-[1200px] mx-auto px-5 md:px-12">
-            <div className="max-w-[640px]">
+            <div className="max-w-[760px]">
               <h2 className="text-[26px] md:text-[30px] leading-[1.15] font-bold tracking-tight text-[#11243e]">
                 FAQ
               </h2>
-              <div className="mt-4 divide-y divide-[#EEE9DD] border-t border-b border-[#EEE9DD]">
+              <p className="text-[16px] text-[#576270] mt-1.5">
+                Answers to common questions.
+              </p>
+              <div className="mt-6 border-t border-[#EEE9DD]">
                 {FAQ_ITEMS.map(({ q, a }) => (
-                  <div key={q} className="py-4">
-                    <p className="text-[16px] font-semibold text-[#11243e]">{q}</p>
-                    <p className="text-[15px] text-[#576270] mt-1">{a}</p>
-                  </div>
+                  <details key={q} className="group border-b border-[#EEE9DD] py-6">
+                    <summary className="flex items-center justify-between gap-6 cursor-pointer list-none [&::-webkit-details-marker]:hidden text-[19px] md:text-[23px] font-bold leading-snug text-[#11243e]">
+                      {q}
+                      <span className="shrink-0 text-[26px] leading-none font-normal text-[#A17D3F] group-open:hidden">
+                        +
+                      </span>
+                      <span className="hidden shrink-0 text-[26px] leading-none font-normal text-[#A17D3F] group-open:inline">
+                        –
+                      </span>
+                    </summary>
+                    <p className="text-[16px] text-[#576270] mt-3 leading-relaxed max-w-[600px]">{a}</p>
+                  </details>
                 ))}
               </div>
             </div>
