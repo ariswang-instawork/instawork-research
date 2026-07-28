@@ -227,26 +227,33 @@ export default function Landing() {
                 Complete a 3-hour recording session at a nearby location.
               </p>
 
-              {/* Social proof line */}
-              <div className="mt-5 text-center lg:text-left">
-                <p className="text-[14px] font-medium text-[#576270]">
-                  ✓ 500+ sessions completed
-                </p>
+              {/* Stat cards: Pay and Sessions */}
+              <div className="mt-6 flex flex-col sm:flex-row gap-4 text-center lg:text-left justify-center lg:justify-start">
+                <div className="flex-1 sm:flex-none">
+                  <p className="text-[36px] font-bold text-[#11243e]">
+                    {hasCity && isLoading ? (
+                      <Skeleton className="h-9 w-32 bg-muted inline-block" />
+                    ) : (
+                      payText ?? "Competitive"
+                    )}
+                  </p>
+                  <p className="text-[14px] text-[#576270] mt-1">Estimated pay</p>
+                </div>
+                <div className="flex-1 sm:flex-none">
+                  <p className="text-[36px] font-bold text-[#11243e]">500+</p>
+                  <p className="text-[14px] text-[#576270] mt-1">Sessions completed</p>
+                </div>
               </div>
 
-              {/* Compact benefit badges */}
-              <div className="mt-5 flex flex-wrap items-center justify-center lg:justify-start gap-2">
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#F8F1E2] px-3 py-1.5 text-[14px] font-semibold text-[#7C6534]">
-                  <BadgeDollarSign className="w-4 h-4 text-[#A17D3F]" strokeWidth={2} />
-                  {hasCity && isLoading ? (
-                    <Skeleton className="h-4 w-20 bg-muted inline-block" />
-                  ) : (
-                    <>{payText ?? "Competitive"} estimated pay</>
-                  )}
-                </span>
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#EAEEFE] px-3 py-1.5 text-[14px] font-semibold text-[#3351E6]">
+              {/* Benefit badges */}
+              <div className="mt-5 flex flex-wrap items-center justify-center lg:justify-start gap-3">
+                <span className="inline-flex items-center gap-2 rounded-full bg-[#EAEEFE] px-4 py-2 text-[14px] font-semibold text-[#3351E6]">
                   <Clock className="w-4 h-4" strokeWidth={2} />
                   In-person
+                </span>
+                <span className="inline-flex items-center gap-2 rounded-full bg-[#E8E4D9] px-4 py-2 text-[14px] font-semibold text-[#7C6534]">
+                  <Clock className="w-4 h-4" strokeWidth={2} />
+                  3 hours
                 </span>
               </div>
 
@@ -295,10 +302,12 @@ export default function Landing() {
             </div>
 
             {/* Right column: image placeholder (desktop only) */}
-            <div className="hidden lg:flex lg:flex-1 items-center justify-center h-[500px] bg-gradient-to-br from-[#E8E4D9] to-[#D8D0C0] rounded-[20px] mt-8 lg:mt-0">
+            <div className="hidden lg:flex lg:flex-1 items-center justify-center h-[500px] rounded-[20px] mt-8 lg:mt-0" style={{ background: "linear-gradient(135deg, #3351E6 0%, #1E2BA8 100%)" }}>
               <div className="text-center">
-                <p className="text-[#576270] font-medium">Hero Image Placeholder</p>
-                <p className="text-[13px] text-[#8A8F9E] mt-1">Your illustration here</p>
+                <svg className="w-24 h-24 mx-auto mb-4 text-white opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 13c0 1.105-1.343 2-3 2s-3-.895-3-2m0-4c1.657 0 3-.895 3-2s-1.343-2-3-2-3 .895-3 2m0 4c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2m4 0c1.657 0 3-.895 3-2s-1.343-2-3-2-3 .895-3 2m0 4c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2M9 7a2 2 0 11-4 0 2 2 0 014 0zm0 8a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+                <p className="text-white text-[18px] font-semibold">Real photo goes here — a real Instawork worker, not stock</p>
               </div>
             </div>
           </div>
