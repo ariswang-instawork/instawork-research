@@ -217,10 +217,10 @@ export default function Landing() {
           <div className="flex flex-col lg:flex-row lg:items-center lg:gap-12">
             {/* Left column: text content */}
             <div className="lg:flex-1 text-center lg:text-left animate-in fade-in slide-in-from-bottom-3 duration-500">
-              <p className="text-[13px] font-bold uppercase tracking-wide text-[#3351E6] mb-4">
+              <p className="text-[13px] font-bold uppercase tracking-wide text-[#3351E6] mb-3">
                 Instawork Research
               </p>
-              <h1 className="text-[40px] md:text-[52px] lg:text-[60px] leading-[1.1] font-extrabold tracking-[-0.03em] text-[#11243e]">
+              <h1 className="text-[36px] md:text-[48px] lg:text-[54px] leading-[1.1] font-extrabold tracking-[-0.03em] text-[#11243e]">
                 Get paid for reading <span className="text-emphasis">short voice prompts</span>
               </h1>
               <p className="text-[17px] leading-[1.5] text-[#576270] mt-4">
@@ -312,7 +312,7 @@ export default function Landing() {
           className="scroll-mt-20 mt-12 md:mt-16 bg-[#FCFBF9] py-12 md:py-16"
         >
           <div className="max-w-[1200px] mx-auto px-5 md:px-12">
-            <h2 className="text-[32px] md:text-[40px] lg:text-[48px] leading-[1.15] font-bold tracking-tight text-[#11243e]">
+            <h2 className="text-[28px] md:text-[36px] lg:text-[42px] leading-[1.15] font-bold tracking-tight text-[#11243e]">
               {hasCity ? `Available sessions near ${site!.label}` : "Available sessions"}
             </h2>
             <p className="text-[16px] text-[#576270] mt-1.5">
@@ -424,7 +424,7 @@ export default function Landing() {
         {/* ============ EXPLORE OTHER LOCATIONS ============ */}
         <section className="bg-[#FCFBF9] py-14 md:py-20 lg:py-24">
           <div className="max-w-[1200px] mx-auto px-5 md:px-12">
-            <h2 className="text-[32px] md:text-[40px] lg:text-[48px] leading-[1.15] font-bold tracking-tight text-[#11243e]">
+            <h2 className="text-[28px] md:text-[36px] lg:text-[42px] leading-[1.15] font-bold tracking-tight text-[#11243e]">
               Explore other locations
             </h2>
             <p className="text-[16px] text-[#576270] mt-1.5">
@@ -440,7 +440,7 @@ export default function Landing() {
         <section id="faq" className="scroll-mt-20 bg-[#EEE9DD] py-16 md:py-20 lg:py-24">
           <div className="max-w-[1200px] mx-auto px-5 md:px-12">
             <div className="max-w-[760px]">
-              <h2 className="text-[40px] md:text-[48px] lg:text-[54px] leading-[1.15] font-bold tracking-tight text-[#11243e]">
+              <h2 className="text-[32px] md:text-[40px] lg:text-[48px] leading-[1.15] font-bold tracking-tight text-[#11243e]">
                 FAQ
               </h2>
               <p className="text-[16px] text-[#576270] mt-2">
@@ -449,7 +449,7 @@ export default function Landing() {
               <div className="mt-8 border-t border-[#D0C5B0]">
                 {FAQ_ITEMS.map(({ q, a }) => (
                   <details key={q} className="group border-b border-[#D0C5B0] py-5">
-                    <summary className="flex items-center justify-between gap-6 cursor-pointer list-none [&::-webkit-details-marker]:hidden text-[22px] md:text-[26px] font-bold leading-[1.25] text-[#11243e]">
+                    <summary className="flex items-center justify-between gap-6 cursor-pointer list-none [&::-webkit-details-marker]:hidden text-[20px] md:text-[24px] font-bold leading-[1.25] text-[#11243e]">
                       {q}
                       <span className="shrink-0 text-[28px] leading-none font-normal text-[#A17D3F] group-open:hidden">
                         +
