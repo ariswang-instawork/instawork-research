@@ -103,7 +103,7 @@ export default function SessionDetail() {
                     {site?.origin && (
                       <p className="text-[14px] text-muted-foreground mt-1">{site.origin.distanceMiles} miles away</p>
                     )}
-                    <p className="text-[14px] text-muted-foreground mt-2">
+                    <p className="text-[13px] text-[#8A8F9E] mt-3">
                       Exact address is provided after you book in the Instawork app.
                     </p>
                   </div>
