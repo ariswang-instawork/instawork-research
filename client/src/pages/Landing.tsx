@@ -67,7 +67,6 @@ function utmProps(): Record<string, string | null> {
 
 const FAQ_ITEMS: { q: string; a: string }[] = [
   { q: "Do I need experience?", a: "No. Every task is guided, and a team member walks you through it." },
-  { q: "Am I paid as a W-2 employee?", a: "Yes. You're a W-2 Instawork employee for every session — not a 1099 contractor." },
   { q: "How and when will I get paid?", a: "Weekly, by direct deposit through the Instawork app." },
   { q: "What should I bring?", a: "A valid photo ID. Everything else is provided." },
   { q: "Where do I finish signing up?", a: "In the Instawork app, after you pick a session." },
