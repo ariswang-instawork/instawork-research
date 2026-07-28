@@ -10,8 +10,15 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { BadgeDollarSign, Clock } from "lucide-react";
 import { SiteLeafletMap } from "@/components/SiteLeafletMap";
 import { trackEvent } from "@/lib/analytics";
+import { EXCLUDED_STATES } from "@/lib/constants";
 
 const INITIAL_SESSION_COUNT = 6;
+
+/** Check if a location is in an excluded state */
+function isLocationExcluded(label: string | null | undefined): boolean {
+  if (!label) return false;
+  return EXCLUDED_STATES.some(state => label.includes(state));
+}
 
 /** "$75" for whole amounts, "$110.58" otherwise. */
 function formatPay(amount: number): string {
@@ -207,58 +214,95 @@ export default function Landing() {
       <main className="flex-1 overflow-y-auto w-full pb-16">
         {/* ============ HERO ============ */}
         <div className="bg-background">
-        <div className="max-w-[640px] mx-auto px-5 md:px-12 pt-10 md:pt-16 pb-4 text-center animate-in fade-in slide-in-from-bottom-3 duration-500">
-          <p className="text-[13px] font-bold uppercase tracking-wide text-[#3351E6] mb-3">
-            Instawork Research
-          </p>
-          <h1 className="text-[34px] md:text-[46px] leading-[1.1] font-extrabold tracking-[-0.03em] text-[#11243e]">
-            Get paid for reading <span className="text-emphasis">short voice prompts</span>
-          </h1>
-          <p className="text-[17px] leading-[1.5] text-[#576270] mt-4">
-            Complete a 3-hour recording session at a nearby location.
-          </p>
+        <div className="max-w-[1200px] mx-auto px-5 md:px-12 pt-10 md:pt-16 pb-4">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:gap-12">
+            {/* Left column: text content */}
+            <div className="lg:flex-1 text-center lg:text-left animate-in fade-in slide-in-from-bottom-3 duration-500">
+              <p className="text-[13px] font-bold uppercase tracking-wide text-[#3351E6] mb-3">
+                Instawork Research
+              </p>
+              <h1 className="text-[34px] md:text-[46px] lg:text-[52px] leading-[1.1] font-extrabold tracking-[-0.03em] text-[#11243e]">
+                Get paid for reading <span className="text-emphasis">short voice prompts</span>
+              </h1>
+              <p className="text-[17px] leading-[1.5] text-[#576270] mt-4">
+                Complete a 3-hour recording session at a nearby location.
+              </p>
 
-          {/* Compact benefit badges */}
-          <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#F8F1E2] px-3 py-1.5 text-[14px] font-semibold text-[#7C6534]">
-              <BadgeDollarSign className="w-4 h-4 text-[#A17D3F]" strokeWidth={2} />
-              {hasCity && isLoading ? (
-                <Skeleton className="h-4 w-20 bg-muted inline-block" />
-              ) : (
-                <>{payText ?? "Competitive"} estimated pay</>
-              )}
-            </span>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#EAEEFE] px-3 py-1.5 text-[14px] font-semibold text-[#3351E6]">
-              <Clock className="w-4 h-4" strokeWidth={2} />
-              In-person
-            </span>
+              {/* Social proof line */}
+              <div className="mt-5 text-center lg:text-left">
+                <p className="text-[14px] font-medium text-[#576270]">
+                  ✓ 500+ sessions completed
+                </p>
+              </div>
+
+              {/* Compact benefit badges */}
+              <div className="mt-5 flex flex-wrap items-center justify-center lg:justify-start gap-2">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#F8F1E2] px-3 py-1.5 text-[14px] font-semibold text-[#7C6534]">
+                  <BadgeDollarSign className="w-4 h-4 text-[#A17D3F]" strokeWidth={2} />
+                  {hasCity && isLoading ? (
+                    <Skeleton className="h-4 w-20 bg-muted inline-block" />
+                  ) : (
+                    <>{payText ?? "Competitive"} estimated pay</>
+                  )}
+                </span>
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#EAEEFE] px-3 py-1.5 text-[14px] font-semibold text-[#3351E6]">
+                  <Clock className="w-4 h-4" strokeWidth={2} />
+                  In-person
+                </span>
+              </div>
+
+              <div className="mt-6 text-left">
+                <LocationSelector
+                  label={site?.label ?? null}
+                  focusSignal={pickerFocus}
+                  onSiteSelected={handleSiteSelected}
+                  onOpened={() =>
+                    trackEvent("location_selector_opened", {
+                      selected_city: site?.label ?? null,
+                      ...utmProps(),
+                    })
+                  }
+                />
+                {site && isLocationExcluded(site.label) && (
+                  <p className="text-[13px] text-[#E04B4D] font-medium mt-2 bg-[#FCE8E8] rounded-[8px] px-3 py-2">
+                    This opportunity is not available in your location.
+                  </p>
+                )}
+              </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  const isMobile = /iPhone|iPad|Android|Mobile/i.test(navigator.userAgent);
+                  if (!isMobile && !hasCity) {
+                    window.location.href = "/get-app";
+                    return;
+                  }
+                  handleSeeSessions();
+                }}
+                disabled={isLocationExcluded(site?.label ?? null)}
+                className={`mt-4 w-full h-[54px] rounded-[8px] text-white text-[16px] font-semibold transition-[transform,filter] duration-150 ${
+                  isLocationExcluded(site?.label ?? null)
+                    ? "bg-gray-400 opacity-50 cursor-not-allowed"
+                    : "bg-cta-gradient hover:brightness-105 active:scale-[0.99] active:brightness-95"
+                } focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3351E6]/40`}
+              >
+                Book sessions near me
+              </button>
+
+              <p className="text-[14px] text-[#576270] mt-3 text-center lg:text-left">
+                This opportunity is not currently available to residents of Texas, Washington, or Illinois.
+              </p>
+            </div>
+
+            {/* Right column: image placeholder (desktop only) */}
+            <div className="hidden lg:flex lg:flex-1 items-center justify-center h-[500px] bg-gradient-to-br from-[#E8E4D9] to-[#D8D0C0] rounded-[20px] mt-8 lg:mt-0">
+              <div className="text-center">
+                <p className="text-[#576270] font-medium">Hero Image Placeholder</p>
+                <p className="text-[13px] text-[#8A8F9E] mt-1">Your illustration here</p>
+              </div>
+            </div>
           </div>
-
-          <div className="mt-6 text-left">
-            <LocationSelector
-              label={site?.label ?? null}
-              focusSignal={pickerFocus}
-              onSiteSelected={handleSiteSelected}
-              onOpened={() =>
-                trackEvent("location_selector_opened", {
-                  selected_city: site?.label ?? null,
-                  ...utmProps(),
-                })
-              }
-            />
-          </div>
-
-          <button
-            type="button"
-            onClick={handleSeeSessions}
-            className="bg-cta-gradient mt-4 w-full h-[54px] rounded-[8px] text-white text-[16px] font-semibold transition-[transform,filter] duration-150 hover:brightness-105 active:scale-[0.99] active:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3351E6]/40"
-          >
-            Book sessions near me
-          </button>
-
-          <p className="text-[14px] text-[#576270] mt-3 text-center">
-            This opportunity is not currently available to residents of Texas, Washington, or Illinois.
-          </p>
         </div>
         </div>
 
