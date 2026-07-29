@@ -162,6 +162,7 @@ export function Shell({ children }: { children: ReactNode }) {
                   {[
                     { label: "Find sessions", action: findSessions },
                     { label: "Locations", action: () => go("/") },
+                    { label: "My sessions", action: () => { closeMenu(); setEligibilityOpen(true); } },
                   ].map(({ label, action }) => (
                     <button
                       key={label}
