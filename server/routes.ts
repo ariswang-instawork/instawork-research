@@ -5,6 +5,8 @@ import MemoryStore from "memorystore";
 import { randomBytes, createHash } from "crypto";
 import { registerApiRoutes } from "./apiRoutes";
 import { prisma } from "./db";
+import { STUB_ELIGIBILITY } from "./stubData";
+import { usingStubData } from "./serving";
 
 const INSTAWORK_BASE_URL = process.env.INSTAWORK_BASE_URL || "http://localhost:8080";
 const INSTAWORK_CLIENT_ID = process.env.INSTAWORK_CLIENT_ID!;
@@ -248,6 +250,10 @@ export async function registerRoutes(
       return res.status(401).json({ error: "Not authenticated" });
     }
     try {
+      if (usingStubData()) {
+        return res.json(STUB_ELIGIBILITY);
+      }
+
       const userData = await fetchInstaworkUser(req);
       const workerId = Number(userData?.id ?? userData?.worker_id ?? userData?.pk);
       if (!userData || !Number.isFinite(workerId)) {

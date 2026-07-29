@@ -371,6 +371,7 @@ export function EligibilityCheckDrawer({
     setUncontrolledOpen(v);
     onOpenChange?.(v);
   };
+  const [tab, setTab] = useState<"overview" | "sessions">("overview");
 
   const { data: auth, isLoading: authLoading } = useAuthStatus();
   const isAuthenticated = !!auth?.authenticated;
@@ -403,6 +404,31 @@ export function EligibilityCheckDrawer({
             </DrawerDescription>
           </DrawerHeader>
 
+          {isAuthenticated && (
+            <div className="flex gap-2 px-6 border-b border-[hsl(var(--border))]">
+              <button
+                onClick={() => setTab("overview")}
+                className={`px-3 py-3 text-sm font-medium border-b-2 transition-colors ${
+                  tab === "overview"
+                    ? "border-primary text-primary"
+                    : "border-transparent text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                Overview
+              </button>
+              <button
+                onClick={() => setTab("sessions")}
+                className={`px-3 py-3 text-sm font-medium border-b-2 transition-colors ${
+                  tab === "sessions"
+                    ? "border-primary text-primary"
+                    : "border-transparent text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                My sessions
+              </button>
+            </div>
+          )}
+
           <div className="p-4 space-y-3">
             {!isAuthenticated ? null : eligibility.isLoading ? (
               <div className="space-y-3">
@@ -417,7 +443,7 @@ export function EligibilityCheckDrawer({
               <div className="p-4 rounded-[12px] text-sm font-medium border bg-muted text-muted-foreground border-transparent">
                 Looks like you haven't booked one yet — you can book up to 3.
               </div>
-            ) : (
+            ) : tab === "overview" ? (
               eligibility.data?.sites.map((s) => (
                 <div
                   key={s.businessId}
@@ -439,6 +465,42 @@ export function EligibilityCheckDrawer({
                       {s.remaining} of {s.cap} session{s.cap === 1 ? "" : "s"} remaining
                     </p>
                   )}
+                </div>
+              ))
+            ) : (
+              eligibility.data?.sites.map((s) => (
+                <div
+                  key={s.businessId}
+                  className="p-4 rounded-[12px] border border-[hsl(var(--border))] bg-white"
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <div>
+                      <p className="text-[15px] font-bold text-gray-900">
+                        {s.siteLabel ?? "Session site"}
+                      </p>
+                    </div>
+                    {s.isBlocked && (
+                      <span className="text-xs font-semibold px-2 py-1 rounded-full bg-amber-100 text-amber-700">
+                        Maxed out
+                      </span>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Booked</span>
+                      <span className="font-medium">{s.bookedCount}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Completed</span>
+                      <span className="font-medium">{s.completedCount}</span>
+                    </div>
+                    <div className="flex justify-between text-sm border-t border-[hsl(var(--border))] pt-2 mt-2">
+                      <span className="font-medium">Remaining</span>
+                      <span className="font-bold text-primary">
+                        {s.remaining}/{s.cap}
+                      </span>
+                    </div>
+                  </div>
                 </div>
               ))
             )}
