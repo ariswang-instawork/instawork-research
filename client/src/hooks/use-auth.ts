@@ -39,7 +39,15 @@ export function useEligibility(enabled: boolean) {
     retry: false,
     queryFn: async (): Promise<EligibilityResponse> => {
       const resp = await fetch(`${base}api/eligibility`, { credentials: "include" });
-      if (!resp.ok) throw new Error(`eligibility ${resp.status}`);
+      if (!resp.ok) {
+        // The endpoint tags each failure with a `reason` so the drawer can say
+        // which step broke instead of one catch-all message.
+        const reason = await resp
+          .json()
+          .then((b) => (typeof b?.reason === "string" ? b.reason : null))
+          .catch(() => null);
+        throw new Error(reason ? `${resp.status}:${reason}` : `${resp.status}`);
+      }
       return resp.json();
     },
   });

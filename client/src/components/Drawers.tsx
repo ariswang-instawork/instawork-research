@@ -438,6 +438,9 @@ export function EligibilityCheckDrawer({
             ) : eligibility.isError ? (
               <div className="p-4 rounded-[12px] text-sm font-medium border bg-destructive/10 text-destructive border-destructive/20">
                 Could not check eligibility right now.
+                <span className="block mt-1 font-normal opacity-70">
+                  {eligibility.error instanceof Error ? eligibility.error.message : "unknown"}
+                </span>
               </div>
             ) : eligibility.data && eligibility.data.sites.length === 0 ? (
               <div className="p-4 rounded-[12px] text-sm font-medium border bg-muted text-muted-foreground border-transparent">

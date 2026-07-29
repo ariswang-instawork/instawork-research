@@ -255,16 +255,21 @@ export async function registerRoutes(
     if (!req.session.accessToken) {
       return res.status(401).json({ error: "Not authenticated" });
     }
+    // Each step reports a distinct `reason` so a failure in the field can be
+    // told apart from the others without a stack trace reaching the client.
+    let step: "worker" | "bookings" | "sites" = "worker";
     try {
       const userData = await fetchInstaworkUser(req);
       const workerId = Number(userData?.id ?? userData?.worker_id ?? userData?.pk);
       if (!userData || !Number.isFinite(workerId)) {
-        return res.status(502).json({ error: "Could not resolve your worker account" });
+        return res
+          .status(502)
+          .json({ error: "Could not resolve your worker account", reason: "worker_unresolved" });
       }
-      const [bookings, rows] = await Promise.all([
-        prisma.participantBooking.findMany({ where: { workerId } }),
-        getServableRows(),
-      ]);
+      step = "bookings";
+      const bookings = await prisma.participantBooking.findMany({ where: { workerId } });
+      step = "sites";
+      const rows = await getServableRows();
       const bookingByBusiness = new Map(bookings.map((b) => [b.businessId, b]));
 
       // Every site currently offering sessions, first row per business wins.
@@ -305,8 +310,14 @@ export async function registerRoutes(
 
       res.json({ workerId, sites });
     } catch (error) {
-      console.error("eligibility lookup failed:", error);
-      res.status(500).json({ error: "We couldn't check right now — please try again" });
+      // `step` names which dependency broke: reading participant_booking, or
+      // reading shift_group. Both are Postgres reads, so a missing table or an
+      // unset DATABASE_URL lands here rather than surfacing as an empty list.
+      console.error(`eligibility lookup failed at step "${step}":`, error);
+      res.status(500).json({
+        error: "We couldn't check right now — please try again",
+        reason: step === "bookings" ? "bookings_unavailable" : "sites_unavailable",
+      });
     }
   });
 
