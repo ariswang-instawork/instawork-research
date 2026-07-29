@@ -441,7 +441,7 @@ export function EligibilityCheckDrawer({
               </div>
             ) : eligibility.data && eligibility.data.sites.length === 0 ? (
               <div className="p-4 rounded-[12px] text-sm font-medium border bg-muted text-muted-foreground border-transparent">
-                Looks like you haven't booked one yet — you can book up to 3.
+                No session locations available right now.
               </div>
             ) : tab === "overview" ? (
               eligibility.data?.sites.map((s) => (

@@ -5,8 +5,10 @@ import MemoryStore from "memorystore";
 import { randomBytes, createHash } from "crypto";
 import { registerApiRoutes } from "./apiRoutes";
 import { prisma } from "./db";
-import { STUB_ELIGIBILITY } from "./stubData";
-import { usingStubData } from "./serving";
+import { getServableRows, sanitizeLabel } from "./serving";
+
+/** Sessions a worker may book at any one site when Mode has no row for them. */
+const DEFAULT_SESSION_CAP = 3;
 
 const INSTAWORK_BASE_URL = process.env.INSTAWORK_BASE_URL || "http://localhost:8080";
 const INSTAWORK_CLIENT_ID = process.env.INSTAWORK_CLIENT_ID!;
@@ -243,38 +245,65 @@ export async function registerRoutes(
     }
   });
 
-  // Auth-required eligibility: the logged-in worker's participant_booking
-  // rows, one per business/site. Never keyed by name/phone from the client.
+  // Auth-required eligibility: what the logged-in worker may still book at each
+  // site. Never keyed by name/phone from the client.
+  //
+  // Mode only has a participant_booking row for workers who have booked before,
+  // so an absent row is not an error — it means "never booked here". Those sites
+  // report the full cap, unblocked, rather than being dropped from the list.
   app.get("/api/eligibility", async (req, res) => {
     if (!req.session.accessToken) {
       return res.status(401).json({ error: "Not authenticated" });
     }
     try {
-      if (usingStubData()) {
-        return res.json(STUB_ELIGIBILITY);
-      }
-
       const userData = await fetchInstaworkUser(req);
       const workerId = Number(userData?.id ?? userData?.worker_id ?? userData?.pk);
       if (!userData || !Number.isFinite(workerId)) {
         return res.status(502).json({ error: "Could not resolve your worker account" });
       }
-      const bookings = await prisma.participantBooking.findMany({
-        where: { workerId },
-        orderBy: { siteLabel: "asc" },
+      const [bookings, rows] = await Promise.all([
+        prisma.participantBooking.findMany({ where: { workerId } }),
+        getServableRows(),
+      ]);
+      const bookingByBusiness = new Map(bookings.map((b) => [b.businessId, b]));
+
+      // Every site currently offering sessions, first row per business wins.
+      const openSites = new Map<number, string>();
+      for (const row of rows) {
+        if (row.businessId == null || openSites.has(row.businessId)) continue;
+        const city = sanitizeLabel(row.city);
+        const stateCode = sanitizeLabel(row.stateCode);
+        const neighborhood = sanitizeLabel(row.siteLabel);
+        const cityLabel = city && stateCode ? `${city}, ${stateCode}` : city;
+        openSites.set(
+          row.businessId,
+          [neighborhood, cityLabel].filter(Boolean).join(", ") || "Session site",
+        );
+      }
+
+      type Booking = (typeof bookings)[number];
+      const toSite = (businessId: number, fallbackLabel: string, b: Booking | undefined) => ({
+        businessId,
+        siteLabel: (b && sanitizeLabel(b.siteLabel)) || fallbackLabel,
+        cap: b?.cap ?? DEFAULT_SESSION_CAP,
+        remaining: b?.isBlocked ? 0 : Math.max(0, b?.remaining ?? DEFAULT_SESSION_CAP),
+        completedCount: b?.completedCount ?? 0,
+        bookedCount: b?.bookedCount ?? 0,
+        isBlocked: b?.isBlocked ?? false,
       });
-      res.json({
-        workerId,
-        sites: bookings.map((b) => ({
-          businessId: b.businessId,
-          siteLabel: b.siteLabel,
-          cap: b.cap ?? 3,
-          remaining: b.isBlocked ? 0 : Math.max(0, b.remaining ?? 3),
-          completedCount: b.completedCount,
-          bookedCount: b.bookedCount,
-          isBlocked: b.isBlocked,
-        })),
-      });
+
+      const sites = [
+        ...Array.from(openSites, ([businessId, label]) =>
+          toSite(businessId, label, bookingByBusiness.get(businessId)),
+        ),
+        // Sites they have history at but which have no open sessions today —
+        // still worth showing, especially when blocked.
+        ...bookings
+          .filter((b) => !openSites.has(b.businessId))
+          .map((b) => toSite(b.businessId, "Session site", b)),
+      ].sort((a, b) => a.siteLabel.localeCompare(b.siteLabel));
+
+      res.json({ workerId, sites });
     } catch (error) {
       console.error("eligibility lookup failed:", error);
       res.status(500).json({ error: "We couldn't check right now — please try again" });
