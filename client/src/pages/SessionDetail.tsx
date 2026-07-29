@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ArrowLeft, Calendar, CreditCard, MapPin, Mic } from "lucide-react";
 import { Link, useRoute } from "wouter";
 import { useGetSessionById, getGetSessionByIdQueryKey } from "@/lib/api-client";
+import { useAuthStatus } from "@/hooks/use-auth";
 import { useSiteStorage } from "@/hooks/use-site";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -15,6 +16,10 @@ export default function SessionDetail() {
   const id = params?.id;
   const { site } = useSiteStorage();
   const [bookSheetOpen, setBookSheetOpen] = useState(false);
+  // The "Continue with Instawork" sheet only exists to route a logged-out
+  // visitor into log-in or sign-up. Once we know they are signed in there is
+  // nothing to ask, so the CTA opens the shift deep link directly.
+  const { data: auth } = useAuthStatus();
 
   const { data: session, isLoading } = useGetSessionById(id || "", { 
     query: { enabled: !!id, queryKey: getGetSessionByIdQueryKey(id || "") } 
@@ -169,6 +174,16 @@ export default function SessionDetail() {
           <PrimaryCtaButton
             onClick={() => {
               trackEvent("book_cta_clicked", analyticsProps);
+              // Fall back to the sheet if the link is missing — without a
+              // bookUrl there is nowhere to send them.
+              if (auth?.authenticated && session.bookUrl) {
+                trackEvent("instawork_redirect_started", {
+                  ...analyticsProps,
+                  destination: "shift",
+                });
+                window.open(session.bookUrl, "_blank", "noopener,noreferrer");
+                return;
+              }
               setBookSheetOpen(true);
               trackEvent("account_choice_modal_opened", analyticsProps);
             }}
