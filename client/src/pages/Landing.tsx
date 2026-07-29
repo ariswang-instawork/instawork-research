@@ -220,7 +220,7 @@ export default function Landing() {
               <p className="text-[13px] font-bold uppercase tracking-wide text-[#3351E6] mb-3">
                 Instawork Research
               </p>
-              <h1 className="text-[32px] md:text-[42px] lg:text-[48px] leading-[1.1] font-extrabold tracking-[-0.03em] text-[#11243e]">
+              <h1 className="text-[36px] md:text-[48px] lg:text-[56px] leading-[1.1] font-extrabold tracking-[-0.03em] text-[#11243e]">
                 Get paid for reading <span className="text-emphasis">short voice prompts</span>
               </h1>
               <p className="text-[17px] leading-[1.5] text-[#576270] mt-4">
