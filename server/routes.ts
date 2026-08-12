@@ -222,6 +222,26 @@ export async function registerRoutes(
     return response.json();
   }
 
+  /** Instawork /api/users/me/ returns JSON:API; accept flat shapes for local dev. */
+  function resolveInstaworkUser(userData: Record<string, unknown> | null) {
+    if (!userData) return null;
+    const data = userData.data as
+      | { id?: string | number; attributes?: Record<string, unknown> }
+      | undefined;
+    const attrs = (data?.attributes ?? userData) as Record<string, unknown>;
+    const rawId = data?.id ?? userData.id ?? userData.worker_id ?? userData.pk;
+    const workerId = Number(rawId);
+    if (!Number.isFinite(workerId)) return null;
+    const name =
+      (typeof attrs.full_name === "string" && attrs.full_name) ||
+      [attrs.given_name, attrs.family_name].filter((part) => typeof part === "string" && part).join(" ") ||
+      [attrs.first_name ?? attrs.name, attrs.last_name]
+        .filter((part) => typeof part === "string" && part)
+        .join(" ") ||
+      null;
+    return { workerId, name: name || null };
+  }
+
   // Current user from the OAuth session (worker identity for eligibility).
   app.get("/api/me", async (req, res) => {
     if (!req.session.accessToken) {
@@ -229,16 +249,11 @@ export async function registerRoutes(
     }
     try {
       const userData = await fetchInstaworkUser(req);
-      if (!userData) {
+      const resolved = resolveInstaworkUser(userData);
+      if (!resolved) {
         return res.status(502).json({ error: "Failed to fetch user data" });
       }
-      // Return only what the UI needs — never the full upstream profile.
-      const workerId = userData.id ?? userData.worker_id ?? userData.pk ?? null;
-      const name =
-        userData.first_name || userData.name
-          ? [userData.first_name ?? userData.name, userData.last_name].filter(Boolean).join(" ")
-          : null;
-      res.json({ workerId, name });
+      res.json(resolved);
     } catch (error) {
       console.error("Instawork API request error:", error);
       res.status(500).json({ error: "Failed to connect to Instawork API" });
@@ -260,12 +275,13 @@ export async function registerRoutes(
     let step: "worker" | "bookings" | "sites" = "worker";
     try {
       const userData = await fetchInstaworkUser(req);
-      const workerId = Number(userData?.id ?? userData?.worker_id ?? userData?.pk);
-      if (!userData || !Number.isFinite(workerId)) {
+      const resolved = resolveInstaworkUser(userData);
+      if (!resolved) {
         return res
           .status(502)
           .json({ error: "Could not resolve your worker account", reason: "worker_unresolved" });
       }
+      const { workerId } = resolved;
       step = "bookings";
       const bookings = await prisma.participantBooking.findMany({ where: { workerId } });
       step = "sites";
