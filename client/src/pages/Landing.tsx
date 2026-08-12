@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { useSiteStorage, type SiteOrigin } from "@/hooks/use-site";
-import { EligibilityCheckDrawer } from "@/components/Drawers";
 import { LocationSelector } from "@/components/LocationSelector";
 import { SessionCard } from "@/components/SessionCard";
 import { useGetSessions, getGetSessionsQueryKey, useGetSites } from "@/lib/api-client";
@@ -75,7 +74,6 @@ const FAQ_ITEMS: { q: string; a: string }[] = [
 export default function Landing() {
   const [, setLocation] = useLocation();
   const { site, setSite } = useSiteStorage();
-  const [eligibilityOpen, setEligibilityOpen] = useState(false);
   // Incremented to open the location selector.
   const [pickerFocus, setPickerFocus] = useState(0);
   const sessionsRef = useRef<HTMLDivElement | null>(null);
@@ -183,6 +181,16 @@ export default function Landing() {
     scrollToSessions();
   };
 
+  const handleBrowsePath = () => {
+    trackEvent("new_user_path_clicked", { selected_city: site?.label ?? null, ...utmProps() });
+    handleSeeSessions();
+  };
+
+  const handleReturningPath = () => {
+    trackEvent("returning_user_path_clicked", { selected_city: site?.label ?? null, ...utmProps() });
+    setLocation("/my-sessions");
+  };
+
   // Picking a city updates the selection and resets choice.
   const handleSiteSelected = (key: string, label: string, origin?: SiteOrigin) => {
     setSite(key, label, origin);
@@ -255,6 +263,31 @@ export default function Landing() {
                   <Clock className="w-4 h-4" strokeWidth={2} />
                   3 hours
                 </span>
+              </div>
+
+              <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="rounded-[12px] border border-[#EEE9DD] bg-white p-4 text-left">
+                  <p className="text-[15px] font-bold text-[#11243e]">New to research sessions?</p>
+                  <p className="text-[13px] text-[#576270] mt-0.5">Browse paid sessions near you.</p>
+                  <button
+                    type="button"
+                    onClick={handleBrowsePath}
+                    className="mt-3 inline-flex items-center justify-center h-11 w-full rounded-[8px] border border-[#3351E6] text-[#3351E6] font-semibold text-[15px] active:opacity-80"
+                  >
+                    Browse sessions
+                  </button>
+                </div>
+                <div className="rounded-[12px] border border-[#3351E6]/30 bg-[#F5F7FF] p-4 text-left">
+                  <p className="text-[15px] font-bold text-[#11243e]">Already booked or completed a session?</p>
+                  <p className="text-[13px] text-[#576270] mt-0.5">See the sessions you can still book.</p>
+                  <button
+                    type="button"
+                    onClick={handleReturningPath}
+                    className="mt-3 inline-flex items-center justify-center h-11 w-full rounded-[8px] bg-cta-gradient text-white font-semibold text-[15px] hover:brightness-105 active:brightness-95"
+                  >
+                    See my sessions
+                  </button>
+                </div>
               </div>
 
               <div className="mt-6 text-left">
@@ -415,18 +448,6 @@ export default function Landing() {
               )}
             </div>
 
-            {hasCity && (
-              <p className="text-[14px] text-[#576270] mt-6">
-                Already booked or completed a session?{" "}
-                <button
-                  type="button"
-                  onClick={() => setEligibilityOpen(true)}
-                  className="text-[#3351E6] underline underline-offset-2"
-                >
-                  Check remaining sessions
-                </button>
-              </p>
-            )}
           </div>
         </section>
 
@@ -476,12 +497,6 @@ export default function Landing() {
         </section>
 
       </main>
-
-      <EligibilityCheckDrawer
-        hideTrigger
-        open={eligibilityOpen}
-        onOpenChange={setEligibilityOpen}
-      />
     </div>
   );
 }
