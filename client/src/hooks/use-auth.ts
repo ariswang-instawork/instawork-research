@@ -1,4 +1,5 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import type { SessionItem } from "@/lib/api-client/generated/api.schemas";
 
 const base = import.meta.env.BASE_URL;
 const RETURN_TO_KEY = "auth-return-to";
@@ -49,6 +50,27 @@ export function useEligibility(enabled: boolean) {
           .catch(() => null);
         throw new Error(reason ? `${resp.status}:${reason}` : `${resp.status}`);
       }
+      return resp.json();
+    },
+  });
+}
+
+export type EligibilitySessionsResponse = {
+  businessId: number;
+  sessions: SessionItem[];
+};
+
+/** Open shifts for one eligible business/site. Lazy — only runs when enabled. */
+export function useEligibilitySessions(businessId: number | null, enabled: boolean) {
+  return useQuery({
+    queryKey: ["eligibility-sessions", businessId],
+    enabled: enabled && businessId != null,
+    retry: false,
+    queryFn: async (): Promise<EligibilitySessionsResponse> => {
+      const resp = await fetch(`${base}api/eligibility/sessions?business=${businessId}`, {
+        credentials: "include",
+      });
+      if (!resp.ok) throw new Error(String(resp.status));
       return resp.json();
     },
   });
