@@ -73,11 +73,6 @@ function formatTimeRange(row: ShiftGroup): string {
   const start = row.shiftStartTime ?? "";
   const end = row.shiftEndTime ?? "";
   if (start && end) {
-    const startMeridiem = start.match(/(AM|PM)$/i)?.[0];
-    const endMeridiem = end.match(/(AM|PM)$/i)?.[0];
-    if (startMeridiem && endMeridiem && startMeridiem.toUpperCase() === endMeridiem.toUpperCase()) {
-      return `${start.replace(/\s*(AM|PM)$/i, "")} – ${end}`;
-    }
     return `${start} – ${end}`;
   }
   return start || end || "";
