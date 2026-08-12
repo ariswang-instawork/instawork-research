@@ -110,6 +110,12 @@ app.use((req, res, next) => {
       syncAll()
         .then(() => logDataSummary())
         .catch((err) => log(`boot sync failed: ${err?.message ?? err}`, "mode-sync"));
+
+      // Re-sync every 5 minutes while the server is running.
+      const SYNC_INTERVAL_MS = 5 * 60 * 1000;
+      setInterval(() => {
+        syncAll().catch((err) => log(`scheduled sync failed: ${err?.message ?? err}`, "mode-sync"));
+      }, SYNC_INTERVAL_MS);
     },
   );
 })();
