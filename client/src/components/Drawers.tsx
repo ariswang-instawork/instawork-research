@@ -1,9 +1,10 @@
 import { useRef, useState } from "react";
 import { useGetSites } from "@/lib/api-client";
-import { useAuthStatus, useEligibility, login } from "@/hooks/use-auth";
+import { useAuthStatus, useEligibility, useEligibilitySessions, login, type EligibilitySite } from "@/hooks/use-auth";
 import { calculateDistance } from "@/lib/zipCentroids";
 import { useSiteStorage, type SiteOrigin } from "@/hooks/use-site";
-import { MapPin, Navigation, ShieldCheck, X, Check, Info } from "lucide-react";
+import { MapPin, Navigation, ShieldCheck, X, Check, Info, ChevronDown } from "lucide-react";
+import { trackEvent } from "@/lib/analytics";
 import { Button } from "@/components/ui/button";
 import { PrimaryCtaButton } from "@/components/PrimaryCtaButton";
 import { Input } from "@/components/ui/input";
@@ -372,6 +373,91 @@ export function LocationDrawer({
   );
 }
 
+/**
+ * Overview-tab card for an eligible site (not blocked, remaining > 0). Expands
+ * in place to lazily load that business's open shifts; each shift books via its
+ * Instawork deep link. Blocked / maxed-out sites never use this component.
+ */
+function ExpandableEligibilitySiteCard({
+  site,
+  isOpen,
+  onToggle,
+}: {
+  site: EligibilitySite;
+  isOpen: boolean;
+  onToggle: () => void;
+}) {
+  const { data, isLoading, isError } = useEligibilitySessions(site.businessId, isOpen);
+  const sessions = data?.sessions ?? [];
+
+  return (
+    <div className="rounded-[12px] border bg-white border-[hsl(var(--border))] overflow-hidden">
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-expanded={isOpen}
+        className="w-full flex items-start justify-between gap-3 p-4 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+      >
+        <span className="min-w-0">
+          <span className="block text-[15px] font-bold text-gray-900">
+            {site.siteLabel ?? "Session site"}
+          </span>
+          <span className="block text-sm text-muted-foreground mt-0.5">
+            {site.remaining} of {site.cap} session{site.cap === 1 ? "" : "s"} remaining
+          </span>
+          {site.oneVisitLimit && (
+            <span className="block text-sm text-blue-900/80 mt-2 leading-relaxed">
+              New York: one visit limit. Additional visits are by invitation only.
+            </span>
+          )}
+        </span>
+        <ChevronDown
+          className={`w-5 h-5 shrink-0 text-muted-foreground transition-transform ${isOpen ? "rotate-180" : ""}`}
+          aria-hidden="true"
+        />
+      </button>
+
+      {isOpen && (
+        <div className="px-4 pb-4 pt-1 border-t border-[hsl(var(--border))]">
+          {isLoading ? (
+            <div className="space-y-2 pt-2">
+              <div className="h-10 rounded-lg bg-muted animate-pulse" />
+              <div className="h-10 rounded-lg bg-muted animate-pulse" />
+            </div>
+          ) : isError ? (
+            <p className="text-sm text-muted-foreground pt-3">Couldn't load shifts right now.</p>
+          ) : sessions.length === 0 ? (
+            <p className="text-sm text-muted-foreground pt-3">No open shifts right now.</p>
+          ) : (
+            <ul className="divide-y divide-[hsl(var(--border))]">
+              {sessions.map((s) => (
+                <li key={s.id} className="flex items-center justify-between gap-3 py-2.5">
+                  <span className="text-[14px] text-gray-900 min-w-0 truncate">
+                    {s.date} · {s.time}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      trackEvent("eligibility_shift_book_clicked", {
+                        business_id: site.businessId,
+                        session_id: s.id,
+                      });
+                      if (s.bookUrl) window.open(s.bookUrl, "_blank", "noopener,noreferrer");
+                    }}
+                    className="shrink-0 text-[14px] font-semibold text-white bg-cta-gradient rounded-[8px] px-4 py-2 hover:brightness-105 active:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+                  >
+                    Book
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function EligibilityCheckDrawer({
   suppressed = false,
   open: controlledOpen,
@@ -392,6 +478,7 @@ export function EligibilityCheckDrawer({
     onOpenChange?.(v);
   };
   const [tab, setTab] = useState<"overview" | "sessions">("overview");
+  const [expandedBusiness, setExpandedBusiness] = useState<number | null>(null);
 
   const { data: auth, isLoading: authLoading } = useAuthStatus();
   const isAuthenticated = !!auth?.authenticated;
@@ -470,34 +557,50 @@ export function EligibilityCheckDrawer({
               <>
                 <SessionLimitPolicyNotice />
                 {tab === "overview"
-                  ? eligibility.data?.sites.map((s) => (
-                <div
-                  key={s.businessId}
-                  className={`p-4 rounded-[12px] border ${
-                    s.isBlocked
-                      ? "bg-amber-50 border-amber-200"
-                      : "bg-white border-[hsl(var(--border))]"
-                  }`}
-                >
-                  <p className="text-[15px] font-bold text-gray-900">
-                    {s.siteLabel ?? "Session site"}
-                  </p>
-                  {s.isBlocked ? (
-                    <p className="text-sm font-medium text-amber-900 mt-0.5">
-                      You can't book more sessions at this site.
-                    </p>
-                  ) : (
-                    <p className="text-sm text-muted-foreground mt-0.5">
-                      {s.remaining} of {s.cap} session{s.cap === 1 ? "" : "s"} remaining
-                    </p>
-                  )}
-                  {s.oneVisitLimit && (
-                    <p className="text-sm text-blue-900/80 mt-2 leading-relaxed">
-                      New York: one visit limit. Additional visits are by invitation only.
-                    </p>
-                  )}
-                </div>
-                  ))
+                  ? eligibility.data?.sites.map((s) =>
+                      s.isBlocked || s.remaining <= 0 ? (
+                        <div
+                          key={s.businessId}
+                          className={`p-4 rounded-[12px] border ${
+                            s.isBlocked
+                              ? "bg-amber-50 border-amber-200"
+                              : "bg-white border-[hsl(var(--border))]"
+                          }`}
+                        >
+                          <p className="text-[15px] font-bold text-gray-900">
+                            {s.siteLabel ?? "Session site"}
+                          </p>
+                          {s.isBlocked ? (
+                            <p className="text-sm font-medium text-amber-900 mt-0.5">
+                              You can't book more sessions at this site.
+                            </p>
+                          ) : (
+                            <p className="text-sm text-muted-foreground mt-0.5">
+                              {s.remaining} of {s.cap} session{s.cap === 1 ? "" : "s"} remaining
+                            </p>
+                          )}
+                          {s.oneVisitLimit && (
+                            <p className="text-sm text-blue-900/80 mt-2 leading-relaxed">
+                              New York: one visit limit. Additional visits are by invitation only.
+                            </p>
+                          )}
+                        </div>
+                      ) : (
+                        <ExpandableEligibilitySiteCard
+                          key={s.businessId}
+                          site={s}
+                          isOpen={expandedBusiness === s.businessId}
+                          onToggle={() =>
+                            setExpandedBusiness((cur) => {
+                              const next = cur === s.businessId ? null : s.businessId;
+                              if (next !== null)
+                                trackEvent("eligibility_site_expanded", { business_id: s.businessId });
+                              return next;
+                            })
+                          }
+                        />
+                      ),
+                    )
                   : eligibility.data?.sites.map((s) => (
                 <div
                   key={s.businessId}
