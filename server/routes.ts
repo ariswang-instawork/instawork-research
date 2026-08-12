@@ -5,6 +5,7 @@ import MemoryStore from "memorystore";
 import { randomBytes, createHash } from "crypto";
 import { registerApiRoutes } from "./apiRoutes";
 import { prisma } from "./db";
+import { resolveInstaworkUser } from "./instaworkUser";
 import { getServableRows, sanitizeLabel } from "./serving";
 
 /** Sessions a worker may book at any one site when Mode has no row for them. */
@@ -220,26 +221,6 @@ export async function registerRoutes(
       return null;
     }
     return response.json();
-  }
-
-  /** Instawork /api/users/me/ returns JSON:API; accept flat shapes for local dev. */
-  function resolveInstaworkUser(userData: Record<string, unknown> | null) {
-    if (!userData) return null;
-    const data = userData.data as
-      | { id?: string | number; attributes?: Record<string, unknown> }
-      | undefined;
-    const attrs = (data?.attributes ?? userData) as Record<string, unknown>;
-    const rawId = data?.id ?? userData.id ?? userData.worker_id ?? userData.pk;
-    const workerId = Number(rawId);
-    if (!Number.isFinite(workerId)) return null;
-    const name =
-      (typeof attrs.full_name === "string" && attrs.full_name) ||
-      [attrs.given_name, attrs.family_name].filter((part) => typeof part === "string" && part).join(" ") ||
-      [attrs.first_name ?? attrs.name, attrs.last_name]
-        .filter((part) => typeof part === "string" && part)
-        .join(" ") ||
-      null;
-    return { workerId, name: name || null };
   }
 
   // Current user from the OAuth session (worker identity for eligibility).
