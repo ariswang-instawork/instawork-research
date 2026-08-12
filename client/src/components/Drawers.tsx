@@ -3,7 +3,7 @@ import { useGetSites } from "@/lib/api-client";
 import { useAuthStatus, useEligibility, login } from "@/hooks/use-auth";
 import { calculateDistance } from "@/lib/zipCentroids";
 import { useSiteStorage, type SiteOrigin } from "@/hooks/use-site";
-import { MapPin, Navigation, ShieldCheck, X, Check } from "lucide-react";
+import { MapPin, Navigation, ShieldCheck, X, Check, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PrimaryCtaButton } from "@/components/PrimaryCtaButton";
 import { Input } from "@/components/ui/input";
@@ -20,6 +20,26 @@ import {
 
 /** Sessions within this many miles of the user count as "nearby". */
 const NEARBY_RADIUS_MILES = 50;
+
+function SessionLimitPolicyNotice() {
+  return (
+    <div className="p-4 rounded-[12px] border border-blue-200 bg-blue-50 text-sm text-blue-950">
+      <div className="flex gap-3">
+        <Info className="w-4 h-4 shrink-0 mt-0.5 text-blue-700" aria-hidden="true" />
+        <div className="space-y-1.5">
+          <p className="font-semibold text-blue-950">How session limits work</p>
+          <p className="text-blue-900/90 leading-relaxed">
+            Most locations let you book up to 3 sessions per site.
+          </p>
+          <p className="text-blue-900/90 leading-relaxed">
+            <span className="font-medium">New York is limited to 1 visit.</span> If you have already
+            completed a New York session, our team may invite you back for additional visits.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 type NearbyResult =
   | { kind: "nearby"; key: string; label: string; distanceMiles: number }
@@ -446,8 +466,11 @@ export function EligibilityCheckDrawer({
               <div className="p-4 rounded-[12px] text-sm font-medium border bg-muted text-muted-foreground border-transparent">
                 No session locations available right now.
               </div>
-            ) : tab === "overview" ? (
-              eligibility.data?.sites.map((s) => (
+            ) : (
+              <>
+                <SessionLimitPolicyNotice />
+                {tab === "overview"
+                  ? eligibility.data?.sites.map((s) => (
                 <div
                   key={s.businessId}
                   className={`p-4 rounded-[12px] border ${
@@ -468,10 +491,14 @@ export function EligibilityCheckDrawer({
                       {s.remaining} of {s.cap} session{s.cap === 1 ? "" : "s"} remaining
                     </p>
                   )}
+                  {s.oneVisitLimit && (
+                    <p className="text-sm text-blue-900/80 mt-2 leading-relaxed">
+                      New York: one visit limit. Additional visits are by invitation only.
+                    </p>
+                  )}
                 </div>
-              ))
-            ) : (
-              eligibility.data?.sites.map((s) => (
+                  ))
+                  : eligibility.data?.sites.map((s) => (
                 <div
                   key={s.businessId}
                   className="p-4 rounded-[12px] border border-[hsl(var(--border))] bg-white"
@@ -481,6 +508,11 @@ export function EligibilityCheckDrawer({
                       <p className="text-[15px] font-bold text-gray-900">
                         {s.siteLabel ?? "Session site"}
                       </p>
+                      {s.oneVisitLimit && (
+                        <p className="text-sm text-blue-900/80 mt-1 leading-relaxed">
+                          New York: one visit limit. Additional visits are by invitation only.
+                        </p>
+                      )}
                     </div>
                     {s.isBlocked && (
                       <span className="text-xs font-semibold px-2 py-1 rounded-full bg-amber-100 text-amber-700">
@@ -505,7 +537,8 @@ export function EligibilityCheckDrawer({
                     </div>
                   </div>
                 </div>
-              ))
+                  ))}
+              </>
             )}
           </div>
 
