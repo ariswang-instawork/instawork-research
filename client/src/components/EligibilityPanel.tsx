@@ -1,16 +1,15 @@
 import { useState } from "react";
-import { Info, ChevronDown } from "lucide-react";
+import { Info, ChevronRight } from "lucide-react";
+import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import {
   useAuthStatus,
   useEligibility,
-  useEligibilitySessions,
   login,
-  type EligibilitySite,
 } from "@/hooks/use-auth";
 import { trackEvent } from "@/lib/analytics";
 
-function SessionLimitPolicyNotice() {
+export function SessionLimitPolicyNotice() {
   return (
     <div className="p-4 rounded-[12px] border border-blue-200 bg-blue-50 text-sm text-blue-950">
       <div className="flex gap-3">
@@ -31,98 +30,12 @@ function SessionLimitPolicyNotice() {
 }
 
 /**
- * Remaining-tab card for an eligible site (not blocked, remaining > 0). Expands
- * in place to lazily load that business's open shifts; each shift books via its
- * Instawork deep link. Blocked / maxed-out sites never use this component.
- */
-function ExpandableEligibilitySiteCard({
-  site,
-  isOpen,
-  onToggle,
-}: {
-  site: EligibilitySite;
-  isOpen: boolean;
-  onToggle: () => void;
-}) {
-  const { data, isLoading, isError } = useEligibilitySessions(site.businessId, isOpen);
-  const sessions = data?.sessions ?? [];
-
-  return (
-    <div className="rounded-[12px] border bg-white border-[hsl(var(--border))] overflow-hidden">
-      <button
-        type="button"
-        onClick={onToggle}
-        aria-expanded={isOpen}
-        className="w-full flex items-start justify-between gap-3 p-4 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
-      >
-        <span className="min-w-0">
-          <span className="block text-[15px] font-bold text-gray-900">
-            {site.siteLabel ?? "Session site"}
-          </span>
-          <span className="block text-sm text-muted-foreground mt-0.5">
-            {site.remaining} of {site.cap} session{site.cap === 1 ? "" : "s"} remaining
-          </span>
-          {site.oneVisitLimit && (
-            <span className="block text-sm text-blue-900/80 mt-2 leading-relaxed">
-              New York: one visit limit. Additional visits are by invitation only.
-            </span>
-          )}
-        </span>
-        <ChevronDown
-          className={`w-5 h-5 shrink-0 text-muted-foreground transition-transform ${isOpen ? "rotate-180" : ""}`}
-          aria-hidden="true"
-        />
-      </button>
-
-      {isOpen && (
-        <div className="px-4 pb-4 pt-1 border-t border-[hsl(var(--border))]">
-          {isLoading ? (
-            <div className="space-y-2 pt-2">
-              <div className="h-10 rounded-lg bg-muted animate-pulse" />
-              <div className="h-10 rounded-lg bg-muted animate-pulse" />
-            </div>
-          ) : isError ? (
-            <p className="text-sm text-muted-foreground pt-3">Couldn't load shifts right now.</p>
-          ) : sessions.length === 0 ? (
-            <p className="text-sm text-muted-foreground pt-3">No open shifts right now.</p>
-          ) : (
-            <ul className="divide-y divide-[hsl(var(--border))]">
-              {sessions.map((s) => (
-                <li key={s.id} className="flex items-center justify-between gap-3 py-2.5">
-                  <span className="text-[14px] text-gray-900 min-w-0 truncate">
-                    {s.date} · {s.time}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      trackEvent("eligibility_shift_book_clicked", {
-                        business_id: site.businessId,
-                        session_id: s.id,
-                      });
-                      if (s.bookUrl) window.open(s.bookUrl, "_blank", "noopener,noreferrer");
-                    }}
-                    className="shrink-0 text-[14px] font-semibold text-white bg-cta-gradient rounded-[8px] px-4 py-2 hover:brightness-105 active:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
-                  >
-                    Book
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
-
-/**
  * The eligibility experience with no drawer chrome, for rendering full-page on
  * /my-sessions. Handles auth-loading, logged-out (login prompt), and logged-in
  * (Remaining / History tabs) states.
  */
 export function EligibilityPanel() {
   const [tab, setTab] = useState<"remaining" | "history">("remaining");
-  const [expandedBusiness, setExpandedBusiness] = useState<number | null>(null);
 
   const { data: auth, isLoading: authLoading } = useAuthStatus();
   const isAuthenticated = !!auth?.authenticated;
@@ -229,19 +142,32 @@ export function EligibilityPanel() {
                       )}
                     </div>
                   ) : (
-                    <ExpandableEligibilitySiteCard
+                    <Link
                       key={s.businessId}
-                      site={s}
-                      isOpen={expandedBusiness === s.businessId}
-                      onToggle={() =>
-                        setExpandedBusiness((cur) => {
-                          const next = cur === s.businessId ? null : s.businessId;
-                          if (next !== null)
-                            trackEvent("eligibility_site_expanded", { business_id: s.businessId });
-                          return next;
-                        })
+                      href={`/my-sessions/${s.businessId}`}
+                      onClick={() =>
+                        trackEvent("eligibility_site_expanded", { business_id: s.businessId })
                       }
-                    />
+                      className="flex items-start justify-between gap-3 p-4 rounded-[12px] border bg-white border-[hsl(var(--border))] text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+                    >
+                      <span className="min-w-0">
+                        <span className="block text-[15px] font-bold text-gray-900">
+                          {s.siteLabel ?? "Session site"}
+                        </span>
+                        <span className="block text-sm text-muted-foreground mt-0.5">
+                          {s.remaining} of {s.cap} session{s.cap === 1 ? "" : "s"} remaining
+                        </span>
+                        {s.oneVisitLimit && (
+                          <span className="block text-sm text-blue-900/80 mt-2 leading-relaxed">
+                            New York: one visit limit. Additional visits are by invitation only.
+                          </span>
+                        )}
+                      </span>
+                      <ChevronRight
+                        className="w-5 h-5 shrink-0 text-muted-foreground mt-0.5"
+                        aria-hidden="true"
+                      />
+                    </Link>
                   ),
                 )
               : eligibility.data?.sites.map((s) => (
