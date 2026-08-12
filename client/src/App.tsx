@@ -3,6 +3,7 @@ import { Route, Switch, Redirect, Router as WouterRouter } from "wouter";
 import Landing from "@/pages/Landing";
 import SessionDetail from "@/pages/SessionDetail";
 import GetApp from "@/pages/GetApp";
+import MySessions from "@/pages/MySessions";
 import Admin from "@/pages/Admin";
 import { Toaster } from "@/components/ui/sonner";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -31,6 +32,7 @@ function AppRouter() {
           <Redirect to="/" />
         </Route>
         <Route path="/sessions/:id" component={SessionDetail} />
+        <Route path="/my-sessions" component={MySessions} />
         <Route path="/get-app" component={GetApp} />
         <Route path="/admin" component={Admin} />
         <Route>
