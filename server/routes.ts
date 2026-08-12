@@ -7,7 +7,7 @@ import { registerApiRoutes } from "./apiRoutes";
 import { prisma } from "./db";
 import { resolveInstaworkUser } from "./instaworkUser";
 import { getLifetimeCap, isOneVisitLimitSite } from "./siteCaps";
-import { getServableRows, sanitizeLabel } from "./serving";
+import { getServableRows, sanitizeLabel, getServableRowsForBusiness, toPublicSessionItem } from "./serving";
 
 const INSTAWORK_BASE_URL = process.env.INSTAWORK_BASE_URL || "http://localhost:8080";
 const INSTAWORK_CLIENT_ID = process.env.INSTAWORK_CLIENT_ID!;
@@ -316,6 +316,29 @@ export async function registerRoutes(
       res.status(500).json({
         error: "We couldn't check right now — please try again",
         reason: step === "bookings" ? "bookings_unavailable" : "sites_unavailable",
+      });
+    }
+  });
+
+  // Auth-required: open shifts for a single business (site) the worker is
+  // eligible for. Same "servable" rule and address-hiding as public browsing.
+  app.get("/api/eligibility/sessions", async (req, res) => {
+    if (!req.session.accessToken) {
+      return res.status(401).json({ error: "Not authenticated", reason: "unauthenticated" });
+    }
+    const raw = typeof req.query.business === "string" ? req.query.business.trim() : "";
+    const businessId = Number(raw);
+    if (!/^\d+$/.test(raw) || !Number.isInteger(businessId) || businessId <= 0) {
+      return res.status(400).json({ error: "Missing or invalid 'business' parameter" });
+    }
+    try {
+      const rows = await getServableRowsForBusiness(businessId);
+      res.json({ businessId, sessions: rows.map(toPublicSessionItem) });
+    } catch (error) {
+      console.error("eligibility sessions lookup failed:", error);
+      res.status(500).json({
+        error: "We couldn't load shifts right now — please try again",
+        reason: "sessions_unavailable",
       });
     }
   });
