@@ -49,6 +49,12 @@ export async function getServableRows(): Promise<ShiftGroup[]> {
   return rows.filter((r) => isValidHttpsUrl(r.shiftLink));
 }
 
+/** Servable rows for a single business (site), same ordering as getServableRows. */
+export async function getServableRowsForBusiness(businessId: number): Promise<ShiftGroup[]> {
+  const rows = await getServableRows();
+  return rows.filter((r) => r.businessId === businessId);
+}
+
 /**
  * Upcoming rows for map/site aggregation. Includes overbook rows and rows
  * with 0 openings — per product decision, the map pin count is the sum of
