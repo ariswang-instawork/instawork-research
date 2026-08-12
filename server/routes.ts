@@ -6,10 +6,8 @@ import { randomBytes, createHash } from "crypto";
 import { registerApiRoutes } from "./apiRoutes";
 import { prisma } from "./db";
 import { resolveInstaworkUser } from "./instaworkUser";
+import { getLifetimeCap } from "./siteCaps";
 import { getServableRows, sanitizeLabel } from "./serving";
-
-/** Sessions a worker may book at any one site when Mode has no row for them. */
-const DEFAULT_SESSION_CAP = 3;
 
 const INSTAWORK_BASE_URL = process.env.INSTAWORK_BASE_URL || "http://localhost:8080";
 const INSTAWORK_CLIENT_ID = process.env.INSTAWORK_CLIENT_ID!;
@@ -284,15 +282,18 @@ export async function registerRoutes(
       }
 
       type Booking = (typeof bookings)[number];
-      const toSite = (businessId: number, fallbackLabel: string, b: Booking | undefined) => ({
-        businessId,
-        siteLabel: (b && sanitizeLabel(b.siteLabel)) || fallbackLabel,
-        cap: b?.cap ?? DEFAULT_SESSION_CAP,
-        remaining: b?.isBlocked ? 0 : Math.max(0, b?.remaining ?? DEFAULT_SESSION_CAP),
-        completedCount: b?.completedCount ?? 0,
-        bookedCount: b?.bookedCount ?? 0,
-        isBlocked: b?.isBlocked ?? false,
-      });
+      const toSite = (businessId: number, fallbackLabel: string, b: Booking | undefined) => {
+        const cap = b?.cap ?? getLifetimeCap(businessId);
+        return {
+          businessId,
+          siteLabel: (b && sanitizeLabel(b.siteLabel)) || fallbackLabel,
+          cap,
+          remaining: b?.isBlocked ? 0 : Math.max(0, b?.remaining ?? cap),
+          completedCount: b?.completedCount ?? 0,
+          bookedCount: b?.bookedCount ?? 0,
+          isBlocked: b?.isBlocked ?? false,
+        };
+      };
 
       const sites = [
         ...Array.from(openSites, ([businessId, label]) =>
