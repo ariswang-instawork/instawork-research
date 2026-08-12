@@ -1,6 +1,5 @@
 import { ReactNode, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
-import { EligibilityCheckDrawer } from "@/components/Drawers";
 import { useAuthStatus, useLogout, login } from "@/hooks/use-auth";
 
 const LOGO_URL = `${import.meta.env.BASE_URL}iw-logo.svg`;
@@ -23,7 +22,6 @@ export function Shell({ children }: { children: ReactNode }) {
   // menuOpen drives the open/closed visual state.
   const [menuMounted, setMenuMounted] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [eligibilityOpen, setEligibilityOpen] = useState(false);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const openMenu = () => {
@@ -98,6 +96,9 @@ export function Shell({ children }: { children: ReactNode }) {
 
             {/* Desktop nav */}
             <nav className="hidden md:flex items-center gap-6" aria-label="Main">
+              <button type="button" onClick={() => go("/my-sessions")} className={navLink}>
+                My sessions
+              </button>
               <button type="button" onClick={handleAuthClick} className={navLink}>
                 {isAuthenticated ? "Log out" : "Log in"}
               </button>
@@ -166,7 +167,7 @@ export function Shell({ children }: { children: ReactNode }) {
                   {[
                     { label: "Find sessions", action: findSessions },
                     { label: "Locations", action: () => go("/") },
-                    { label: "My sessions", action: () => { closeMenu(); setEligibilityOpen(true); } },
+                    { label: "My sessions", action: () => go("/my-sessions") },
                   ].map(({ label, action }) => (
                     <button
                       key={label}
@@ -202,13 +203,6 @@ export function Shell({ children }: { children: ReactNode }) {
             </div>
           </div>
         )}
-
-        {/* Eligibility drawer opened from "Log in" — trigger footer hidden */}
-        <EligibilityCheckDrawer
-          hideTrigger
-          open={eligibilityOpen}
-          onOpenChange={setEligibilityOpen}
-        />
 
         {children}
       </div>
