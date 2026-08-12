@@ -5,6 +5,7 @@ import MemoryStore from "memorystore";
 import { randomBytes, createHash } from "crypto";
 import { registerApiRoutes } from "./apiRoutes";
 import { prisma } from "./db";
+import { resolveInstaworkUser } from "./instaworkUser";
 import { getServableRows, sanitizeLabel } from "./serving";
 
 /** Sessions a worker may book at any one site when Mode has no row for them. */
@@ -229,16 +230,12 @@ export async function registerRoutes(
     }
     try {
       const userData = await fetchInstaworkUser(req);
-      if (!userData) {
+      const resolved = resolveInstaworkUser(userData);
+      if (!resolved) {
         return res.status(502).json({ error: "Failed to fetch user data" });
       }
       // Return only what the UI needs — never the full upstream profile.
-      const workerId = userData.id ?? userData.worker_id ?? userData.pk ?? null;
-      const name =
-        userData.first_name || userData.name
-          ? [userData.first_name ?? userData.name, userData.last_name].filter(Boolean).join(" ")
-          : null;
-      res.json({ workerId, name });
+      res.json(resolved);
     } catch (error) {
       console.error("Instawork API request error:", error);
       res.status(500).json({ error: "Failed to connect to Instawork API" });
@@ -260,12 +257,13 @@ export async function registerRoutes(
     let step: "worker" | "bookings" | "sites" = "worker";
     try {
       const userData = await fetchInstaworkUser(req);
-      const workerId = Number(userData?.id ?? userData?.worker_id ?? userData?.pk);
-      if (!userData || !Number.isFinite(workerId)) {
+      const resolved = resolveInstaworkUser(userData);
+      if (!resolved) {
         return res
           .status(502)
           .json({ error: "Could not resolve your worker account", reason: "worker_unresolved" });
       }
+      const { workerId } = resolved;
       step = "bookings";
       const bookings = await prisma.participantBooking.findMany({ where: { workerId } });
       step = "sites";
