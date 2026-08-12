@@ -411,9 +411,9 @@ export function EligibilityCheckDrawer({
           </div>
         </footer>
       )}
-      <DrawerContent className="max-w-[480px] mx-auto">
-        <div className="w-full max-w-[448px] mx-auto">
-          <DrawerHeader>
+      <DrawerContent className="max-w-[480px] mx-auto max-h-[85dvh]">
+        <div className="w-full max-w-[448px] mx-auto flex min-h-0 flex-1 flex-col overflow-hidden">
+          <DrawerHeader className="shrink-0">
             <DrawerTitle>
               {isAuthenticated ? "Your remaining sessions" : "Check remaining sessions"}
             </DrawerTitle>
@@ -425,7 +425,7 @@ export function EligibilityCheckDrawer({
           </DrawerHeader>
 
           {isAuthenticated && (
-            <div className="flex gap-2 px-6 border-b border-[hsl(var(--border))]">
+            <div className="flex gap-2 px-6 border-b border-[hsl(var(--border))] shrink-0">
               <button
                 onClick={() => setTab("overview")}
                 className={`px-3 py-3 text-sm font-medium border-b-2 transition-colors ${
@@ -449,7 +449,7 @@ export function EligibilityCheckDrawer({
             </div>
           )}
 
-          <div className="p-4 space-y-3">
+          <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-3">
             {!isAuthenticated ? null : eligibility.isLoading ? (
               <div className="space-y-3">
                 <div className="h-14 rounded-xl bg-muted animate-pulse" />
@@ -542,7 +542,7 @@ export function EligibilityCheckDrawer({
             )}
           </div>
 
-          <DrawerFooter className="pb-safe pt-2">
+          <DrawerFooter className="pb-safe pt-2 shrink-0">
             {!isAuthenticated && (
               <Button
                 className="w-full h-12 rounded-[8px] font-bold bg-cta-gradient hover:brightness-105 active:brightness-95 shadow-none"
