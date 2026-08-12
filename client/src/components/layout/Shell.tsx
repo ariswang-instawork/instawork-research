@@ -101,14 +101,18 @@ export function Shell({ children }: { children: ReactNode }) {
               <button type="button" onClick={handleAuthClick} className={navLink}>
                 {isAuthenticated ? "Log out" : "Log in"}
               </button>
-              <a
-                href="https://app.instawork.com/worker?utm_source=instawork_research&utm_medium=web&utm_campaign=voice_sessions"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-cta-gradient rounded-[8px] text-white text-[15px] font-semibold px-5 h-11 inline-flex items-center transition-[filter] duration-150 hover:brightness-105 active:brightness-95"
-              >
-                Download the app
-              </a>
+              {/* The app download CTA is only relevant to logged-out visitors;
+                  hide it once the user is authenticated. */}
+              {!isAuthenticated && (
+                <a
+                  href="https://app.instawork.com/worker?utm_source=instawork_research&utm_medium=web&utm_campaign=voice_sessions"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-cta-gradient rounded-[8px] text-white text-[15px] font-semibold px-5 h-11 inline-flex items-center transition-[filter] duration-150 hover:brightness-105 active:brightness-95"
+                >
+                  Download the app
+                </a>
+              )}
             </nav>
 
             {/* Mobile: hamburger only */}
@@ -183,14 +187,16 @@ export function Shell({ children }: { children: ReactNode }) {
                   >
                     {isAuthenticated ? "Log out" : "Log in"}
                   </button>
-                  <a
-                    href="https://app.instawork.com/worker?utm_source=instawork_research&utm_medium=web&utm_campaign=voice_sessions"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full h-12 rounded-[10px] border border-white/70 text-white text-[16px] font-semibold transition-colors duration-150 active:bg-white/10 inline-flex items-center justify-center"
-                  >
-                    Download the app
-                  </a>
+                  {!isAuthenticated && (
+                    <a
+                      href="https://app.instawork.com/worker?utm_source=instawork_research&utm_medium=web&utm_campaign=voice_sessions"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full h-12 rounded-[10px] border border-white/70 text-white text-[16px] font-semibold transition-colors duration-150 active:bg-white/10 inline-flex items-center justify-center"
+                    >
+                      Download the app
+                    </a>
+                  )}
                 </div>
               </div>
             </div>
