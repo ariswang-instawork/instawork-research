@@ -6,7 +6,7 @@ import { randomBytes, createHash } from "crypto";
 import { registerApiRoutes } from "./apiRoutes";
 import { prisma } from "./db";
 import { resolveInstaworkUser } from "./instaworkUser";
-import { getLifetimeCap } from "./siteCaps";
+import { getLifetimeCap, isOneVisitLimitSite } from "./siteCaps";
 import { getServableRows, sanitizeLabel } from "./serving";
 
 const INSTAWORK_BASE_URL = process.env.INSTAWORK_BASE_URL || "http://localhost:8080";
@@ -292,6 +292,7 @@ export async function registerRoutes(
           completedCount: b?.completedCount ?? 0,
           bookedCount: b?.bookedCount ?? 0,
           isBlocked: b?.isBlocked ?? false,
+          oneVisitLimit: isOneVisitLimitSite(businessId),
         };
       };
 

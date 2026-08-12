@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { getLifetimeCap } from "./siteCaps";
+import { getLifetimeCap, isOneVisitLimitSite } from "./siteCaps";
 
 describe("getLifetimeCap", () => {
   it("returns cap 1 for NYC business sites", () => {
@@ -18,5 +18,13 @@ describe("getLifetimeCap", () => {
 
   it("defaults to 3 for unknown business ids", () => {
     expect(getLifetimeCap(999999)).toBe(3);
+  });
+});
+
+describe("isOneVisitLimitSite", () => {
+  it("returns true only for NYC business sites", () => {
+    expect(isOneVisitLimitSite(365082)).toBe(true);
+    expect(isOneVisitLimitSite(201172)).toBe(true);
+    expect(isOneVisitLimitSite(365079)).toBe(false);
   });
 });

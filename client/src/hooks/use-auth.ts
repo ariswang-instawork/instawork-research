@@ -11,6 +11,7 @@ export type EligibilitySite = {
   completedCount: number;
   bookedCount: number;
   isBlocked: boolean;
+  oneVisitLimit: boolean;
 };
 
 export type EligibilityResponse = {
