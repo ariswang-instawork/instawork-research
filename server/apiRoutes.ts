@@ -61,6 +61,8 @@ export function registerApiRoutes(app: Express) {
       res.set("Cache-Control", "no-store");
       res.json({
         ok: true,
+        version: process.env.BUILD_VERSION ?? "dev",
+        builtAt: process.env.BUILD_TIME ?? null,
         syncedAt,
         sessionCount: rows.length,
         eligibilityEnabled: eligibilityEnabled(),

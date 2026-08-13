@@ -1,6 +1,18 @@
 import { build as esbuild } from "esbuild";
 import { build as viteBuild } from "vite";
 import { rm, readFile } from "fs/promises";
+import { execSync } from "child_process";
+
+/** Short git SHA of the build, or "unknown" when git metadata is unavailable. */
+function gitVersion(): string {
+  try {
+    return execSync("git rev-parse --short HEAD", { stdio: ["ignore", "pipe", "ignore"] })
+      .toString()
+      .trim();
+  } catch {
+    return "unknown";
+  }
+}
 
 // server deps to bundle to reduce openat(2) syscalls
 // which helps cold start times
@@ -54,6 +66,8 @@ async function buildAll() {
     outfile: "dist/index.cjs",
     define: {
       "process.env.NODE_ENV": '"production"',
+      "process.env.BUILD_VERSION": JSON.stringify(gitVersion()),
+      "process.env.BUILD_TIME": JSON.stringify(new Date().toISOString()),
     },
     minify: true,
     external: externals,
