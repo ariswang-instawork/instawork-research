@@ -1,12 +1,14 @@
 import { useEffect } from "react";
 import { Link, useRoute, useLocation } from "wouter";
 import { SessionLimitPolicyNotice } from "@/components/EligibilityPanel";
+import { SessionCalendar } from "@/components/SessionCalendar";
 import {
   useAuthStatus,
   useEligibility,
   useEligibilitySessions,
 } from "@/hooks/use-auth";
 import { trackEvent } from "@/lib/analytics";
+import type { SessionItem } from "@/lib/api-client/generated/api.schemas";
 
 export default function MySessionsSite() {
   const [, params] = useRoute("/my-sessions/:businessId");
@@ -40,6 +42,15 @@ export default function MySessionsSite() {
     isAuthenticated && businessId != null && !!site && !site.isBlocked,
   );
   const sessions = sessionsQuery.data?.sessions ?? [];
+
+  const handleBook = (s: SessionItem) => {
+    if (!site) return;
+    trackEvent("eligibility_shift_book_clicked", {
+      business_id: site.businessId,
+      session_id: s.id,
+    });
+    if (s.bookUrl) window.open(s.bookUrl, "_blank", "noopener,noreferrer");
+  };
 
   return (
     <div className="flex-1 flex flex-col bg-[#FCFBF9]">
@@ -101,36 +112,8 @@ export default function MySessionsSite() {
                     <p className="text-[15px] md:text-[16px] text-[#576270]">
                       Couldn't load shifts right now.
                     </p>
-                  ) : sessions.length === 0 ? (
-                    <p className="text-[15px] md:text-[16px] text-[#576270]">
-                      No open shifts right now.
-                    </p>
                   ) : (
-                    <div className="rounded-[14px] border border-[#EEE9DD] bg-white overflow-hidden divide-y divide-[#EEE9DD]">
-                      {sessions.map((s) => (
-                        <div
-                          key={s.id}
-                          className="flex items-center justify-between gap-4 px-5 py-4 md:py-5"
-                        >
-                          <span className="text-[17px] md:text-[18px] font-semibold text-[#11243e] min-w-0 truncate">
-                            {s.date} · {s.time}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              trackEvent("eligibility_shift_book_clicked", {
-                                business_id: site.businessId,
-                                session_id: s.id,
-                              });
-                              if (s.bookUrl) window.open(s.bookUrl, "_blank", "noopener,noreferrer");
-                            }}
-                            className="shrink-0 text-[15px] md:text-[16px] font-semibold text-white bg-cta-gradient rounded-[8px] px-5 py-2.5 hover:brightness-105 active:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3351E6]/40"
-                          >
-                            Book
-                          </button>
-                        </div>
-                      ))}
-                    </div>
+                    <SessionCalendar sessions={sessions} onBook={handleBook} />
                   )}
                 </div>
               </>
