@@ -3,7 +3,11 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 const findMany = vi.fn();
 vi.mock("./db", () => ({ prisma: { shiftGroup: { findMany: (...a: unknown[]) => findMany(...a) } } }));
 
-import { getServableRowsForBusiness, formatEligibilitySiteLabel } from "./serving";
+import {
+  getServableRowsForBusiness,
+  formatEligibilitySiteLabel,
+  disambiguateDuplicateSiteLabels,
+} from "./serving";
 
 const base = {
   isOverbookShiftGroup: false,
@@ -90,5 +94,19 @@ describe("formatEligibilitySiteLabel", () => {
         businessName: "Acme Research LLC",
       }),
     ).toBe("New York, NY");
+  });
+});
+
+describe("disambiguateDuplicateSiteLabels", () => {
+  it("numbers duplicate Philadelphia labels using known business ids", () => {
+    const map = new Map<number, string>([
+      [365079, "Boston, MA"],
+      [353952, "Philadelphia, PA"],
+      [372868, "Philadelphia, PA"],
+    ]);
+    const out = disambiguateDuplicateSiteLabels(map);
+    expect(out.get(365079)).toBe("Boston, MA");
+    expect(out.get(372868)).toBe("Philadelphia, PA (1)");
+    expect(out.get(353952)).toBe("Philadelphia, PA (2)");
   });
 });

@@ -141,6 +141,39 @@ export function formatEligibilitySiteLabel(
   return "Session site";
 }
 
+/**
+ * If two businesses share the same city/state label (e.g. both "Philadelphia, PA"),
+ * append (1)/(2) so they are distinguishable. Known Philadelphia sites keep their
+ * mapped numbers; any remaining duplicates get the next unused integer.
+ */
+export function disambiguateDuplicateSiteLabels(map: Map<number, string>): Map<number, string> {
+  const byLabel = new Map<string, number[]>();
+  for (const [id, label] of map) {
+    const list = byLabel.get(label);
+    if (list) list.push(id);
+    else byLabel.set(label, [id]);
+  }
+  for (const [label, ids] of byLabel) {
+    if (ids.length < 2) continue;
+    if (/\(\d+\)$/.test(label)) continue;
+    const used = new Set<string>();
+    for (const id of ids) {
+      const known = SITE_SUFFIX_BY_BUSINESS_ID[id];
+      if (!known) continue;
+      map.set(id, `${label} (${known})`);
+      used.add(known);
+    }
+    let n = 1;
+    for (const id of ids.filter((id) => !SITE_SUFFIX_BY_BUSINESS_ID[id]).sort((a, b) => a - b)) {
+      while (used.has(String(n))) n += 1;
+      map.set(id, `${label} (${n})`);
+      used.add(String(n));
+      n += 1;
+    }
+  }
+  return map;
+}
+
 /** One display label per business_id from synced shift rows. */
 export async function getSiteLabelsByBusinessId(): Promise<Map<number, string>> {
   const rows = await prisma.shiftGroup.findMany({
@@ -159,7 +192,7 @@ export async function getSiteLabelsByBusinessId(): Promise<Map<number, string>> 
     if (row.businessId == null || map.has(row.businessId)) continue;
     map.set(row.businessId, formatEligibilitySiteLabel(row, row.businessId));
   }
-  return map;
+  return disambiguateDuplicateSiteLabels(map);
 }
 
 /**
