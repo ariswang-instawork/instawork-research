@@ -16,14 +16,14 @@ export function SessionCard({
       : null;
 
   return (
-    <li className="flex items-center justify-between gap-4 py-3.5">
+    <li className="flex items-center justify-between gap-4 py-4 md:py-5">
       <div className="min-w-0">
-        <p className="text-[15px] font-semibold text-[#11243e] truncate">
+        <p className="text-[18px] md:text-[20px] font-semibold text-[#11243e] truncate">
           {session.date} · {session.time}
         </p>
         {spots && (
           <p
-            className={`text-[13px] mt-0.5 ${
+            className={`text-[16px] mt-1 ${
               session.open === 1 ? "text-[#CF4A42]" : "text-[#576270]"
             }`}
           >
@@ -34,7 +34,7 @@ export function SessionCard({
       <button
         type="button"
         onClick={onBook}
-        className="shrink-0 text-[14px] font-semibold text-[#3351E6] underline underline-offset-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3351E6]/40 rounded-sm py-2"
+        className="shrink-0 text-[16px] font-semibold text-[#3351E6] underline underline-offset-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3351E6]/40 rounded-sm py-2"
       >
         View session
       </button>
