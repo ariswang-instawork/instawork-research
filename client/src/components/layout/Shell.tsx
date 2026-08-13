@@ -1,7 +1,6 @@
 import { ReactNode, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { useAuthStatus, useLogout, login } from "@/hooks/use-auth";
-import { LoginDialog } from "@/components/LoginDialog";
 
 const LOGO_URL = `${import.meta.env.BASE_URL}iw-logo.svg`;
 
@@ -24,8 +23,6 @@ export function Shell({ children }: { children: ReactNode }) {
   // menuOpen drives the open/closed visual state.
   const [menuMounted, setMenuMounted] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [loginOpen, setLoginOpen] = useState(false);
-  const [loginReturnTo, setLoginReturnTo] = useState("/my-sessions");
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const { data: auth } = useAuthStatus();
@@ -64,8 +61,7 @@ export function Shell({ children }: { children: ReactNode }) {
 
   const openLogin = (returnTo = "/my-sessions") => {
     closeMenu();
-    setLoginReturnTo(returnTo);
-    setLoginOpen(true);
+    login(returnTo);
   };
 
   const goMySessions = () => {
@@ -239,12 +235,6 @@ export function Shell({ children }: { children: ReactNode }) {
         )}
 
         {children}
-
-        <LoginDialog
-          open={loginOpen}
-          onOpenChange={setLoginOpen}
-          returnTo={loginReturnTo}
-        />
       </div>
     </div>
   );
