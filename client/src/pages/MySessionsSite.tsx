@@ -33,6 +33,7 @@ export default function MySessionsSite() {
       );
     }
   }, [authLoading, isAuthenticated, returnTo, setLocation]);
+
   const eligibility = useEligibility(isAuthenticated && businessId != null);
   const site = eligibility.data?.sites.find((s) => s.businessId === businessId);
   const sessionsQuery = useEligibilitySessions(
@@ -42,33 +43,34 @@ export default function MySessionsSite() {
   const sessions = sessionsQuery.data?.sessions ?? [];
 
   return (
-    <div className="flex-1 flex flex-col bg-background">
-      <main className="flex-1 overflow-y-auto px-5 md:px-6">
-        <div className="max-w-md md:max-w-2xl mx-auto w-full pt-5 md:pt-10 pb-24 animate-in fade-in slide-in-from-bottom-3 duration-500">
+    <div className="flex-1 flex flex-col bg-[#FCFBF9]">
+      <main className="flex-1 overflow-y-auto py-10 md:py-16 lg:py-20">
+        <div className="max-w-[1200px] mx-auto px-5 md:px-12 w-full animate-in fade-in slide-in-from-bottom-3 duration-500">
           <Link
             href="/my-sessions"
-            className="inline-flex items-center mb-6 -ml-1"
+            className="inline-flex items-center gap-2 mb-6 text-[15px] md:text-[16px] font-medium text-[#576270] hover:text-[#11243e] transition-colors"
             aria-label="Back to your sessions"
           >
-            <ArrowLeft className="w-5 h-5 text-foreground" />
+            <ArrowLeft className="w-5 h-5" />
+            Back to your sessions
           </Link>
 
           {businessId == null ? (
             <NotFound />
           ) : authLoading || !isAuthenticated ? (
-            <div className="space-y-3">
-              <div className="h-8 w-2/3 rounded-xl bg-muted animate-pulse" />
-              <div className="h-14 rounded-xl bg-muted animate-pulse" />
-              <div className="h-14 rounded-xl bg-muted animate-pulse" />
+            <div className="space-y-4 max-w-3xl">
+              <div className="h-10 w-2/3 rounded-xl bg-muted animate-pulse" />
+              <div className="h-16 rounded-xl bg-muted animate-pulse" />
+              <div className="h-16 rounded-xl bg-muted animate-pulse" />
             </div>
           ) : eligibility.isLoading ? (
-            <div className="space-y-3">
-              <div className="h-8 w-2/3 rounded-xl bg-muted animate-pulse" />
-              <div className="h-14 rounded-xl bg-muted animate-pulse" />
-              <div className="h-14 rounded-xl bg-muted animate-pulse" />
+            <div className="space-y-4 max-w-3xl">
+              <div className="h-10 w-2/3 rounded-xl bg-muted animate-pulse" />
+              <div className="h-16 rounded-xl bg-muted animate-pulse" />
+              <div className="h-16 rounded-xl bg-muted animate-pulse" />
             </div>
           ) : eligibility.isError ? (
-            <div className="p-4 rounded-[12px] text-sm font-medium border bg-destructive/10 text-destructive border-destructive/20">
+            <div className="max-w-3xl p-5 rounded-[12px] text-[15px] md:text-[16px] font-medium border bg-destructive/10 text-destructive border-destructive/20">
               Could not check eligibility right now.
               <span className="block mt-1 font-normal opacity-70">
                 {eligibility.error instanceof Error ? eligibility.error.message : "unknown"}
@@ -77,41 +79,44 @@ export default function MySessionsSite() {
           ) : !site ? (
             <NotFound />
           ) : (
-            <>
-              <h1 className="text-[28px] md:text-[32px] font-bold tracking-tight text-[#11243e]">
+            <div className="max-w-3xl">
+              <h1 className="text-[28px] md:text-[36px] lg:text-[42px] leading-[1.15] font-bold tracking-tight text-[#11243e]">
                 {site.siteLabel ?? "Session site"}
               </h1>
               {site.isBlocked ? (
-                <p className="text-[15px] font-medium text-amber-900 mt-1.5">
+                <p className="text-[16px] font-medium text-amber-900 mt-1.5">
                   You can't book more sessions at this site.
                 </p>
               ) : (
-                <p className="text-[15px] text-muted-foreground mt-1.5">
+                <p className="text-[16px] text-[#576270] mt-1.5">
                   {site.remaining} of {site.cap} session{site.cap === 1 ? "" : "s"} remaining
                 </p>
               )}
               {site.oneVisitLimit && (
-                <p className="text-sm text-blue-900/80 mt-2 leading-relaxed">
+                <p className="text-[15px] md:text-[16px] text-blue-900/80 mt-2 leading-relaxed">
                   New York: one visit limit. Additional visits are by invitation only.
                 </p>
               )}
 
-              <div className="mt-6 space-y-3">
+              <div className="mt-8 space-y-4">
                 <SessionLimitPolicyNotice />
                 {site.isBlocked ? null : sessionsQuery.isLoading ? (
                   <div className="space-y-2">
-                    <div className="h-10 rounded-lg bg-muted animate-pulse" />
-                    <div className="h-10 rounded-lg bg-muted animate-pulse" />
+                    <div className="h-12 rounded-lg bg-muted animate-pulse" />
+                    <div className="h-12 rounded-lg bg-muted animate-pulse" />
                   </div>
                 ) : sessionsQuery.isError ? (
-                  <p className="text-sm text-muted-foreground">Couldn't load shifts right now.</p>
+                  <p className="text-[15px] md:text-[16px] text-[#576270]">Couldn't load shifts right now.</p>
                 ) : sessions.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">No open shifts right now.</p>
+                  <p className="text-[15px] md:text-[16px] text-[#576270]">No open shifts right now.</p>
                 ) : (
-                  <ul className="divide-y divide-[hsl(var(--border))] border-t border-b border-[hsl(var(--border))]">
+                  <ul className="divide-y divide-[#EEE9DD] border-t border-b border-[#EEE9DD] bg-white rounded-[12px] overflow-hidden">
                     {sessions.map((s) => (
-                      <li key={s.id} className="flex items-center justify-between gap-3 py-3">
-                        <span className="text-[15px] text-gray-900 min-w-0 truncate">
+                      <li
+                        key={s.id}
+                        className="flex items-center justify-between gap-4 px-5 py-4 md:py-5"
+                      >
+                        <span className="text-[17px] md:text-[18px] font-semibold text-[#11243e] min-w-0 truncate">
                           {s.date} · {s.time}
                         </span>
                         <button
@@ -123,7 +128,7 @@ export default function MySessionsSite() {
                             });
                             if (s.bookUrl) window.open(s.bookUrl, "_blank", "noopener,noreferrer");
                           }}
-                          className="shrink-0 text-[14px] font-semibold text-white bg-cta-gradient rounded-[8px] px-4 py-2 hover:brightness-105 active:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+                          className="shrink-0 text-[15px] md:text-[16px] font-semibold text-white bg-cta-gradient rounded-[8px] px-5 py-2.5 hover:brightness-105 active:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3351E6]/40"
                         >
                           Book
                         </button>
@@ -132,7 +137,7 @@ export default function MySessionsSite() {
                   </ul>
                 )}
               </div>
-            </>
+            </div>
           )}
         </div>
       </main>
@@ -142,16 +147,16 @@ export default function MySessionsSite() {
 
 function NotFound() {
   return (
-    <div>
-      <h1 className="text-[28px] md:text-[32px] font-bold tracking-tight text-[#11243e]">
+    <div className="max-w-3xl">
+      <h1 className="text-[28px] md:text-[36px] lg:text-[42px] leading-[1.15] font-bold tracking-tight text-[#11243e]">
         Site not found
       </h1>
-      <p className="text-[15px] text-muted-foreground mt-1.5">
+      <p className="text-[16px] text-[#576270] mt-1.5">
         This location isn't available right now.
       </p>
       <Link
         href="/my-sessions"
-        className="inline-flex mt-4 text-[15px] font-semibold text-[#3351E6] underline underline-offset-2"
+        className="inline-flex mt-4 text-[16px] font-semibold text-[#3351E6] underline underline-offset-2"
       >
         Back to your sessions
       </Link>
