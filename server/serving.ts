@@ -142,9 +142,10 @@ export function formatEligibilitySiteLabel(
 }
 
 /**
- * If two businesses share the same city/state label (e.g. both "Philadelphia, PA"),
- * append (1)/(2) so they are distinguishable. Known Philadelphia sites keep their
- * mapped numbers; any remaining duplicates get the next unused integer.
+ * If two businesses share the same city/state label, append a number only for
+ * sites with an explicit mapping (currently the two Philadelphia locations).
+ * Other cities that happen to share a label (e.g. two New York business ids)
+ * are left unchanged — we only number where product has asked for it.
  */
 export function disambiguateDuplicateSiteLabels(map: Map<number, string>): Map<number, string> {
   const byLabel = new Map<string, number[]>();
@@ -156,19 +157,9 @@ export function disambiguateDuplicateSiteLabels(map: Map<number, string>): Map<n
   for (const [label, ids] of byLabel) {
     if (ids.length < 2) continue;
     if (/\(\d+\)$/.test(label)) continue;
-    const used = new Set<string>();
     for (const id of ids) {
-      const known = SITE_SUFFIX_BY_BUSINESS_ID[id];
-      if (!known) continue;
-      map.set(id, `${label} (${known})`);
-      used.add(known);
-    }
-    let n = 1;
-    for (const id of ids.filter((id) => !SITE_SUFFIX_BY_BUSINESS_ID[id]).sort((a, b) => a - b)) {
-      while (used.has(String(n))) n += 1;
-      map.set(id, `${label} (${n})`);
-      used.add(String(n));
-      n += 1;
+      const suffix = SITE_SUFFIX_BY_BUSINESS_ID[id];
+      if (suffix) map.set(id, `${label} (${suffix})`);
     }
   }
   return map;

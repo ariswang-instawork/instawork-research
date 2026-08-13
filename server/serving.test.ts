@@ -124,4 +124,14 @@ describe("disambiguateDuplicateSiteLabels", () => {
     expect(out.get(372868)).toBe("Philadelphia, PA (1)");
     expect(out.get(353952)).toBe("Philadelphia, PA (2)");
   });
+
+  it("does NOT number other duplicate cities (e.g. New York)", () => {
+    const map = new Map<number, string>([
+      [365082, "New York, NY"],
+      [201172, "New York, NY"],
+    ]);
+    const out = disambiguateDuplicateSiteLabels(map);
+    expect(out.get(365082)).toBe("New York, NY");
+    expect(out.get(201172)).toBe("New York, NY");
+  });
 });
