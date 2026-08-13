@@ -22,9 +22,13 @@ function parseISO(dateISO: string): { year: number; month: number; day: number }
 export function SessionCalendar({
   sessions,
   onBook,
+  actionLabel = "Book",
 }: {
   sessions: SessionItem[];
   onBook: (session: SessionItem) => void;
+  /** Button label for each slot — "Book" (site detail, opens bookUrl directly)
+   * or "View session" (landing, routes to the session-detail page first). */
+  actionLabel?: string;
 }) {
   const byDate = useMemo(() => {
     const map = new Map<string, SessionItem[]>();
@@ -179,7 +183,7 @@ export function SessionCalendar({
                     onClick={() => onBook(s)}
                     className="shrink-0 text-[15px] md:text-[16px] font-semibold text-white bg-cta-gradient rounded-[8px] px-5 py-2.5 hover:brightness-105 active:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3351E6]/40"
                   >
-                    Book
+                    {actionLabel}
                   </button>
                 </div>
               ))}

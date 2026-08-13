@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { useSiteStorage, type SiteOrigin } from "@/hooks/use-site";
 import { LocationSelector } from "@/components/LocationSelector";
-import { SessionCard } from "@/components/SessionCard";
+import { SessionCalendar } from "@/components/SessionCalendar";
 import { useGetSessions, getGetSessionsQueryKey, useGetSites } from "@/lib/api-client";
 import { useAuthStatus } from "@/hooks/use-auth";
 import type { SessionItem as Session } from "@/lib/api-client/generated/api.schemas";
@@ -10,8 +10,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { SiteLeafletMap } from "@/components/SiteLeafletMap";
 import { trackEvent } from "@/lib/analytics";
 import { EXCLUDED_STATES } from "@/lib/constants";
-
-const INITIAL_SESSION_COUNT = 6;
 
 /** Check if a location is in an excluded state */
 function isLocationExcluded(label: string | null | undefined): boolean {
@@ -72,7 +70,6 @@ export default function Landing() {
   // Incremented to open the location selector.
   const [pickerFocus, setPickerFocus] = useState(0);
   const sessionsRef = useRef<HTMLDivElement | null>(null);
-  const [showAll, setShowAll] = useState(false);
   const [sessionsRevealed, setSessionsRevealed] = useState(false);
 
   const { data: auth } = useAuthStatus();
@@ -138,7 +135,6 @@ export default function Landing() {
   // Reset per-city choices whenever the canonical site changes, no matter
   // where the change came from (picker, map popup, another tab).
   useEffect(() => {
-    setShowAll(false);
     setSessionsRevealed(false);
   }, [site?.key]);
 
@@ -165,10 +161,9 @@ export default function Landing() {
     }
   };
 
-  // Picking a city updates the selection and resets choice.
+  // Picking a city updates the selection.
   const handleSiteSelected = (key: string, label: string, origin?: SiteOrigin) => {
     setSite(key, label, origin);
-    setShowAll(false);
     trackEvent("research_city_selected", { selected_city: label, ...utmProps() });
   };
 
@@ -186,9 +181,6 @@ export default function Landing() {
     });
     setLocation(`/sessions/${session.id}`);
   };
-
-  const visibleSessions = showAll ? sessions : sessions.slice(0, INITIAL_SESSION_COUNT);
-  const hiddenCount = sessions.length - visibleSessions.length;
 
   return (
     <div className="flex min-h-0 flex-1 flex-col bg-background">
@@ -326,34 +318,11 @@ export default function Landing() {
                   </div>
                 </div>
               ) : (
-                <>
-                  <ul className="divide-y divide-[#EEE9DD] border-t border-b border-[#EEE9DD]">
-                    {visibleSessions.map((session) => (
-                      <SessionCard
-                        key={session.id}
-                        session={session}
-                        onBook={() => handleViewSession(session)}
-                      />
-                    ))}
-                  </ul>
-                  {hiddenCount > 0 && (
-                    <div className="mt-6 text-center">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setShowAll(true);
-                          trackEvent("see_more_sessions_clicked", {
-                            selected_city: site?.label ?? null,
-                            ...utmProps(),
-                          });
-                        }}
-                        className="inline-flex items-center justify-center min-h-[48px] px-6 rounded-[8px] border border-[#E0DCCF] bg-white text-[#11243e] font-semibold text-[16px] active:opacity-80"
-                      >
-                        View more sessions ({hiddenCount})
-                      </button>
-                    </div>
-                  )}
-                </>
+                <SessionCalendar
+                  sessions={sessions}
+                  onBook={handleViewSession}
+                  actionLabel="View session"
+                />
               )}
             </div>
 

@@ -1,7 +1,14 @@
 import { useEffect } from "react";
 import { Link } from "wouter";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Check } from "lucide-react";
 import { trackEvent } from "@/lib/analytics";
+
+const APP_BENEFITS = [
+  "Book sessions and manage your schedule in one place",
+  "Get push notifications for new sessions",
+  "View exact address and directions before you go",
+  "Receive payment and track your earnings",
+];
 
 export default function GetApp() {
   useEffect(() => {
@@ -20,7 +27,7 @@ export default function GetApp() {
           </Link>
 
           <div className="text-center mb-12">
-            <h1 className="text-[32px] md:text-[40px] leading-[1.15] font-bold tracking-tight text-[#11243e] mb-4">
+            <h1 className="text-[28px] md:text-[36px] lg:text-[42px] leading-[1.15] font-bold tracking-tight text-[#11243e] mb-4">
               Download the Instawork app
             </h1>
             <p className="text-[16px] text-[#576270] leading-relaxed">
@@ -83,26 +90,16 @@ export default function GetApp() {
             </a>
           </div>
 
-          {/* Why use the app */}
-          <div className="bg-[#FCFBF9] rounded-[16px] p-6 md:p-8">
-            <h2 className="text-[18px] font-bold text-[#11243e] mb-4">Why download the app?</h2>
+          {/* Why use the app — plain quiet list, no filled panel. */}
+          <div>
+            <h2 className="text-[15px] font-semibold text-[#11243e] mb-4">Why download the app?</h2>
             <ul className="space-y-3">
-              <li className="flex gap-3">
-                <span className="text-[#3351E6] font-bold shrink-0">✓</span>
-                <span className="text-[15px] text-[#576270]">Book sessions and manage your schedule in one place</span>
-              </li>
-              <li className="flex gap-3">
-                <span className="text-[#3351E6] font-bold shrink-0">✓</span>
-                <span className="text-[15px] text-[#576270]">Get push notifications for new sessions</span>
-              </li>
-              <li className="flex gap-3">
-                <span className="text-[#3351E6] font-bold shrink-0">✓</span>
-                <span className="text-[15px] text-[#576270]">View exact address and directions before you go</span>
-              </li>
-              <li className="flex gap-3">
-                <span className="text-[#3351E6] font-bold shrink-0">✓</span>
-                <span className="text-[15px] text-[#576270]">Receive payment and track your earnings</span>
-              </li>
+              {APP_BENEFITS.map((benefit) => (
+                <li key={benefit} className="flex gap-2.5">
+                  <Check className="w-4 h-4 text-[#3351E6] shrink-0 mt-0.5" strokeWidth={2.5} />
+                  <span className="text-[16px] text-[#576270]">{benefit}</span>
+                </li>
+              ))}
             </ul>
           </div>
         </div>

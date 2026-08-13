@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowLeft, Calendar, CreditCard, MapPin, Mic } from "lucide-react";
+import { ArrowLeft, Calendar, CreditCard, Info, MapPin, Mic } from "lucide-react";
 import { Link, useRoute } from "wouter";
 import { useGetSessionById, getGetSessionByIdQueryKey } from "@/lib/api-client";
 import { useAuthStatus } from "@/hooks/use-auth";
@@ -8,8 +8,14 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ContinueWithInstaworkSheet } from "@/components/ContinueWithInstaworkSheet";
 import { PrimaryCtaButton } from "@/components/PrimaryCtaButton";
-import { EXCLUDED_STATES, SESSION_CAP } from "@/lib/constants";
+import { EXCLUDED_STATES } from "@/lib/constants";
 import { trackEvent } from "@/lib/analytics";
+
+const BOOKING_STEPS = [
+  { title: "Continue in the Instawork app", body: "Open the selected shift in the Instawork app." },
+  { title: "Complete the sign-up form", body: "Complete the sign-up form in the Instawork app." },
+  { title: "Book your session", body: "Reserve your recording session." },
+];
 
 export default function SessionDetail() {
   const [, params] = useRoute("/sessions/:id");
@@ -21,21 +27,21 @@ export default function SessionDetail() {
   // nothing to ask, so the CTA opens the shift deep link directly.
   const { data: auth } = useAuthStatus();
 
-  const { data: session, isLoading } = useGetSessionById(id || "", { 
-    query: { enabled: !!id, queryKey: getGetSessionByIdQueryKey(id || "") } 
+  const { data: session, isLoading } = useGetSessionById(id || "", {
+    query: { enabled: !!id, queryKey: getGetSessionByIdQueryKey(id || "") },
   });
 
-  const excludedStatesText = EXCLUDED_STATES.slice(0, -1).join(", ") + ", or " + EXCLUDED_STATES[EXCLUDED_STATES.length - 1];
+  const excludedStatesText =
+    EXCLUDED_STATES.slice(0, -1).join(", ") + ", or " + EXCLUDED_STATES[EXCLUDED_STATES.length - 1];
 
   if (isLoading) {
     return (
-      <div className="flex-1 flex flex-col bg-background">
-        <div className="px-6 pt-5 pb-10 space-y-6 max-w-md mx-auto w-full">
-          <Skeleton className="w-10 h-10 rounded-full bg-muted" />
+      <div className="flex-1 flex flex-col bg-[#FCFBF9]">
+        <div className="max-w-[720px] mx-auto px-5 md:px-8 pt-10 md:pt-14 pb-10 space-y-6 w-full">
           <Skeleton className="w-24 h-5 rounded bg-muted" />
-          <Skeleton className="w-3/4 h-8 bg-muted" />
+          <Skeleton className="w-3/4 h-10 bg-muted" />
           <Skeleton className="w-1/2 h-5 bg-muted" />
-          <Skeleton className="h-[100px] rounded-xl bg-muted" />
+          <Skeleton className="h-[160px] rounded-[14px] bg-muted" />
         </div>
       </div>
     );
@@ -60,117 +66,119 @@ export default function SessionDetail() {
   };
 
   return (
-    <div className="flex-1 flex flex-col bg-background">
-      <main className="flex-1 overflow-y-auto px-5 md:px-6">
-        <div className="max-w-md md:max-w-2xl mx-auto w-full pt-5 md:pt-10 pb-40 animate-in fade-in slide-in-from-bottom-3 duration-500">
-          <Link href="/" className="inline-flex items-center mb-6 -ml-1">
-            <ArrowLeft className="w-5 h-5 text-foreground" />
+    <div className="flex-1 flex flex-col bg-[#FCFBF9]">
+      <main className="flex-1 overflow-y-auto">
+        <div className="max-w-[720px] mx-auto px-5 md:px-8 pt-10 md:pt-14 pb-40 w-full animate-in fade-in slide-in-from-bottom-3 duration-500">
+          <Link
+            href="/"
+            className="inline-flex items-center text-[15px] font-medium text-[#576270] hover:text-[#11243e] transition-colors mb-6"
+          >
+            <ArrowLeft className="w-4 h-4 mr-1.5" />
+            Sessions
           </Link>
 
-          <div className="md:bg-card md:border md:border-[hsl(var(--border))] md:rounded-[20px] md:shadow-[0_5px_20px_0_rgba(0,0,0,0.08)] md:p-10">
-            {/* Header — title + location on the left, compact earnings pill on the right. */}
-            <div className="flex items-end justify-between gap-4 mb-8">
+          {/* Header — title + location, estimated-pay pill beneath. */}
+          <h1 className="text-[28px] md:text-[36px] lg:text-[42px] leading-[1.15] font-bold tracking-tight text-[#11243e]">
+            Paid Research Participant
+          </h1>
+          <p className="text-[16px] text-[#576270] mt-1.5">
+            {session.label}
+            {site?.origin && ` · ${site.origin.distanceMiles} miles away`}
+          </p>
+
+          <div className="inline-flex items-center gap-3 mt-4 rounded-[10px] bg-[#3351E6]/[0.06] px-4 py-2.5">
+            <span className="text-[16px] font-bold text-[#11243e]">
+              {session.payLabel || "$72"}
+            </span>
+            <span className="text-[13px] text-[#8A93A0]">estimated pay</span>
+            {session.payRateUsd != null && session.billableHours != null && (
+              <span className="text-[13px] text-[#8A93A0]">
+                · ${Number.isInteger(session.payRateUsd) ? session.payRateUsd : session.payRateUsd.toFixed(2)}
+                /hr × {session.billableHours}h
+              </span>
+            )}
+          </div>
+
+          {/* Detail rows — quiet grouped hairline list. */}
+          <div className="mt-8 rounded-[14px] border border-[#EEE9DD] bg-white overflow-hidden divide-y divide-[#EEE9DD]">
+            <div className="flex items-start gap-3.5 px-5 py-4 md:py-5">
+              <Calendar className="w-5 h-5 text-[#8A93A0] shrink-0 mt-0.5" strokeWidth={1.75} />
               <div className="min-w-0">
-                <h1 className="text-[32px] font-bold tracking-tight mb-2 leading-tight">Paid Research Participant</h1>
-                <p className="text-[14px] text-muted-foreground leading-snug">{session.label}</p>
-                {site?.origin && (
-                  <p className="text-[14px] text-muted-foreground mt-1">{site.origin.distanceMiles} miles away</p>
-                )}
-              </div>
-              <div className="shrink-0 text-center">
-                <div className="inline-block rounded-[10px] border border-[hsl(var(--border))] bg-card px-4 py-2 text-[16px] font-bold shadow-sm">
-                  {session.payLabel || "$72"}
-                </div>
-                <p className="text-[13px] font-medium text-muted-foreground mt-1">Estimated pay</p>
-                {session.payRateUsd != null && session.billableHours != null && (
-                  <p className="text-[13px] text-muted-foreground mt-1 whitespace-nowrap">
-                    ${Number.isInteger(session.payRateUsd) ? session.payRateUsd : session.payRateUsd.toFixed(2)}/hr × {session.billableHours} hours
-                  </p>
-                )}
+                <p className="text-[16px] font-semibold text-[#11243e]">
+                  {session.date}
+                  {session.dateISO ? `, ${session.dateISO.slice(0, 4)}` : ""}
+                </p>
+                <p className="text-[15px] text-[#8A93A0] mt-1">{session.time} (3 hours)</p>
               </div>
             </div>
-
-            {/* Details card — one rounded card, icon sections with thin dividers. */}
-            <div className="mb-8">
-              <div className="flex items-start gap-3.5 py-5 border-b border-[hsl(var(--border))]">
-                <Calendar className="w-5 h-5 text-muted-foreground shrink-0 mt-0.5" strokeWidth={1.75} />
+            {session.label && (
+              <div className="flex items-start gap-3.5 px-5 py-4 md:py-5">
+                <MapPin className="w-5 h-5 text-[#8A93A0] shrink-0 mt-0.5" strokeWidth={1.75} />
                 <div className="min-w-0">
-                  <p className="text-[17px] font-bold text-foreground">{session.date}{session.dateISO ? `, ${session.dateISO.slice(0, 4)}` : ""}</p>
-                  <p className="text-[16px] text-muted-foreground mt-2">{session.time} (3 hours)</p>
+                  <p className="text-[16px] font-semibold text-[#11243e]">Location</p>
+                  <p className="text-[15px] text-[#8A93A0] mt-1 leading-relaxed">{session.label}</p>
+                  {site?.origin && (
+                    <p className="text-[13px] text-[#8A93A0] mt-0.5">
+                      {site.origin.distanceMiles} miles away
+                    </p>
+                  )}
+                  <p className="text-[13px] text-[#8A93A0] mt-2">
+                    Exact address is provided after you book in the Instawork app.
+                  </p>
                 </div>
               </div>
-              {session.label && (
-                <div className="flex items-start gap-3.5 py-5 border-b border-[hsl(var(--border))]">
-                  <MapPin className="w-5 h-5 text-muted-foreground shrink-0 mt-0.5" strokeWidth={1.75} />
+            )}
+            <div className="flex items-start gap-3.5 px-5 py-4 md:py-5">
+              <Mic className="w-5 h-5 text-[#8A93A0] shrink-0 mt-0.5" strokeWidth={1.75} />
+              <div className="min-w-0">
+                <p className="text-[16px] font-semibold text-[#11243e]">What you'll do</p>
+                <p className="text-[15px] text-[#8A93A0] mt-1">
+                  Complete simple voice recording tasks to help improve AI technology.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3.5 px-5 py-4 md:py-5">
+              <CreditCard className="w-5 h-5 text-[#8A93A0] shrink-0 mt-0.5" strokeWidth={1.75} />
+              <div className="min-w-0">
+                <p className="text-[16px] font-semibold text-[#11243e]">Payment</p>
+                <p className="text-[15px] text-[#8A93A0] mt-1">
+                  You'll be paid through Instawork after your session.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Important to know — one quiet note, not a bulleted box. */}
+          <p className="flex items-start gap-2 text-[14px] md:text-[15px] text-[#8A93A0] leading-relaxed mt-6">
+            <Info className="w-4 h-4 shrink-0 mt-0.5" aria-hidden="true" />
+            <span>
+              Arrive on time with a valid photo ID. Check your email for a follow-up form before
+              your session. Not available to residents of {excludedStatesText}.
+            </span>
+          </p>
+
+          {/* How booking works — lightweight numbered rows. */}
+          <div className="mt-8">
+            <h3 className="text-[15px] font-semibold text-[#11243e] mb-1">How booking works</h3>
+            <div className="divide-y divide-[#EEE9DD]">
+              {BOOKING_STEPS.map((step, i) => (
+                <div key={step.title} className="flex items-start gap-3.5 py-4">
+                  <span className="w-6 h-6 rounded-full bg-[#3351E6]/10 text-[#3351E6] text-[12px] font-bold flex items-center justify-center shrink-0 mt-0.5">
+                    {i + 1}
+                  </span>
                   <div className="min-w-0">
-                    <p className="text-[17px] font-bold text-foreground">Location</p>
-                    <p className="text-[16px] text-muted-foreground leading-relaxed mt-2">{session.label}</p>
-                    {site?.origin && (
-                      <p className="text-[14px] text-muted-foreground mt-1">{site.origin.distanceMiles} miles away</p>
-                    )}
-                    <p className="text-[13px] text-[#8A8F9E] mt-3">
-                      Exact address is provided after you book in the Instawork app.
-                    </p>
+                    <p className="text-[16px] font-semibold text-[#11243e]">{step.title}</p>
+                    <p className="text-[14px] text-[#8A93A0] mt-1 leading-relaxed">{step.body}</p>
                   </div>
                 </div>
-              )}
-              <div className="flex items-start gap-3.5 py-5 border-b border-[hsl(var(--border))]">
-                <Mic className="w-5 h-5 text-muted-foreground shrink-0 mt-0.5" strokeWidth={1.75} />
-                <div className="min-w-0">
-                  <p className="text-[17px] font-bold text-foreground">What you'll do</p>
-                  <p className="text-[16px] text-muted-foreground mt-2">Complete simple voice recording tasks to help improve AI technology.</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3.5 py-5">
-                <CreditCard className="w-5 h-5 text-muted-foreground shrink-0 mt-0.5" strokeWidth={1.75} />
-                <div className="min-w-0">
-                  <p className="text-[17px] font-bold text-foreground">Payment</p>
-                  <p className="text-[16px] text-muted-foreground mt-2">You'll be paid through Instawork after your session.</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="mb-8">
-              <h3 className="text-[18px] font-semibold mb-3">Important to know</h3>
-              <ul className="space-y-1.5 pl-5 list-disc text-[15px] text-[hsl(var(--body-muted))] leading-relaxed">
-                <li>Arrive on time</li>
-                <li>Bring a valid photo ID</li>
-                <li>Check your email for a follow-up form before your session</li>
-                <li>Not available to residents of {excludedStatesText}</li>
-              </ul>
-            </div>
-
-            {/* How booking works — numbered rows; only step 1 is interactive. */}
-            <div>
-              <h3 className="text-[18px] font-semibold mb-2">How booking works</h3>
-              <div className="flex items-start gap-3.5 py-5 border-b border-[hsl(var(--border))]">
-                <span className="w-6 h-6 rounded-full bg-primary/10 text-primary text-[12px] font-bold flex items-center justify-center shrink-0 mt-0.5">1</span>
-                <div className="min-w-0">
-                  <p className="text-[17px] font-bold text-foreground">Continue in the Instawork app</p>
-                  <p className="text-[15px] text-[hsl(var(--body-muted))] leading-relaxed mt-2">Open the selected shift in the Instawork app.</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3.5 py-5 border-b border-[hsl(var(--border))]">
-                <span className="w-6 h-6 rounded-full bg-primary/10 text-primary text-[12px] font-bold flex items-center justify-center shrink-0 mt-0.5">2</span>
-                <div className="min-w-0">
-                  <p className="text-[17px] font-bold text-foreground">Complete the sign-up form</p>
-                  <p className="text-[15px] text-[hsl(var(--body-muted))] leading-relaxed mt-2">Complete the sign-up form in the Instawork app.</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3.5 py-5">
-                <span className="w-6 h-6 rounded-full bg-primary/10 text-primary text-[12px] font-bold flex items-center justify-center shrink-0 mt-0.5">3</span>
-                <div className="min-w-0">
-                  <p className="text-[17px] font-bold text-foreground">Book your session</p>
-                  <p className="text-[15px] text-[hsl(var(--body-muted))] leading-relaxed mt-2">Reserve your recording session.</p>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
         </div>
       </main>
 
-      <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-[hsl(var(--border))] px-6 py-4 pb-[calc(1rem+env(safe-area-inset-bottom))] z-20">
-        <div className="max-w-md md:max-w-2xl mx-auto w-full flex flex-col gap-2.5">
+      <div className="fixed bottom-0 left-0 right-0 bg-[#FCFBF9] border-t border-[#EEE9DD] px-6 py-4 pb-[calc(1rem+env(safe-area-inset-bottom))] z-20">
+        <div className="max-w-[720px] mx-auto px-0 md:px-3 w-full flex flex-col gap-2.5">
           <PrimaryCtaButton
             onClick={() => {
               trackEvent("book_cta_clicked", analyticsProps);
