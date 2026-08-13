@@ -12,9 +12,9 @@ import { EXCLUDED_STATES } from "@/lib/constants";
 import { trackEvent } from "@/lib/analytics";
 
 const BOOKING_STEPS = [
-  { title: "Continue in the Instawork app", body: "Open the selected shift in the Instawork app." },
-  { title: "Complete the sign-up form", body: "Complete the sign-up form in the Instawork app." },
-  { title: "Book your session", body: "Reserve your recording session." },
+  { title: "Open the shift in Instawork", body: "Tap the button below to open the selected shift in the Instawork app." },
+  { title: "Complete the sign-up form", body: "Fill out the short sign-up form on the shift page." },
+  { title: "Book your session", body: "Tap Book shift to reserve your recording session." },
 ];
 
 export default function SessionDetail() {
@@ -196,7 +196,7 @@ export default function SessionDetail() {
               trackEvent("account_choice_modal_opened", analyticsProps);
             }}
           >
-            Book in the Instawork app
+            Open shift in Instawork
           </PrimaryCtaButton>
         </div>
       </div>
