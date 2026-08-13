@@ -120,6 +120,9 @@ export function Shell({ children }: { children: ReactNode }) {
 
             {/* Desktop nav */}
             <nav className="hidden md:flex items-center gap-6" aria-label="Main">
+              <button type="button" onClick={() => go("/")} className={navLink}>
+                Home
+              </button>
               {isAuthenticated && (
                 <button type="button" onClick={goMySessions} className={navLink}>
                   My sessions

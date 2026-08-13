@@ -55,6 +55,32 @@ export function useEligibility(enabled: boolean) {
   });
 }
 
+export type MeResponse = {
+  workerId: number;
+  name: string | null;
+};
+
+/** The logged-in user's Instawork identity (worker id + display name). */
+export function useMe(enabled: boolean) {
+  return useQuery({
+    queryKey: ["me"],
+    enabled,
+    retry: false,
+    queryFn: async (): Promise<MeResponse> => {
+      const resp = await fetch(`${base}api/me`, { credentials: "include" });
+      if (!resp.ok) throw new Error(String(resp.status));
+      return resp.json();
+    },
+  });
+}
+
+/** First name only, for greetings. Null when unavailable. */
+export function firstNameOf(name: string | null | undefined): string | null {
+  if (!name) return null;
+  const first = name.trim().split(/\s+/)[0];
+  return first || null;
+}
+
 export type EligibilitySessionsResponse = {
   businessId: number;
   sessions: SessionItem[];

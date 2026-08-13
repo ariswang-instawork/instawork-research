@@ -7,22 +7,21 @@ import {
 } from "@/hooks/use-auth";
 import { trackEvent } from "@/lib/analytics";
 
+/** One incidental line summarizing per-site booking limits. */
 export function SessionLimitPolicyNotice() {
   return (
-    <div className="p-4 md:p-5 rounded-[12px] border border-blue-200 bg-blue-50 text-[15px] md:text-[16px] text-blue-950 lg:col-span-2">
-      <div className="flex gap-3">
-        <Info className="w-5 h-5 shrink-0 mt-0.5 text-blue-700" aria-hidden="true" />
-        <div className="space-y-1.5">
-          <p className="font-semibold text-blue-950">How session limits work</p>
-          <p className="text-blue-900/90 leading-relaxed">
-            Most locations let you book up to 3 sessions per site.
-          </p>
-          <p className="text-blue-900/90 leading-relaxed">
-            <span className="font-medium">New York is limited to 1 visit.</span> If you have already
-            completed a New York session, our team may invite you back for additional visits.
-          </p>
-        </div>
-      </div>
+    <p className="flex items-start gap-2 text-[14px] md:text-[15px] text-[#8A93A0] leading-relaxed">
+      <Info className="w-4 h-4 shrink-0 mt-0.5" aria-hidden="true" />
+      <span>Most sites allow 3 sessions; New York allows 1 visit.</span>
+    </p>
+  );
+}
+
+/** Rounded container that groups list rows with inset hairline dividers. */
+function GroupedList({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="rounded-[14px] border border-[#EEE9DD] bg-white overflow-hidden divide-y divide-[#EEE9DD]">
+      {children}
     </div>
   );
 }
@@ -48,152 +47,133 @@ export function EligibilityPanel() {
     );
   }
 
+  const tabClass = (active: boolean) =>
+    `pb-3 -mb-px text-[15px] md:text-[16px] font-semibold border-b-2 transition-colors ${
+      active
+        ? "border-[#3351E6] text-[#3351E6]"
+        : "border-transparent text-[#8A93A0] hover:text-[#11243e]"
+    }`;
+
   return (
     <div className="space-y-6">
-      <div className="flex gap-6 border-b border-[#EEE9DD]">
-        <button
-          onClick={() => setTab("remaining")}
-          className={`px-1 py-3 md:py-4 text-[15px] md:text-[16px] font-semibold border-b-2 transition-colors ${
-            tab === "remaining"
-              ? "border-[#3351E6] text-[#3351E6]"
-              : "border-transparent text-[#576270] hover:text-[#11243e]"
-          }`}
-        >
+      <div className="flex gap-7 border-b border-[#EEE9DD]">
+        <button onClick={() => setTab("remaining")} className={tabClass(tab === "remaining")}>
           Remaining
         </button>
-        <button
-          onClick={() => setTab("history")}
-          className={`px-1 py-3 md:py-4 text-[15px] md:text-[16px] font-semibold border-b-2 transition-colors ${
-            tab === "history"
-              ? "border-[#3351E6] text-[#3351E6]"
-              : "border-transparent text-[#576270] hover:text-[#11243e]"
-          }`}
-        >
+        <button onClick={() => setTab("history")} className={tabClass(tab === "history")}>
           History
         </button>
       </div>
 
-      <div>
-        {eligibility.isLoading ? (
-          <div className="space-y-3">
-            <div className="h-14 rounded-xl bg-muted animate-pulse" />
-            <div className="h-14 rounded-xl bg-muted animate-pulse" />
-          </div>
-        ) : eligibility.isError ? (
-          <div className="p-5 rounded-[12px] text-[15px] md:text-[16px] font-medium border bg-destructive/10 text-destructive border-destructive/20">
-            Could not check eligibility right now.
-            <span className="block mt-1 font-normal opacity-70">
-              {eligibility.error instanceof Error ? eligibility.error.message : "unknown"}
-            </span>
-          </div>
-        ) : eligibility.data && eligibility.data.sites.length === 0 ? (
-          <div className="p-5 rounded-[12px] text-[15px] md:text-[16px] font-medium border bg-white text-[#576270] border-[#EEE9DD]">
-            No session locations available right now.
-          </div>
-        ) : (
-          <div className="grid gap-4 lg:grid-cols-2">
-            <SessionLimitPolicyNotice />
-            {tab === "remaining"
-              ? eligibility.data?.sites.map((s) =>
-                  s.isBlocked || s.remaining <= 0 ? (
-                    <div
-                      key={s.businessId}
-                      className={`p-5 md:p-6 rounded-[12px] border ${
-                        s.isBlocked
-                          ? "bg-amber-50 border-amber-200"
-                          : "bg-white border-[#EEE9DD]"
-                      }`}
-                    >
-                      <p className="text-[17px] md:text-[18px] font-bold text-[#11243e]">
-                        {s.siteLabel ?? "Session site"}
-                      </p>
-                      {s.isBlocked ? (
-                        <p className="text-[15px] md:text-[16px] font-medium text-amber-900 mt-1">
-                          You can't book more sessions at this site.
-                        </p>
-                      ) : (
-                        <p className="text-[15px] md:text-[16px] text-[#576270] mt-1">
-                          {s.remaining} of {s.cap} session{s.cap === 1 ? "" : "s"} remaining
-                        </p>
-                      )}
-                      {s.oneVisitLimit && (
-                        <p className="text-[15px] md:text-[16px] text-blue-900/80 mt-2 leading-relaxed">
-                          New York: one visit limit. Additional visits are by invitation only.
-                        </p>
-                      )}
-                    </div>
-                  ) : (
-                    <Link
-                      key={s.businessId}
-                      href={`/my-sessions/${s.businessId}`}
-                      onClick={() =>
-                        trackEvent("eligibility_site_expanded", { business_id: s.businessId })
-                      }
-                      className="flex items-start justify-between gap-4 p-5 md:p-6 rounded-[12px] border bg-white border-[#EEE9DD] text-left transition-colors hover:border-[#D9D3C4] hover:bg-[#FAFAF8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3351E6]/40"
-                    >
-                      <span className="min-w-0">
-                        <span className="block text-[17px] md:text-[18px] font-bold text-[#11243e]">
-                          {s.siteLabel ?? "Session site"}
-                        </span>
-                        <span className="block text-[15px] md:text-[16px] text-[#576270] mt-1">
-                          {s.remaining} of {s.cap} session{s.cap === 1 ? "" : "s"} remaining
-                        </span>
-                        {s.oneVisitLimit && (
-                          <span className="block text-[15px] md:text-[16px] text-blue-900/80 mt-2 leading-relaxed">
-                            New York: one visit limit. Additional visits are by invitation only.
-                          </span>
-                        )}
+      {eligibility.isLoading ? (
+        <div className="space-y-3">
+          <div className="h-16 rounded-xl bg-muted animate-pulse" />
+          <div className="h-16 rounded-xl bg-muted animate-pulse" />
+        </div>
+      ) : eligibility.isError ? (
+        <div className="p-5 rounded-[14px] text-[15px] font-medium border border-destructive/20 bg-destructive/10 text-destructive">
+          Could not check eligibility right now.
+          <span className="block mt-1 font-normal opacity-70">
+            {eligibility.error instanceof Error ? eligibility.error.message : "unknown"}
+          </span>
+        </div>
+      ) : eligibility.data && eligibility.data.sites.length === 0 ? (
+        <p className="text-[15px] md:text-[16px] text-[#576270]">
+          No session locations available right now.
+        </p>
+      ) : (
+        <div className="space-y-4">
+          <SessionLimitPolicyNotice />
+          {tab === "remaining" ? (
+            <GroupedList>
+              {eligibility.data?.sites.map((s) => {
+                const blocked = s.isBlocked || s.remaining <= 0;
+                const detail = (
+                  <span className="min-w-0">
+                    <span className="block text-[17px] md:text-[18px] font-semibold text-[#11243e]">
+                      {s.siteLabel ?? "Session site"}
+                    </span>
+                    {s.isBlocked ? (
+                      <span className="block text-[15px] text-[#B4791F] mt-0.5">
+                        You can't book more sessions here.
                       </span>
-                      <ChevronRight
-                        className="w-5 h-5 shrink-0 text-[#576270] mt-1"
-                        aria-hidden="true"
-                      />
-                    </Link>
-                  ),
-                )
-              : eligibility.data?.sites.map((s) => (
+                    ) : (
+                      <span className="block text-[15px] text-[#8A93A0] mt-0.5">
+                        {s.remaining} of {s.cap} session{s.cap === 1 ? "" : "s"} remaining
+                      </span>
+                    )}
+                    {s.oneVisitLimit && (
+                      <span className="block text-[14px] text-[#5B6EE8] mt-1">
+                        New York: one visit limit
+                      </span>
+                    )}
+                  </span>
+                );
+                return blocked ? (
                   <div
                     key={s.businessId}
-                    className="p-5 md:p-6 rounded-[12px] border border-[#EEE9DD] bg-white"
+                    className="flex items-center justify-between gap-4 px-5 py-4 md:py-5"
                   >
-                    <div className="flex items-start justify-between gap-4 mb-4">
-                      <div>
-                        <p className="text-[17px] md:text-[18px] font-bold text-[#11243e]">
-                          {s.siteLabel ?? "Session site"}
+                    {detail}
+                  </div>
+                ) : (
+                  <Link
+                    key={s.businessId}
+                    href={`/my-sessions/${s.businessId}`}
+                    onClick={() =>
+                      trackEvent("eligibility_site_expanded", { business_id: s.businessId })
+                    }
+                    className="flex items-center justify-between gap-4 px-5 py-4 md:py-5 transition-colors hover:bg-[#FAFAF8] focus-visible:outline-none focus-visible:bg-[#FAFAF8]"
+                  >
+                    {detail}
+                    <ChevronRight className="w-5 h-5 shrink-0 text-[#C4CAD2]" aria-hidden="true" />
+                  </Link>
+                );
+              })}
+            </GroupedList>
+          ) : (
+            <GroupedList>
+              {eligibility.data?.sites.map((s) => (
+                <div key={s.businessId} className="px-5 py-4 md:py-5">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="min-w-0">
+                      <p className="text-[17px] md:text-[18px] font-semibold text-[#11243e]">
+                        {s.siteLabel ?? "Session site"}
+                      </p>
+                      {s.oneVisitLimit && (
+                        <p className="text-[14px] text-[#5B6EE8] mt-0.5">
+                          New York: one visit limit
                         </p>
-                        {s.oneVisitLimit && (
-                          <p className="text-[15px] md:text-[16px] text-blue-900/80 mt-1 leading-relaxed">
-                            New York: one visit limit. Additional visits are by invitation only.
-                          </p>
-                        )}
-                      </div>
-                      {s.isBlocked && (
-                        <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-amber-100 text-amber-700 shrink-0">
-                          Maxed out
-                        </span>
                       )}
                     </div>
-                    <div className="space-y-2.5">
-                      <div className="flex justify-between text-[15px] md:text-[16px]">
-                        <span className="text-[#576270]">Booked</span>
-                        <span className="font-medium text-[#11243e]">{s.bookedCount}</span>
-                      </div>
-                      <div className="flex justify-between text-[15px] md:text-[16px]">
-                        <span className="text-[#576270]">Completed</span>
-                        <span className="font-medium text-[#11243e]">{s.completedCount}</span>
-                      </div>
-                      <div className="flex justify-between text-[15px] md:text-[16px] border-t border-[#EEE9DD] pt-2.5 mt-2.5">
-                        <span className="font-semibold text-[#11243e]">Remaining</span>
-                        <span className="font-bold text-[#3351E6]">
-                          {s.remaining}/{s.cap}
-                        </span>
-                      </div>
-                    </div>
+                    {s.isBlocked && (
+                      <span className="shrink-0 text-xs font-semibold px-2.5 py-1 rounded-full bg-amber-100 text-amber-700">
+                        Maxed out
+                      </span>
+                    )}
                   </div>
-                ))}
-          </div>
-        )}
-      </div>
+                  <dl className="mt-3 space-y-2 text-[15px]">
+                    <div className="flex justify-between">
+                      <dt className="text-[#8A93A0]">Booked</dt>
+                      <dd className="font-medium text-[#11243e]">{s.bookedCount}</dd>
+                    </div>
+                    <div className="flex justify-between">
+                      <dt className="text-[#8A93A0]">Completed</dt>
+                      <dd className="font-medium text-[#11243e]">{s.completedCount}</dd>
+                    </div>
+                    <div className="flex justify-between border-t border-[#EEE9DD] pt-2 mt-2">
+                      <dt className="font-semibold text-[#11243e]">Remaining</dt>
+                      <dd className="font-bold text-[#3351E6]">
+                        {s.remaining}/{s.cap}
+                      </dd>
+                    </div>
+                  </dl>
+                </div>
+              ))}
+            </GroupedList>
+          )}
+        </div>
+      )}
     </div>
   );
 }
