@@ -7,7 +7,14 @@ import { registerApiRoutes } from "./apiRoutes";
 import { prisma } from "./db";
 import { resolveInstaworkUser } from "./instaworkUser";
 import { getLifetimeCap, isOneVisitLimitSite } from "./siteCaps";
-import { getServableRows, getServableRowsForBusiness, getSiteLabelsByBusinessId, toPublicSessionItem } from "./serving";
+import {
+  baseSiteLabel,
+  disambiguateDuplicateSiteLabels,
+  getServableRows,
+  getServableRowsForBusiness,
+  getSiteLabelsByBusinessId,
+  toPublicSessionItem,
+} from "./serving";
 
 const INSTAWORK_BASE_URL = process.env.INSTAWORK_BASE_URL || "http://localhost:8080";
 const INSTAWORK_CLIENT_ID = process.env.INSTAWORK_CLIENT_ID!;
@@ -297,7 +304,18 @@ export async function registerRoutes(
         ...bookings
           .filter((b) => !openBusinessIds.has(b.businessId))
           .map((b) => toSite(b.businessId, b)),
-      ].sort((a, b) => a.siteLabel.localeCompare(b.siteLabel));
+      ];
+
+      // Number City, ST (1)/(2) only among sites in THIS response. If one of two
+      // Philadelphia (or New York) sites is filled/absent, the remaining one
+      // drops the suffix and shows as plain "Philadelphia, PA".
+      const labeled = disambiguateDuplicateSiteLabels(
+        new Map(sites.map((s) => [s.businessId, baseSiteLabel(s.siteLabel)])),
+      );
+      for (const s of sites) {
+        s.siteLabel = labeled.get(s.businessId) ?? s.siteLabel;
+      }
+      sites.sort((a, b) => a.siteLabel.localeCompare(b.siteLabel));
 
       res.json({ workerId, sites });
     } catch (error) {

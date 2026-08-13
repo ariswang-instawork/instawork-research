@@ -9,10 +9,16 @@ export const LIFETIME_CAP_BY_BUSINESS_ID: Readonly<Record<number, number>> = {
   201172: 1, // NYC
 };
 
-/** When Mode site_label is just the city, disambiguate multi-site cities by business_id. */
+/**
+ * Stable (1)/(2) suffixes for multi-site cities. Applied only when 2+ sites with
+ * the same city/state label are present in the list being shown — a lone site
+ * stays unnumbered (e.g. one Philadelphia filled → the other is just "Philadelphia, PA").
+ */
 export const SITE_SUFFIX_BY_BUSINESS_ID: Readonly<Record<number, string>> = {
   372868: "1", // Philadelphia 1
   353952: "2", // Philadelphia 2
+  201172: "1", // New York 1
+  365082: "2", // New York 2
 };
 
 /** NYC sites: one visit via self-serve booking; additional visits by team invitation. */

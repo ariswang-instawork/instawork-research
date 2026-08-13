@@ -8,6 +8,7 @@ import {
   formatEligibilitySiteLabel,
   disambiguateDuplicateSiteLabels,
   getSiteLabelsByBusinessId,
+  baseSiteLabel,
 } from "./serving";
 
 const base = {
@@ -47,21 +48,21 @@ describe("formatEligibilitySiteLabel", () => {
     ).toBe("Boston, MA");
   });
 
-  it("shows numbered location codenames as City, ST (n)", () => {
+  it("strips Mode numbered codenames to a base city/state (numbering is later)", () => {
     expect(
       formatEligibilitySiteLabel({
         siteLabel: "Philadelphia 1",
         city: "Philadelphia",
         stateCode: "PA",
       }),
-    ).toBe("Philadelphia, PA (1)");
+    ).toBe("Philadelphia, PA");
     expect(
       formatEligibilitySiteLabel({
         siteLabel: "Philadelphia 2",
         city: "Philadelphia",
         stateCode: "PA",
       }),
-    ).toBe("Philadelphia, PA (2)");
+    ).toBe("Philadelphia, PA");
     expect(
       formatEligibilitySiteLabel(
         {
@@ -71,19 +72,22 @@ describe("formatEligibilitySiteLabel", () => {
         },
         372868,
       ),
-    ).toBe("Philadelphia, PA (1)");
+    ).toBe("Philadelphia, PA");
+  });
+
+  it("does not number a site from business id alone", () => {
     expect(
       formatEligibilitySiteLabel(
         { siteLabel: "Philadelphia", city: "Philadelphia", stateCode: "PA" },
         372868,
       ),
-    ).toBe("Philadelphia, PA (1)");
+    ).toBe("Philadelphia, PA");
     expect(
       formatEligibilitySiteLabel(
-        { siteLabel: "Philadelphia", city: "Philadelphia", stateCode: "PA" },
-        353952,
+        { siteLabel: "New York", city: "New York", stateCode: "NY" },
+        201172,
       ),
-    ).toBe("Philadelphia, PA (2)");
+    ).toBe("New York, NY");
   });
 
   it("never uses business or company names as the label", () => {
@@ -99,39 +103,59 @@ describe("formatEligibilitySiteLabel", () => {
 });
 
 describe("getSiteLabelsByBusinessId (production-like: Mode label is just the city)", () => {
-  it("numbers the two Philadelphia sites even when site_label === city", async () => {
+  it("numbers Philadelphia and New York when both sites are present", async () => {
     findMany.mockResolvedValue([
       { businessId: 365079, siteLabel: "Boston", city: "Boston", stateCode: "MA", businessName: "Q.ai", companyName: null },
       { businessId: 372868, siteLabel: "Philadelphia", city: "Philadelphia", stateCode: "PA", businessName: "Q.ai", companyName: null },
       { businessId: 353952, siteLabel: "Philadelphia", city: "Philadelphia", stateCode: "PA", businessName: "Q.ai", companyName: null },
+      { businessId: 201172, siteLabel: "New York", city: "New York", stateCode: "NY", businessName: "Q.ai", companyName: null },
+      { businessId: 365082, siteLabel: "New York", city: "New York", stateCode: "NY", businessName: "Q.ai", companyName: null },
     ]);
     const labels = await getSiteLabelsByBusinessId();
     expect(labels.get(365079)).toBe("Boston, MA");
     expect(labels.get(372868)).toBe("Philadelphia, PA (1)");
     expect(labels.get(353952)).toBe("Philadelphia, PA (2)");
+    expect(labels.get(201172)).toBe("New York, NY (1)");
+    expect(labels.get(365082)).toBe("New York, NY (2)");
+  });
+
+  it("drops (1)/(2) when only one Philadelphia site remains", async () => {
+    findMany.mockResolvedValue([
+      { businessId: 372868, siteLabel: "Philadelphia", city: "Philadelphia", stateCode: "PA", businessName: "Q.ai", companyName: null },
+    ]);
+    const labels = await getSiteLabelsByBusinessId();
+    expect(labels.get(372868)).toBe("Philadelphia, PA");
   });
 });
 
 describe("disambiguateDuplicateSiteLabels", () => {
-  it("numbers duplicate Philadelphia labels using known business ids", () => {
+  it("numbers duplicate Philadelphia and New York labels", () => {
     const map = new Map<number, string>([
       [365079, "Boston, MA"],
       [353952, "Philadelphia, PA"],
       [372868, "Philadelphia, PA"],
+      [365082, "New York, NY"],
+      [201172, "New York, NY"],
     ]);
     const out = disambiguateDuplicateSiteLabels(map);
     expect(out.get(365079)).toBe("Boston, MA");
     expect(out.get(372868)).toBe("Philadelphia, PA (1)");
     expect(out.get(353952)).toBe("Philadelphia, PA (2)");
+    expect(out.get(201172)).toBe("New York, NY (1)");
+    expect(out.get(365082)).toBe("New York, NY (2)");
   });
 
-  it("does NOT number other duplicate cities (e.g. New York)", () => {
+  it("strips numbering when only one site for a city remains", () => {
     const map = new Map<number, string>([
-      [365082, "New York, NY"],
-      [201172, "New York, NY"],
+      [372868, "Philadelphia, PA (1)"],
+      [201172, "New York, NY (1)"],
+      [365082, "New York, NY (2)"],
     ]);
-    const out = disambiguateDuplicateSiteLabels(map);
-    expect(out.get(365082)).toBe("New York, NY");
-    expect(out.get(201172)).toBe("New York, NY");
+    const out = disambiguateDuplicateSiteLabels(
+      new Map([...map].map(([id, label]) => [id, baseSiteLabel(label)])),
+    );
+    expect(out.get(372868)).toBe("Philadelphia, PA");
+    expect(out.get(201172)).toBe("New York, NY (1)");
+    expect(out.get(365082)).toBe("New York, NY (2)");
   });
 });

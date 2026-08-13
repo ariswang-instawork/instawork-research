@@ -85,9 +85,15 @@ function formatTimeRange(row: ShiftGroup): string {
   return start || end || "";
 }
 
+/** Strip a trailing " (1)" / " (2)" disambiguator from a site label. */
+export function baseSiteLabel(label: string): string {
+  return label.replace(/\s*\(\d+\)$/, "").trim();
+}
+
 /**
- * Location-facing site name for My sessions (e.g. "Boston, MA", "Philadelphia, PA (1)").
- * Uses city/state and location codenames — never business or company names.
+ * Location-facing site name for My sessions (e.g. "Boston, MA", "Philadelphia, PA").
+ * Uses city/state — never business or company names. Does not append (1)/(2);
+ * call disambiguateDuplicateSiteLabels when 2+ sites share a label.
  */
 export function formatEligibilitySiteLabel(
   row: {
@@ -97,7 +103,7 @@ export function formatEligibilitySiteLabel(
     businessName?: string | null;
     companyName?: string | null;
   },
-  businessId?: number,
+  _businessId?: number,
 ): string {
   let siteLabel = sanitizeLabel(row.siteLabel ?? "").trim();
   const city = sanitizeLabel(row.city ?? "").trim();
@@ -109,18 +115,16 @@ export function formatEligibilitySiteLabel(
     siteLabel = "";
   }
 
+  // Mode sometimes sends "Philadelphia 1" — treat as the city; numbering is
+  // applied later only when another site shares the same city/state label.
   if (siteLabel && city) {
     const numberedPrefix = siteLabel.match(
       new RegExp(`^${city.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s+(\\d+)\\b`, "i"),
     );
-    if (numberedPrefix && stateCode) {
-      return `${city}, ${stateCode} (${numberedPrefix[1]})`;
+    if (numberedPrefix) {
+      if (city && stateCode) return `${city}, ${stateCode}`;
+      if (city) return city;
     }
-  }
-
-  const mappedSuffix = businessId != null ? SITE_SUFFIX_BY_BUSINESS_ID[businessId] : undefined;
-  if (mappedSuffix && city && stateCode) {
-    return `${city}, ${stateCode} (${mappedSuffix})`;
   }
 
   if (siteLabel && city && siteLabel.toLowerCase() !== city.toLowerCase()) {
@@ -129,6 +133,11 @@ export function formatEligibilitySiteLabel(
     );
     if (suffixMatch) {
       const suffix = suffixMatch[1].trim();
+      // Numeric suffixes are reserved for multi-site disambiguation.
+      if (/^\d+$/.test(suffix)) {
+        if (city && stateCode) return `${city}, ${stateCode}`;
+        if (city) return city;
+      }
       if (city && stateCode) return `${city}, ${stateCode} (${suffix})`;
       if (city) return `${city} (${suffix})`;
     }
@@ -142,24 +151,28 @@ export function formatEligibilitySiteLabel(
 }
 
 /**
- * If two businesses share the same city/state label, append a number only for
- * sites with an explicit mapping (currently the two Philadelphia locations).
- * Other cities that happen to share a label (e.g. two New York business ids)
- * are left unchanged — we only number where product has asked for it.
+ * When 2+ businesses share the same city/state label, append (1)/(2) using
+ * SITE_SUFFIX_BY_BUSINESS_ID (or sorted business id as fallback). A lone site
+ * for a city stays unnumbered — including when a sibling site is filled/absent.
  */
 export function disambiguateDuplicateSiteLabels(map: Map<number, string>): Map<number, string> {
   const byLabel = new Map<string, number[]>();
   for (const [id, label] of map) {
-    const list = byLabel.get(label);
+    const base = baseSiteLabel(label);
+    const list = byLabel.get(base);
     if (list) list.push(id);
-    else byLabel.set(label, [id]);
+    else byLabel.set(base, [id]);
   }
-  for (const [label, ids] of byLabel) {
-    if (ids.length < 2) continue;
-    if (/\(\d+\)$/.test(label)) continue;
-    for (const id of ids) {
-      const suffix = SITE_SUFFIX_BY_BUSINESS_ID[id];
-      if (suffix) map.set(id, `${label} (${suffix})`);
+  for (const [base, ids] of byLabel) {
+    if (ids.length < 2) {
+      for (const id of ids) map.set(id, base);
+      continue;
+    }
+    const sorted = ids.slice().sort((a, b) => a - b);
+    for (const id of sorted) {
+      const mapped = SITE_SUFFIX_BY_BUSINESS_ID[id];
+      const suffix = mapped ?? String(sorted.indexOf(id) + 1);
+      map.set(id, `${base} (${suffix})`);
     }
   }
   return map;
