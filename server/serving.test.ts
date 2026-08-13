@@ -42,14 +42,21 @@ describe("formatEligibilitySiteLabel", () => {
     ).toBe("Boston, MA");
   });
 
-  it("shows location codename and state when site differs from city", () => {
+  it("shows numbered location codenames as City, ST (n)", () => {
     expect(
       formatEligibilitySiteLabel({
         siteLabel: "Philadelphia 1",
         city: "Philadelphia",
         stateCode: "PA",
       }),
-    ).toBe("Philadelphia 1, PA");
+    ).toBe("Philadelphia, PA (1)");
+    expect(
+      formatEligibilitySiteLabel({
+        siteLabel: "Philadelphia 2",
+        city: "Philadelphia",
+        stateCode: "PA",
+      }),
+    ).toBe("Philadelphia, PA (2)");
   });
 
   it("never uses business or company names as the label", () => {

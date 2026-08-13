@@ -85,7 +85,7 @@ function formatTimeRange(row: ShiftGroup): string {
 }
 
 /**
- * Location-facing site name for My sessions (e.g. "Boston, MA", "Philadelphia 1, PA").
+ * Location-facing site name for My sessions (e.g. "Boston, MA", "Philadelphia, PA (1)").
  * Uses city/state and location codenames — never business or company names.
  */
 export function formatEligibilitySiteLabel(row: {
@@ -106,6 +106,14 @@ export function formatEligibilitySiteLabel(row: {
   }
 
   if (siteLabel && city && siteLabel.toLowerCase() !== city.toLowerCase()) {
+    const suffixMatch = siteLabel.match(
+      new RegExp(`^${city.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s+(.+)$`, "i"),
+    );
+    if (suffixMatch) {
+      const suffix = suffixMatch[1].trim();
+      if (city && stateCode) return `${city}, ${stateCode} (${suffix})`;
+      if (city) return `${city} (${suffix})`;
+    }
     return stateCode ? `${siteLabel}, ${stateCode}` : siteLabel;
   }
 
