@@ -283,12 +283,7 @@ export default function Landing() {
         <section className="bg-background pb-4">
           <div className="max-w-[1200px] mx-auto px-5 md:px-12">
             <div className="max-w-[640px] mx-auto text-center">
-              <p className="text-[16px] leading-[1.6] text-[#576270]">
-                A research session is a paid, in-person appointment where you read short voice
-                prompts out loud to help improve AI. No experience needed — you'll get simple
-                instructions on site.
-              </p>
-              <div className="mt-5 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[14px] font-medium text-[#11243e]">
+              <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[14px] font-medium text-[#11243e]">
                 <span className="inline-flex items-center gap-1.5">
                   <DollarSign className="w-4 h-4 text-[#3351E6]" strokeWidth={2} />
                   Paid via Instawork
