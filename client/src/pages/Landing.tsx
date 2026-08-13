@@ -186,15 +186,15 @@ export default function Landing() {
       <main className="flex-1 overflow-y-auto w-full pb-16">
         {/* ============ HERO ============ */}
         <div className="bg-background">
-        <div className="max-w-md mx-auto px-5 md:px-6 pt-10 md:pt-16 pb-8">
-          <div className="text-center animate-in fade-in slide-in-from-bottom-3 duration-500">
+        <div className="max-w-[1200px] mx-auto px-5 md:px-12 pt-10 md:pt-16 pb-8">
+          <div className="max-w-[640px] mx-auto text-center animate-in fade-in slide-in-from-bottom-3 duration-500">
             <p className="text-[13px] font-bold uppercase tracking-wide text-[#3351E6] mb-3">
               Instawork Research
             </p>
-            <h1 className="text-[32px] md:text-[40px] leading-[1.1] font-extrabold tracking-[-0.03em] text-[#11243e]">
+            <h1 className="text-[28px] md:text-[36px] lg:text-[42px] leading-[1.15] font-bold tracking-tight text-[#11243e]">
               Get paid for reading <span className="text-emphasis">short voice prompts</span>
             </h1>
-            <p className="text-[17px] leading-[1.5] text-[#576270] mt-4">
+            <p className="text-[16px] leading-[1.5] text-[#576270] mt-4">
               Complete a 3-hour recording session at a nearby location.
             </p>
 
@@ -221,7 +221,7 @@ export default function Landing() {
               type="button"
               onClick={handleFindSessions}
               disabled={isLocationExcluded(site?.label ?? null)}
-              className={`mt-4 w-full h-[54px] rounded-[8px] text-white text-[16px] font-semibold transition-[transform,filter] duration-150 ${
+              className={`mt-4 w-full h-[54px] rounded-[8px] text-white text-[17px] font-semibold transition-[transform,filter] duration-150 ${
                 isLocationExcluded(site?.label ?? null)
                   ? "bg-gray-400 opacity-50 cursor-not-allowed"
                   : "bg-cta-gradient hover:brightness-105 active:scale-[0.99] active:brightness-95"
@@ -230,7 +230,7 @@ export default function Landing() {
               Find sessions near me
             </button>
 
-            <p className="text-[14px] text-[#576270] mt-4">
+            <p className="text-[16px] text-[#576270] mt-4">
               Already booked with us?{" "}
               <button
                 type="button"
@@ -249,10 +249,10 @@ export default function Landing() {
         <section
           id="sessions"
           ref={sessionsRef}
-          className="scroll-mt-20 bg-[#FCFBF9] py-10 md:py-12"
+          className="scroll-mt-20 bg-[#FCFBF9] py-14 md:py-20 lg:py-24"
         >
-          <div className="max-w-md mx-auto px-5 md:px-6">
-            <h2 className="text-[22px] md:text-[26px] leading-[1.2] font-bold tracking-tight text-[#11243e]">
+          <div className="max-w-[1200px] mx-auto px-5 md:px-12">
+            <h2 className="text-[28px] md:text-[36px] lg:text-[42px] leading-[1.15] font-bold tracking-tight text-[#11243e]">
               {hasCity ? `Available sessions near ${site!.label}` : "Available sessions"}
             </h2>
             <p className="text-[16px] text-[#576270] mt-1.5">
@@ -271,13 +271,13 @@ export default function Landing() {
             <div className="mt-7">
               {!hasCity ? (
                 <div className="py-8 text-center max-w-[480px] mx-auto">
-                  <p className="text-[17px] font-semibold text-[#11243e]">
+                  <p className="text-[17px] md:text-[18px] font-semibold text-[#11243e]">
                     Enter your city to see sessions near you.
                   </p>
                   <button
                     type="button"
                     onClick={openPicker}
-                    className="mt-4 inline-flex items-center justify-center h-12 px-6 rounded-[8px] border border-[#3351E6] text-[#3351E6] font-semibold text-[15px] active:opacity-80"
+                    className="mt-4 inline-flex items-center justify-center h-12 px-6 rounded-[8px] border border-[#3351E6] text-[#3351E6] font-semibold text-[16px] active:opacity-80"
                   >
                     Enter your city
                   </button>
@@ -290,14 +290,14 @@ export default function Landing() {
                 </div>
               ) : sessions.length === 0 ? (
                 <div className="py-8 text-center max-w-[480px] mx-auto">
-                  <p className="text-[17px] font-semibold text-[#11243e]">
+                  <p className="text-[17px] md:text-[18px] font-semibold text-[#11243e]">
                     No sessions are currently open near this location.
                   </p>
                   <div className="mt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
                     <button
                       type="button"
                       onClick={openPicker}
-                      className="inline-flex items-center justify-center h-12 px-6 rounded-[8px] border border-[#3351E6] text-[#3351E6] font-semibold text-[15px] active:opacity-80"
+                      className="inline-flex items-center justify-center h-12 px-6 rounded-[8px] border border-[#3351E6] text-[#3351E6] font-semibold text-[16px] active:opacity-80"
                     >
                       Change location
                     </button>
@@ -307,7 +307,7 @@ export default function Landing() {
                         onClick={() =>
                           handleSiteSelected(closestOpenMarket.key, closestOpenMarket.label)
                         }
-                        className="inline-flex items-center justify-center h-12 px-6 rounded-[8px] border border-[#3351E6] text-[#3351E6] font-semibold text-[15px] active:opacity-80"
+                        className="inline-flex items-center justify-center h-12 px-6 rounded-[8px] border border-[#3351E6] text-[#3351E6] font-semibold text-[16px] active:opacity-80"
                       >
                         View sessions in {closestOpenMarket.label}
                       </button>
@@ -336,7 +336,7 @@ export default function Landing() {
                             ...utmProps(),
                           });
                         }}
-                        className="inline-flex items-center justify-center min-h-[48px] px-6 rounded-[8px] border border-[#E0DCCF] bg-white text-[#11243e] font-semibold text-[15px] active:opacity-80"
+                        className="inline-flex items-center justify-center min-h-[48px] px-6 rounded-[8px] border border-[#E0DCCF] bg-white text-[#11243e] font-semibold text-[16px] active:opacity-80"
                       >
                         View more sessions ({hiddenCount})
                       </button>
