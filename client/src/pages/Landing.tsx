@@ -239,16 +239,17 @@ export default function Landing() {
               Find sessions near me
             </button>
 
-            <p className="text-[16px] text-[#576270] mt-4">
-              Already booked with us?{" "}
-              <button
-                type="button"
-                onClick={handleReturningPath}
-                className="text-[#3351E6] underline underline-offset-2 font-medium"
-              >
-                See my sessions
-              </button>
-            </p>
+            {!isAuthenticated && (
+              <p className="text-[16px] mt-4">
+                <button
+                  type="button"
+                  onClick={handleReturningPath}
+                  className="text-[#3351E6] underline underline-offset-2 font-medium"
+                >
+                  Log in to see your sessions
+                </button>
+              </p>
+            )}
           </div>
         </div>
         </div>

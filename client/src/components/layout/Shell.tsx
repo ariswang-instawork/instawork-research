@@ -120,9 +120,11 @@ export function Shell({ children }: { children: ReactNode }) {
 
             {/* Desktop nav */}
             <nav className="hidden md:flex items-center gap-6" aria-label="Main">
-              <button type="button" onClick={goMySessions} className={navLink}>
-                My sessions
-              </button>
+              {isAuthenticated && (
+                <button type="button" onClick={goMySessions} className={navLink}>
+                  My sessions
+                </button>
+              )}
               <button type="button" onClick={handleAuthClick} className={navLink}>
                 {isAuthenticated ? "Log out" : "Log in"}
               </button>
@@ -191,7 +193,9 @@ export function Shell({ children }: { children: ReactNode }) {
                   {[
                     { label: "Find sessions", action: findSessions },
                     { label: "Locations", action: () => go("/") },
-                    { label: "My sessions", action: goMySessions },
+                    ...(isAuthenticated
+                      ? [{ label: "My sessions", action: goMySessions }]
+                      : []),
                   ].map(({ label, action }) => (
                     <button
                       key={label}
