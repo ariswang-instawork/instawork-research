@@ -1,7 +1,8 @@
 import { useEffect } from "react";
-import { Link, useRoute, useLocation } from "wouter";
+import { useRoute, useLocation } from "wouter";
 import { SessionLimitPolicyNotice } from "@/components/EligibilityPanel";
 import { SessionCalendar } from "@/components/SessionCalendar";
+import { BackLink } from "@/components/BackLink";
 import {
   useAuthStatus,
   useEligibility,
@@ -57,12 +58,7 @@ export default function MySessionsSite() {
       <main className="flex-1 overflow-y-auto py-14 md:py-20 lg:py-24">
         <div className="max-w-[1200px] mx-auto px-5 md:px-12 w-full animate-in fade-in slide-in-from-bottom-3 duration-500">
           <div className="max-w-[720px]">
-            <Link
-              href="/my-sessions"
-              className="inline-flex items-center text-[15px] font-medium text-[#576270] hover:text-[#11243e] transition-colors mb-6"
-            >
-              My sessions
-            </Link>
+            <BackLink href="/my-sessions" label="My sessions" />
 
             {businessId == null ? (
               <NotFound />
@@ -134,12 +130,7 @@ function NotFound() {
       <p className="text-[16px] text-[#576270] mt-1.5">
         This location isn't available right now.
       </p>
-      <Link
-        href="/my-sessions"
-        className="inline-flex mt-4 text-[16px] font-semibold text-[#3351E6] underline underline-offset-2"
-      >
-        Back to my sessions
-      </Link>
+      <BackLink href="/my-sessions" label="Back to my sessions" className="mt-4 mb-0" />
     </div>
   );
 }

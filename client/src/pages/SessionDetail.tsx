@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { ArrowLeft, Calendar, CreditCard, Info, MapPin, Mic } from "lucide-react";
-import { Link, useRoute } from "wouter";
+import { Calendar, CreditCard, Info, MapPin, Mic } from "lucide-react";
+import { useRoute, Link } from "wouter";
+import { BackLink } from "@/components/BackLink";
 import { useGetSessionById, getGetSessionByIdQueryKey } from "@/lib/api-client";
 import { useAuthStatus } from "@/hooks/use-auth";
 import { useSiteStorage } from "@/hooks/use-site";
@@ -68,13 +69,7 @@ export default function SessionDetail() {
     <div className="flex-1 flex flex-col bg-[#FCFBF9]">
       <main className="flex-1 overflow-y-auto">
         <div className="max-w-[720px] mx-auto px-5 md:px-8 pt-10 md:pt-14 pb-40 w-full animate-in fade-in slide-in-from-bottom-3 duration-500">
-          <Link
-            href="/"
-            className="inline-flex items-center text-[15px] font-medium text-[#576270] hover:text-[#11243e] transition-colors mb-6"
-          >
-            <ArrowLeft className="w-4 h-4 mr-1.5" />
-            Sessions
-          </Link>
+          <BackLink href="/" label="Sessions" />
 
           {/* Header — title + location, estimated-pay pill beneath. */}
           <h1 className="text-[28px] md:text-[36px] lg:text-[42px] leading-[1.15] font-bold tracking-tight text-[#11243e]">

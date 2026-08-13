@@ -1,6 +1,6 @@
 import { useEffect } from "react";
-import { Link } from "wouter";
-import { ArrowLeft, Check } from "lucide-react";
+import { BackLink } from "@/components/BackLink";
+import { Check } from "lucide-react";
 import { trackEvent } from "@/lib/analytics";
 
 const APP_BENEFITS = [
@@ -22,9 +22,7 @@ export default function GetApp() {
     <div className="flex-1 flex flex-col bg-background">
       <main className="flex-1 overflow-y-auto w-full">
         <div className="max-w-[640px] mx-auto px-5 md:px-12 pt-5 md:pt-10 pb-20 animate-in fade-in slide-in-from-bottom-3 duration-500">
-          <Link href="/" className="inline-flex items-center mb-8 -ml-1">
-            <ArrowLeft className="w-5 h-5 text-foreground" />
-          </Link>
+          <BackLink href="/" />
 
           <div className="text-center mb-12">
             <h1 className="text-[28px] md:text-[36px] lg:text-[42px] leading-[1.15] font-bold tracking-tight text-[#11243e] mb-4">
