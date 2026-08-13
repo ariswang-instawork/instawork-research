@@ -4,6 +4,7 @@ import { useSiteStorage, type SiteOrigin } from "@/hooks/use-site";
 import { LocationSelector } from "@/components/LocationSelector";
 import { SessionCard } from "@/components/SessionCard";
 import { useGetSessions, getGetSessionsQueryKey, useGetSites } from "@/lib/api-client";
+import { useAuthStatus } from "@/hooks/use-auth";
 import type { SessionItem as Session } from "@/lib/api-client/generated/api.schemas";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SiteLeafletMap } from "@/components/SiteLeafletMap";
@@ -73,6 +74,9 @@ export default function Landing() {
   const sessionsRef = useRef<HTMLDivElement | null>(null);
   const [showAll, setShowAll] = useState(false);
   const [sessionsRevealed, setSessionsRevealed] = useState(false);
+
+  const { data: auth } = useAuthStatus();
+  const isAuthenticated = !!auth?.authenticated;
 
   const hasCity = !!site;
 
@@ -153,7 +157,12 @@ export default function Landing() {
 
   const handleReturningPath = () => {
     trackEvent("returning_user_path_clicked", { selected_city: site?.label ?? null, ...utmProps() });
-    setLocation("/my-sessions");
+    if (isAuthenticated) setLocation("/my-sessions");
+    else {
+      window.dispatchEvent(
+        new CustomEvent("iw:login-required", { detail: { returnTo: "/my-sessions" } }),
+      );
+    }
   };
 
   // Picking a city updates the selection and resets choice.

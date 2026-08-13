@@ -1,20 +1,20 @@
 import { useEffect } from "react";
 import { ArrowLeft } from "lucide-react";
-import { Link, useRoute } from "wouter";
-import { Button } from "@/components/ui/button";
+import { Link, useRoute, useLocation } from "wouter";
 import { SessionLimitPolicyNotice } from "@/components/EligibilityPanel";
 import {
   useAuthStatus,
   useEligibility,
   useEligibilitySessions,
-  login,
 } from "@/hooks/use-auth";
 import { trackEvent } from "@/lib/analytics";
 
 export default function MySessionsSite() {
   const [, params] = useRoute("/my-sessions/:businessId");
+  const [, setLocation] = useLocation();
   const raw = params?.businessId ?? "";
   const businessId = /^\d+$/.test(raw) ? Number(raw) : null;
+  const returnTo = businessId != null ? `/my-sessions/${businessId}` : "/my-sessions";
 
   useEffect(() => {
     if (businessId != null) {
@@ -24,6 +24,15 @@ export default function MySessionsSite() {
 
   const { data: auth, isLoading: authLoading } = useAuthStatus();
   const isAuthenticated = !!auth?.authenticated;
+
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      setLocation("/");
+      window.dispatchEvent(
+        new CustomEvent("iw:login-required", { detail: { returnTo } }),
+      );
+    }
+  }, [authLoading, isAuthenticated, returnTo, setLocation]);
   const eligibility = useEligibility(isAuthenticated && businessId != null);
   const site = eligibility.data?.sites.find((s) => s.businessId === businessId);
   const sessionsQuery = useEligibilitySessions(
@@ -46,24 +55,11 @@ export default function MySessionsSite() {
 
           {businessId == null ? (
             <NotFound />
-          ) : authLoading ? (
+          ) : authLoading || !isAuthenticated ? (
             <div className="space-y-3">
               <div className="h-8 w-2/3 rounded-xl bg-muted animate-pulse" />
               <div className="h-14 rounded-xl bg-muted animate-pulse" />
               <div className="h-14 rounded-xl bg-muted animate-pulse" />
-            </div>
-          ) : !isAuthenticated ? (
-            <div className="rounded-[12px] border border-[hsl(var(--border))] bg-white p-6 text-center">
-              <p className="text-[17px] font-bold text-gray-900">Log in to see your sessions</p>
-              <p className="text-sm text-muted-foreground mt-1.5 leading-relaxed">
-                Log in with your Instawork account to see how many sessions you can still book.
-              </p>
-              <Button
-                className="w-full h-12 rounded-[8px] font-bold bg-cta-gradient hover:brightness-105 active:brightness-95 shadow-none mt-5"
-                onClick={login}
-              >
-                Log in with Instawork
-              </Button>
             </div>
           ) : eligibility.isLoading ? (
             <div className="space-y-3">

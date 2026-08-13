@@ -77,11 +77,12 @@ export function useEligibilitySessions(businessId: number | null, enabled: boole
 }
 
 /** Kick off the Instawork OAuth flow, remembering where the user was. */
-export function login() {
+export function login(returnTo?: string) {
   try {
     sessionStorage.setItem(
       RETURN_TO_KEY,
-      window.location.pathname + window.location.search + window.location.hash,
+      returnTo ??
+        window.location.pathname + window.location.search + window.location.hash,
     );
   } catch {
     /* storage unavailable — worst case the user lands on home */

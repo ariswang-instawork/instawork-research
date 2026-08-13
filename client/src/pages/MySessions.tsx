@@ -1,13 +1,31 @@
 import { useEffect } from "react";
 import { ArrowLeft } from "lucide-react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { EligibilityPanel } from "@/components/EligibilityPanel";
+import { useAuthStatus } from "@/hooks/use-auth";
 import { trackEvent } from "@/lib/analytics";
 
 export default function MySessions() {
+  const [, setLocation] = useLocation();
+  const { data: auth, isLoading: authLoading } = useAuthStatus();
+  const isAuthenticated = !!auth?.authenticated;
+
   useEffect(() => {
     trackEvent("my_sessions_page_viewed", {});
   }, []);
+
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      setLocation("/");
+      window.dispatchEvent(
+        new CustomEvent("iw:login-required", { detail: { returnTo: "/my-sessions" } }),
+      );
+    }
+  }, [authLoading, isAuthenticated, setLocation]);
+
+  if (authLoading || !isAuthenticated) {
+    return null;
+  }
 
   return (
     <div className="flex-1 flex flex-col bg-background">

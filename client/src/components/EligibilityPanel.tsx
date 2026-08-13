@@ -1,11 +1,9 @@
 import { useState } from "react";
 import { Info, ChevronRight } from "lucide-react";
 import { Link } from "wouter";
-import { Button } from "@/components/ui/button";
 import {
   useAuthStatus,
   useEligibility,
-  login,
 } from "@/hooks/use-auth";
 import { trackEvent } from "@/lib/analytics";
 
@@ -31,7 +29,7 @@ export function SessionLimitPolicyNotice() {
 
 /**
  * The eligibility experience with no drawer chrome, for rendering full-page on
- * /my-sessions. Handles auth-loading, logged-out (login prompt), and logged-in
+ * /my-sessions when authenticated. Handles auth-loading and logged-in
  * (Remaining / History tabs) states.
  */
 export function EligibilityPanel() {
@@ -41,28 +39,11 @@ export function EligibilityPanel() {
   const isAuthenticated = !!auth?.authenticated;
   const eligibility = useEligibility(isAuthenticated);
 
-  if (authLoading) {
+  if (authLoading || !isAuthenticated) {
     return (
       <div className="space-y-3">
         <div className="h-14 rounded-xl bg-muted animate-pulse" />
         <div className="h-14 rounded-xl bg-muted animate-pulse" />
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return (
-      <div className="rounded-[12px] border border-[hsl(var(--border))] bg-white p-6 text-center">
-        <p className="text-[17px] font-bold text-gray-900">Log in to see your sessions</p>
-        <p className="text-sm text-muted-foreground mt-1.5 leading-relaxed">
-          Log in with your Instawork account to see how many sessions you can still book.
-        </p>
-        <Button
-          className="w-full h-12 rounded-[8px] font-bold bg-cta-gradient hover:brightness-105 active:brightness-95 shadow-none mt-5"
-          onClick={login}
-        >
-          Log in with Instawork
-        </Button>
       </div>
     );
   }
