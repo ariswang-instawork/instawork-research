@@ -11,6 +11,10 @@ import { SiteLeafletMap } from "@/components/SiteLeafletMap";
 import { trackEvent } from "@/lib/analytics";
 import { EXCLUDED_STATES } from "@/lib/constants";
 
+/** Shared scale for landing page section titles (hero, Available sessions, Explore). */
+const SECTION_HEADING =
+  "text-[32px] md:text-[40px] lg:text-[48px] leading-[1.15] font-bold tracking-tight text-[#11243e]";
+
 /** Check if a location is in an excluded state */
 function isLocationExcluded(label: string | null | undefined): boolean {
   if (!label) return false;
@@ -188,7 +192,7 @@ export default function Landing() {
             <p className="text-[13px] font-bold uppercase tracking-wide text-[#3351E6] mb-3">
               Instawork Research
             </p>
-            <h1 className="text-[28px] md:text-[36px] lg:text-[42px] leading-[1.15] font-bold tracking-tight text-[#11243e]">
+            <h1 className={SECTION_HEADING}>
               Get paid for reading <span className="text-emphasis">short voice prompts</span>
             </h1>
             <p className="text-[16px] leading-[1.5] text-[#576270] mt-4">
@@ -251,7 +255,7 @@ export default function Landing() {
           className="scroll-mt-20 bg-[#FCFBF9] py-14 md:py-20 lg:py-24"
         >
           <div className="max-w-[1200px] mx-auto px-5 md:px-12">
-            <h2 className="text-[28px] md:text-[36px] lg:text-[42px] leading-[1.15] font-bold tracking-tight text-[#11243e]">
+            <h2 className={SECTION_HEADING}>
               {hasCity ? `Available sessions near ${site!.label}` : "Available sessions"}
             </h2>
             <p className="text-[16px] text-[#576270] mt-1.5">
@@ -329,7 +333,7 @@ export default function Landing() {
         {/* ============ EXPLORE OTHER LOCATIONS ============ */}
         <section className="bg-[#FCFBF9] py-14 md:py-20 lg:py-24">
           <div className="max-w-[1200px] mx-auto px-5 md:px-12">
-            <h2 className="text-[28px] md:text-[36px] lg:text-[42px] leading-[1.15] font-bold tracking-tight text-[#11243e]">
+            <h2 className={SECTION_HEADING}>
               Explore other locations
             </h2>
             <p className="text-[16px] text-[#576270] mt-1.5">
