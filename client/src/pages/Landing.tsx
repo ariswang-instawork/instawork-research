@@ -12,9 +12,17 @@ import { TESTIMONIALS, BOOKING_TIPS } from "@/lib/testimonials";
 import { trackEvent } from "@/lib/analytics";
 import { EXCLUDED_STATES } from "@/lib/constants";
 
-/** Shared scale for landing page section titles (hero, Available sessions, Explore). */
+/** Shared scale for landing page section titles. */
 const SECTION_HEADING =
   "text-[32px] md:text-[40px] lg:text-[48px] leading-[1.15] font-bold tracking-tight text-[#11243e]";
+
+/** Hero headline — slightly larger than section titles for hierarchy. */
+const HERO_HEADING =
+  "text-[36px] md:text-[44px] lg:text-[52px] leading-[1.12] font-bold tracking-tight text-[#11243e]";
+
+/** Shared subtitle under headings (hero + sections). */
+const SECTION_SUBTITLE =
+  "text-[18px] md:text-[20px] leading-[1.5] text-[#576270] mt-2";
 
 /** Check if a location is in an excluded state */
 function isLocationExcluded(label: string | null | undefined): boolean {
@@ -219,18 +227,19 @@ export default function Landing() {
         {/* ============ HERO ============ */}
         <div className="bg-background">
         <div className="max-w-[1200px] mx-auto px-5 md:px-12 pt-10 md:pt-16 pb-8">
-          <div className="max-w-[640px] mx-auto text-center animate-in fade-in slide-in-from-bottom-3 duration-500">
+          <div className="max-w-[760px] animate-in fade-in slide-in-from-bottom-3 duration-500">
             <p className="text-[13px] font-bold uppercase tracking-wide text-[#3351E6] mb-3">
               Instawork Research
             </p>
-            <h1 className={SECTION_HEADING}>
-              Get paid for reading <span className="text-emphasis">short voice prompts</span>
+            <h1 className={HERO_HEADING}>
+              Get paid for reading{" "}
+              <span className="text-emphasis">short voice prompts</span>
             </h1>
-            <p className="text-[16px] leading-[1.5] text-[#576270] mt-4">
+            <p className={SECTION_SUBTITLE}>
               Complete a 3-hour recording session at a nearby location.
             </p>
 
-            <div className="mt-8 text-left">
+            <div className="mt-8">
               <LocationSelector
                 label={site?.label ?? null}
                 focusSignal={pickerFocus}
@@ -289,7 +298,7 @@ export default function Landing() {
             <h2 className={SECTION_HEADING}>
               {hasCity ? `Available sessions near ${site!.label}` : "Available sessions"}
             </h2>
-            <p className="text-[16px] text-[#576270] mt-1.5">
+            <p className={SECTION_SUBTITLE}>
               Choose a time and finish booking in Instawork.
               {hasCity && (
                 <button
@@ -367,7 +376,7 @@ export default function Landing() {
             <h2 className={SECTION_HEADING}>
               Pros rate these sessions 5★
             </h2>
-            <p className="text-[16px] text-[#576270] mt-1.5">
+            <p className={SECTION_SUBTITLE}>
               5-star average from Instawork Pros who&apos;ve done a session.
             </p>
           </div>
@@ -381,7 +390,7 @@ export default function Landing() {
               <h2 className={SECTION_HEADING}>
                 What to know before you book
               </h2>
-              <p className="text-[16px] text-[#576270] mt-1.5">
+              <p className={SECTION_SUBTITLE}>
                 Tips from Pros who&apos;ve been there.
               </p>
               <div className="mt-6 grid gap-4 sm:grid-cols-2">
@@ -410,7 +419,7 @@ export default function Landing() {
               <h2 className="text-[32px] md:text-[40px] lg:text-[48px] leading-[1.15] font-bold tracking-tight text-[#11243e]">
                 FAQ
               </h2>
-              <p className="text-[16px] text-[#576270] mt-2">
+              <p className={SECTION_SUBTITLE}>
                 Answers to common questions.
               </p>
               <div className="mt-8 border-t border-[#D0C5B0]">
