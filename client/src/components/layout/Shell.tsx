@@ -1,6 +1,7 @@
 import { ReactNode, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { useAuthStatus, useLogout, login } from "@/hooks/use-auth";
+import { LoginDialog } from "@/components/LoginDialog";
 
 const LOGO_URL = `${import.meta.env.BASE_URL}iw-logo.svg`;
 
@@ -22,7 +23,13 @@ export function Shell({ children }: { children: ReactNode }) {
   // menuOpen drives the open/closed visual state.
   const [menuMounted, setMenuMounted] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [loginOpen, setLoginOpen] = useState(false);
+  const [loginReturnTo, setLoginReturnTo] = useState("/my-sessions");
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const { data: auth } = useAuthStatus();
+  const isAuthenticated = !!auth?.authenticated;
+  const logout = useLogout();
 
   const openMenu = () => {
     if (closeTimer.current) clearTimeout(closeTimer.current);
@@ -54,6 +61,27 @@ export function Shell({ children }: { children: ReactNode }) {
     setLocation(path);
   };
 
+  const openLogin = (returnTo = "/my-sessions") => {
+    closeMenu();
+    setLoginReturnTo(returnTo);
+    setLoginOpen(true);
+  };
+
+  const goMySessions = () => {
+    if (isAuthenticated) go("/my-sessions");
+    else openLogin("/my-sessions");
+  };
+
+  useEffect(() => {
+    const onLoginRequired = (e: Event) => {
+      const detail = (e as CustomEvent<{ returnTo?: string }>).detail;
+      openLogin(detail?.returnTo ?? "/my-sessions");
+    };
+    window.addEventListener("iw:login-required", onLoginRequired);
+    return () => window.removeEventListener("iw:login-required", onLoginRequired);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const findSessions = () => {
     closeMenu();
     setLocation("/");
@@ -61,10 +89,6 @@ export function Shell({ children }: { children: ReactNode }) {
       requestAnimationFrame(() => window.dispatchEvent(new CustomEvent("iw:view-sessions"))),
     );
   };
-
-  const { data: auth } = useAuthStatus();
-  const isAuthenticated = !!auth?.authenticated;
-  const logout = useLogout();
 
   // "Log in" starts the Instawork OAuth flow (returning here afterwards);
   // "Log out" ends the session.
@@ -96,7 +120,7 @@ export function Shell({ children }: { children: ReactNode }) {
 
             {/* Desktop nav */}
             <nav className="hidden md:flex items-center gap-6" aria-label="Main">
-              <button type="button" onClick={() => go("/my-sessions")} className={navLink}>
+              <button type="button" onClick={goMySessions} className={navLink}>
                 My sessions
               </button>
               <button type="button" onClick={handleAuthClick} className={navLink}>
@@ -167,7 +191,7 @@ export function Shell({ children }: { children: ReactNode }) {
                   {[
                     { label: "Find sessions", action: findSessions },
                     { label: "Locations", action: () => go("/") },
-                    { label: "My sessions", action: () => go("/my-sessions") },
+                    { label: "My sessions", action: goMySessions },
                   ].map(({ label, action }) => (
                     <button
                       key={label}
@@ -205,6 +229,12 @@ export function Shell({ children }: { children: ReactNode }) {
         )}
 
         {children}
+
+        <LoginDialog
+          open={loginOpen}
+          onOpenChange={setLoginOpen}
+          returnTo={loginReturnTo}
+        />
       </div>
     </div>
   );
