@@ -9,6 +9,12 @@ export const LIFETIME_CAP_BY_BUSINESS_ID: Readonly<Record<number, number>> = {
   201172: 1, // NYC
 };
 
+/** When Mode site_label is just the city, disambiguate multi-site cities by business_id. */
+export const SITE_SUFFIX_BY_BUSINESS_ID: Readonly<Record<number, string>> = {
+  372868: "1", // Philadelphia 1
+  353952: "2", // Philadelphia 2
+};
+
 /** NYC sites: one visit via self-serve booking; additional visits by team invitation. */
 export const ONE_VISIT_LIMIT_BUSINESS_IDS = new Set<number>([365082, 201172]);
 

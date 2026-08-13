@@ -57,6 +57,28 @@ describe("formatEligibilitySiteLabel", () => {
         stateCode: "PA",
       }),
     ).toBe("Philadelphia, PA (2)");
+    expect(
+      formatEligibilitySiteLabel(
+        {
+          siteLabel: "Philadelphia 1, Philadelphia, PA",
+          city: "Philadelphia",
+          stateCode: "PA",
+        },
+        372868,
+      ),
+    ).toBe("Philadelphia, PA (1)");
+    expect(
+      formatEligibilitySiteLabel(
+        { siteLabel: "Philadelphia", city: "Philadelphia", stateCode: "PA" },
+        372868,
+      ),
+    ).toBe("Philadelphia, PA (1)");
+    expect(
+      formatEligibilitySiteLabel(
+        { siteLabel: "Philadelphia", city: "Philadelphia", stateCode: "PA" },
+        353952,
+      ),
+    ).toBe("Philadelphia, PA (2)");
   });
 
   it("never uses business or company names as the label", () => {

@@ -1,5 +1,6 @@
 import type { ShiftGroup } from "@prisma/client";
 import { prisma } from "./db";
+import { SITE_SUFFIX_BY_BUSINESS_ID } from "./siteCaps";
 
 // --- Sanitization: strip internal codenames / partner names from UI-bound strings ---
 const BANNED_PATTERNS: RegExp[] = [
@@ -88,13 +89,16 @@ function formatTimeRange(row: ShiftGroup): string {
  * Location-facing site name for My sessions (e.g. "Boston, MA", "Philadelphia, PA (1)").
  * Uses city/state and location codenames — never business or company names.
  */
-export function formatEligibilitySiteLabel(row: {
-  siteLabel?: string | null;
-  city?: string | null;
-  stateCode?: string | null;
-  businessName?: string | null;
-  companyName?: string | null;
-}): string {
+export function formatEligibilitySiteLabel(
+  row: {
+    siteLabel?: string | null;
+    city?: string | null;
+    stateCode?: string | null;
+    businessName?: string | null;
+    companyName?: string | null;
+  },
+  businessId?: number,
+): string {
   let siteLabel = sanitizeLabel(row.siteLabel ?? "").trim();
   const city = sanitizeLabel(row.city ?? "").trim();
   const stateCode = sanitizeLabel(row.stateCode ?? "").trim();
@@ -103,6 +107,20 @@ export function formatEligibilitySiteLabel(row: {
 
   if (siteLabel && (siteLabel === businessName || siteLabel === companyName)) {
     siteLabel = "";
+  }
+
+  if (siteLabel && city) {
+    const numberedPrefix = siteLabel.match(
+      new RegExp(`^${city.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s+(\\d+)\\b`, "i"),
+    );
+    if (numberedPrefix && stateCode) {
+      return `${city}, ${stateCode} (${numberedPrefix[1]})`;
+    }
+  }
+
+  const mappedSuffix = businessId != null ? SITE_SUFFIX_BY_BUSINESS_ID[businessId] : undefined;
+  if (mappedSuffix && city && stateCode) {
+    return `${city}, ${stateCode} (${mappedSuffix})`;
   }
 
   if (siteLabel && city && siteLabel.toLowerCase() !== city.toLowerCase()) {
@@ -139,7 +157,7 @@ export async function getSiteLabelsByBusinessId(): Promise<Map<number, string>> 
   const map = new Map<number, string>();
   for (const row of rows) {
     if (row.businessId == null || map.has(row.businessId)) continue;
-    map.set(row.businessId, formatEligibilitySiteLabel(row));
+    map.set(row.businessId, formatEligibilitySiteLabel(row, row.businessId));
   }
   return map;
 }
