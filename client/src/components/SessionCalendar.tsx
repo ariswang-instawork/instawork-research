@@ -53,7 +53,7 @@ export function SessionCalendar({
   const [selectedDate, setSelectedDate] = useState<string | null>(firstDate);
 
   if (sortedDates.length === 0) {
-    return <p className="text-[15px] md:text-[16px] text-[#576270]">No open shifts right now.</p>;
+    return <p className="text-[18px] md:text-[20px] leading-[1.5] text-[#576270]">No open shifts right now.</p>;
   }
 
   const minKey = firstDate ? monthKey(parseISO(firstDate).year, parseISO(firstDate).month) : null;
@@ -115,7 +115,7 @@ export function SessionCalendar({
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
-          <p className="text-[15px] md:text-[16px] font-semibold text-[#11243e]">{monthLabel}</p>
+          <p className="text-[18px] md:text-[20px] font-bold text-[#11243e]">{monthLabel}</p>
           <button
             type="button"
             onClick={goNext}
@@ -129,7 +129,7 @@ export function SessionCalendar({
 
         <div className="grid grid-cols-7 gap-1 mb-1">
           {WEEKDAY_LABELS.map((label) => (
-            <div key={label} className="text-center text-[12px] font-medium text-[#8A93A0] py-1">
+            <div key={label} className="text-center text-[13px] md:text-[14px] font-medium text-[#8A93A0] py-1">
               {label}
             </div>
           ))}
@@ -146,7 +146,7 @@ export function SessionCalendar({
                 type="button"
                 disabled={!hasSessions}
                 onClick={() => setSelectedDate(cell.dateISO)}
-                className={`aspect-square flex flex-col items-center justify-center rounded-[10px] text-[14px] transition-colors ${
+                className={`aspect-square flex flex-col items-center justify-center rounded-[10px] text-[15px] md:text-[16px] transition-colors ${
                   isSelected
                     ? "bg-[#3351E6]/10 text-[#3351E6] font-bold"
                     : hasSessions
@@ -168,20 +168,22 @@ export function SessionCalendar({
 
       {selectedLabel && (
         <div>
-          <p className="text-[14px] font-medium text-[#8A93A0] mb-2">{selectedLabel}</p>
+          <p className="text-[20px] md:text-[24px] leading-[1.2] font-bold tracking-tight text-[#11243e] mb-3">
+            {selectedLabel}
+          </p>
           {selectedSessions.length === 0 ? (
-            <p className="text-[15px] md:text-[16px] text-[#576270]">No sessions this day.</p>
+            <p className="text-[18px] md:text-[20px] leading-[1.5] text-[#576270]">No sessions this day.</p>
           ) : (
             <div className="rounded-[14px] border border-[#EEE9DD] bg-white overflow-hidden divide-y divide-[#EEE9DD]">
               {selectedSessions.map((s) => (
-                <div key={s.id} className="flex items-center justify-between gap-4 px-5 py-4 md:py-5">
-                  <span className="text-[17px] md:text-[18px] font-semibold text-[#11243e] min-w-0 truncate">
+                <div key={s.id} className="flex items-center justify-between gap-4 px-5 py-4 md:px-6 md:py-5">
+                  <span className="text-[18px] md:text-[20px] font-semibold text-[#11243e] min-w-0 truncate">
                     {s.time}
                   </span>
                   <button
                     type="button"
                     onClick={() => onBook(s)}
-                    className="shrink-0 text-[15px] md:text-[16px] font-semibold text-white bg-cta-gradient rounded-[8px] px-5 py-2.5 hover:brightness-105 active:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3351E6]/40"
+                    className="shrink-0 text-[16px] md:text-[17px] font-semibold text-white bg-cta-gradient rounded-[8px] px-5 py-2.5 hover:brightness-105 active:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3351E6]/40"
                   >
                     {actionLabel}
                   </button>
