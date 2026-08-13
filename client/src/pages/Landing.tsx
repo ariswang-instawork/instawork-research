@@ -241,8 +241,9 @@ export default function Landing() {
               <span className="text-emphasis">short voice prompts</span>
             </h1>
             <p className={HERO_BODY}>
-              Complete a 3-hour recording session at a nearby location. No experience
-              needed — simple instructions on site, paid through Instawork.
+              Complete a 3-hour recording session at a nearby location.
+              <br />
+              No experience needed — simple instructions on site, paid through Instawork.
             </p>
 
             <div className="mt-8 md:mt-10 max-w-[480px]">
