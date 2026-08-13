@@ -18,7 +18,8 @@ function HamburgerIcon({ open }: { open: boolean }) {
 }
 
 export function Shell({ children }: { children: ReactNode }) {
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
+  const isHome = location === "/" || location === "";
   // menuMounted keeps the panel in the DOM during the close animation;
   // menuOpen drives the open/closed visual state.
   const [menuMounted, setMenuMounted] = useState(false);
@@ -120,9 +121,11 @@ export function Shell({ children }: { children: ReactNode }) {
 
             {/* Desktop nav */}
             <nav className="hidden md:flex items-center gap-6" aria-label="Main">
-              <button type="button" onClick={() => go("/")} className={navLink}>
-                Home
-              </button>
+              {!isHome && (
+                <button type="button" onClick={() => go("/")} className={navLink}>
+                  Home
+                </button>
+              )}
               {isAuthenticated && (
                 <button type="button" onClick={goMySessions} className={navLink}>
                   My sessions
