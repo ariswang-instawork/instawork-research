@@ -7,6 +7,7 @@ import {
   getServableRowsForBusiness,
   formatEligibilitySiteLabel,
   disambiguateDuplicateSiteLabels,
+  getSiteLabelsByBusinessId,
 } from "./serving";
 
 const base = {
@@ -94,6 +95,20 @@ describe("formatEligibilitySiteLabel", () => {
         businessName: "Acme Research LLC",
       }),
     ).toBe("New York, NY");
+  });
+});
+
+describe("getSiteLabelsByBusinessId (production-like: Mode label is just the city)", () => {
+  it("numbers the two Philadelphia sites even when site_label === city", async () => {
+    findMany.mockResolvedValue([
+      { businessId: 365079, siteLabel: "Boston", city: "Boston", stateCode: "MA", businessName: "Q.ai", companyName: null },
+      { businessId: 372868, siteLabel: "Philadelphia", city: "Philadelphia", stateCode: "PA", businessName: "Q.ai", companyName: null },
+      { businessId: 353952, siteLabel: "Philadelphia", city: "Philadelphia", stateCode: "PA", businessName: "Q.ai", companyName: null },
+    ]);
+    const labels = await getSiteLabelsByBusinessId();
+    expect(labels.get(365079)).toBe("Boston, MA");
+    expect(labels.get(372868)).toBe("Philadelphia, PA (1)");
+    expect(labels.get(353952)).toBe("Philadelphia, PA (2)");
   });
 });
 
