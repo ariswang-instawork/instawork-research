@@ -7,7 +7,9 @@ import { useGetSessions, getGetSessionsQueryKey, useGetSites } from "@/lib/api-c
 import { useAuthStatus, login } from "@/hooks/use-auth";
 import type { SessionItem as Session } from "@/lib/api-client/generated/api.schemas";
 import { Skeleton } from "@/components/ui/skeleton";
-import { SiteLeafletMap } from "@/components/SiteLeafletMap";
+import { DollarSign, Clock, Mic } from "lucide-react";
+import { TestimonialMarquee } from "@/components/TestimonialMarquee";
+import { TESTIMONIALS, BOOKING_TIPS } from "@/lib/testimonials";
 import { trackEvent } from "@/lib/analytics";
 import { EXCLUDED_STATES } from "@/lib/constants";
 
@@ -74,6 +76,8 @@ export default function Landing() {
   // Incremented to open the location selector.
   const [pickerFocus, setPickerFocus] = useState(0);
   const sessionsRef = useRef<HTMLDivElement | null>(null);
+  const testimonialsRef = useRef<HTMLDivElement | null>(null);
+  const tipsRef = useRef<HTMLDivElement | null>(null);
   const [sessionsRevealed, setSessionsRevealed] = useState(false);
 
   const { data: auth } = useAuthStatus();
@@ -113,6 +117,34 @@ export default function Landing() {
 
   useEffect(() => {
     trackEvent("research_landing_viewed", { selected_city: site?.label ?? null, ...utmProps() });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Fire a "viewed" event the first time the trust sections scroll into view.
+  const siteLabelRef = useRef<string | null>(null);
+  siteLabelRef.current = site?.label ?? null;
+  useEffect(() => {
+    const targets = [
+      [testimonialsRef.current, "testimonials_viewed"] as const,
+      [tipsRef.current, "booking_tips_viewed"] as const,
+    ].filter(([el]) => el);
+    if (targets.length === 0) return;
+    const fired = new Set<string>();
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          const name = (entry.target as HTMLElement).dataset.track;
+          if (entry.isIntersecting && name && !fired.has(name)) {
+            fired.add(name);
+            trackEvent(name, { selected_city: siteLabelRef.current, ...utmProps() });
+            io.unobserve(entry.target);
+          }
+        }
+      },
+      { threshold: 0.3 },
+    );
+    targets.forEach(([el]) => io.observe(el as Element));
+    return () => io.disconnect();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -247,6 +279,33 @@ export default function Landing() {
         </div>
         </div>
 
+        {/* ============ WHAT A SESSION IS (trust intro) ============ */}
+        <section className="bg-background pb-4">
+          <div className="max-w-[1200px] mx-auto px-5 md:px-12">
+            <div className="max-w-[640px] mx-auto text-center">
+              <p className="text-[16px] leading-[1.6] text-[#576270]">
+                A research session is a paid, in-person appointment where you read short voice
+                prompts out loud to help improve AI. No experience needed — you'll get simple
+                instructions on site.
+              </p>
+              <div className="mt-5 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[14px] font-medium text-[#11243e]">
+                <span className="inline-flex items-center gap-1.5">
+                  <DollarSign className="w-4 h-4 text-[#3351E6]" strokeWidth={2} />
+                  Paid via Instawork
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                  <Clock className="w-4 h-4 text-[#3351E6]" strokeWidth={2} />
+                  ~3 hours
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                  <Mic className="w-4 h-4 text-[#3351E6]" strokeWidth={2} />
+                  Simple voice tasks
+                </span>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* ============ SESSIONS (revealed on demand) ============ */}
         {sessionsRevealed && (
         <section
@@ -330,17 +389,44 @@ export default function Landing() {
         </section>
         )}
 
-        {/* ============ EXPLORE OTHER LOCATIONS ============ */}
+        {/* ============ TESTIMONIALS (rolling) ============ */}
         <section className="bg-[#FCFBF9] py-14 md:py-20 lg:py-24">
-          <div className="max-w-[1200px] mx-auto px-5 md:px-12">
+          <div ref={testimonialsRef} data-track="testimonials_viewed" className="max-w-[1200px] mx-auto px-5 md:px-12">
             <h2 className={SECTION_HEADING}>
-              Explore other locations
+              Pros rate these sessions 5★
             </h2>
             <p className="text-[16px] text-[#576270] mt-1.5">
-              Sessions run in cities across the country. Find one near you.
+              5-star average from Instawork Pros who&apos;ve done a session.
             </p>
-            <div className="mt-6 rounded-[16px] overflow-hidden border border-[#EEE9DD]">
-              <SiteLeafletMap />
+          </div>
+          <TestimonialMarquee items={TESTIMONIALS} />
+        </section>
+
+        {/* ============ WHAT TO KNOW BEFORE YOU BOOK (tips) ============ */}
+        <section className="bg-background py-14 md:py-20 lg:py-24">
+          <div ref={tipsRef} data-track="booking_tips_viewed" className="max-w-[1200px] mx-auto px-5 md:px-12">
+            <div className="max-w-[760px]">
+              <h2 className={SECTION_HEADING}>
+                What to know before you book
+              </h2>
+              <p className="text-[16px] text-[#576270] mt-1.5">
+                Tips from Pros who&apos;ve been there.
+              </p>
+              <div className="mt-6 grid gap-4 sm:grid-cols-2">
+                {BOOKING_TIPS.map((t) => (
+                  <div
+                    key={`${t.name}-${t.city}`}
+                    className="rounded-[14px] border border-[#EEE9DD] bg-white px-5 py-4"
+                  >
+                    <p className="text-[15px] md:text-[16px] leading-relaxed text-[#11243e]">
+                      {t.tip}
+                    </p>
+                    <p className="text-[13px] text-[#8A93A0] mt-2.5">
+                      — {t.name} · {t.city}
+                    </p>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </section>
