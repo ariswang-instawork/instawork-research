@@ -240,7 +240,8 @@ export default function Landing() {
             </button>
 
             {!isAuthenticated && (
-              <p className="text-[16px] mt-4">
+              <p className="text-[16px] text-[#576270] mt-4">
+                Already booked with us?{" "}
                 <button
                   type="button"
                   onClick={handleReturningPath}
