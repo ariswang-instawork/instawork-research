@@ -7,7 +7,7 @@ import { registerApiRoutes } from "./apiRoutes";
 import { prisma } from "./db";
 import { resolveInstaworkUser } from "./instaworkUser";
 import { getLifetimeCap, isOneVisitLimitSite } from "./siteCaps";
-import { getServableRows, sanitizeLabel, getServableRowsForBusiness, toPublicSessionItem } from "./serving";
+import { getServableRows, getServableRowsForBusiness, getSiteLabelsByBusinessId, toPublicSessionItem } from "./serving";
 
 const INSTAWORK_BASE_URL = process.env.INSTAWORK_BASE_URL || "http://localhost:8080";
 const INSTAWORK_CLIENT_ID = process.env.INSTAWORK_CLIENT_ID!;
@@ -266,27 +266,19 @@ export async function registerRoutes(
       step = "sites";
       const rows = await getServableRows();
       const bookingByBusiness = new Map(bookings.map((b) => [b.businessId, b]));
+      const labelByBusiness = await getSiteLabelsByBusinessId();
 
-      // Every site currently offering sessions, first row per business wins.
-      const openSites = new Map<number, string>();
+      const openBusinessIds = new Set<number>();
       for (const row of rows) {
-        if (row.businessId == null || openSites.has(row.businessId)) continue;
-        const city = sanitizeLabel(row.city);
-        const stateCode = sanitizeLabel(row.stateCode);
-        const neighborhood = sanitizeLabel(row.siteLabel);
-        const cityLabel = city && stateCode ? `${city}, ${stateCode}` : city;
-        openSites.set(
-          row.businessId,
-          [neighborhood, cityLabel].filter(Boolean).join(", ") || "Session site",
-        );
+        if (row.businessId != null) openBusinessIds.add(row.businessId);
       }
 
       type Booking = (typeof bookings)[number];
-      const toSite = (businessId: number, fallbackLabel: string, b: Booking | undefined) => {
+      const toSite = (businessId: number, b: Booking | undefined) => {
         const cap = b?.cap ?? getLifetimeCap(businessId);
         return {
           businessId,
-          siteLabel: (b && sanitizeLabel(b.siteLabel)) || fallbackLabel,
+          siteLabel: labelByBusiness.get(businessId) ?? "Session site",
           cap,
           remaining: b?.isBlocked ? 0 : Math.max(0, b?.remaining ?? cap),
           completedCount: b?.completedCount ?? 0,
@@ -297,14 +289,14 @@ export async function registerRoutes(
       };
 
       const sites = [
-        ...Array.from(openSites, ([businessId, label]) =>
-          toSite(businessId, label, bookingByBusiness.get(businessId)),
+        ...Array.from(openBusinessIds, (businessId) =>
+          toSite(businessId, bookingByBusiness.get(businessId)),
         ),
         // Sites they have history at but which have no open sessions today —
         // still worth showing, especially when blocked.
         ...bookings
-          .filter((b) => !openSites.has(b.businessId))
-          .map((b) => toSite(b.businessId, "Session site", b)),
+          .filter((b) => !openBusinessIds.has(b.businessId))
+          .map((b) => toSite(b.businessId, b)),
       ].sort((a, b) => a.siteLabel.localeCompare(b.siteLabel));
 
       res.json({ workerId, sites });

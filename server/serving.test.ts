@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 const findMany = vi.fn();
 vi.mock("./db", () => ({ prisma: { shiftGroup: { findMany: (...a: unknown[]) => findMany(...a) } } }));
 
-import { getServableRowsForBusiness } from "./serving";
+import { getServableRowsForBusiness, formatEligibilitySiteLabel } from "./serving";
 
 const base = {
   isOverbookShiftGroup: false,
@@ -32,5 +32,34 @@ describe("getServableRowsForBusiness", () => {
     ]);
     const rows = await getServableRowsForBusiness(100);
     expect(rows.map((r) => r.id)).toEqual([1]);
+  });
+});
+
+describe("formatEligibilitySiteLabel", () => {
+  it("shows city and state for standard sites", () => {
+    expect(
+      formatEligibilitySiteLabel({ siteLabel: "Boston", city: "Boston", stateCode: "MA" }),
+    ).toBe("Boston, MA");
+  });
+
+  it("shows location codename and state when site differs from city", () => {
+    expect(
+      formatEligibilitySiteLabel({
+        siteLabel: "Philadelphia 1",
+        city: "Philadelphia",
+        stateCode: "PA",
+      }),
+    ).toBe("Philadelphia 1, PA");
+  });
+
+  it("never uses business or company names as the label", () => {
+    expect(
+      formatEligibilitySiteLabel({
+        siteLabel: "Acme Research LLC",
+        city: "New York",
+        stateCode: "NY",
+        businessName: "Acme Research LLC",
+      }),
+    ).toBe("New York, NY");
   });
 });

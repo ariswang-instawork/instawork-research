@@ -85,6 +85,58 @@ function formatTimeRange(row: ShiftGroup): string {
 }
 
 /**
+ * Location-facing site name for My sessions (e.g. "Boston, MA", "Philadelphia 1, PA").
+ * Uses city/state and location codenames — never business or company names.
+ */
+export function formatEligibilitySiteLabel(row: {
+  siteLabel?: string | null;
+  city?: string | null;
+  stateCode?: string | null;
+  businessName?: string | null;
+  companyName?: string | null;
+}): string {
+  let siteLabel = sanitizeLabel(row.siteLabel ?? "").trim();
+  const city = sanitizeLabel(row.city ?? "").trim();
+  const stateCode = sanitizeLabel(row.stateCode ?? "").trim();
+  const businessName = sanitizeLabel(row.businessName ?? "").trim();
+  const companyName = sanitizeLabel(row.companyName ?? "").trim();
+
+  if (siteLabel && (siteLabel === businessName || siteLabel === companyName)) {
+    siteLabel = "";
+  }
+
+  if (siteLabel && city && siteLabel.toLowerCase() !== city.toLowerCase()) {
+    return stateCode ? `${siteLabel}, ${stateCode}` : siteLabel;
+  }
+
+  if (city && stateCode) return `${city}, ${stateCode}`;
+  if (city) return city;
+  if (siteLabel) return stateCode ? `${siteLabel}, ${stateCode}` : siteLabel;
+  return "Session site";
+}
+
+/** One display label per business_id from synced shift rows. */
+export async function getSiteLabelsByBusinessId(): Promise<Map<number, string>> {
+  const rows = await prisma.shiftGroup.findMany({
+    select: {
+      businessId: true,
+      siteLabel: true,
+      city: true,
+      stateCode: true,
+      businessName: true,
+      companyName: true,
+    },
+    orderBy: { shiftDate: "asc" },
+  });
+  const map = new Map<number, string>();
+  for (const row of rows) {
+    if (row.businessId == null || map.has(row.businessId)) continue;
+    map.set(row.businessId, formatEligibilitySiteLabel(row));
+  }
+  return map;
+}
+
+/**
  * Derive a short neighborhood/area label from the site label when it adds
  * information beyond the city name. Never exposes company/business names.
  */
