@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, Calendar, CreditCard, Info, MapPin, Mic } from "lucide-react";
 import { Link, useRoute } from "wouter";
 import { useGetSessionById, getGetSessionByIdQueryKey } from "@/lib/api-client";
@@ -22,14 +22,30 @@ export default function SessionDetail() {
   const id = params?.id;
   const { site } = useSiteStorage();
   const [bookSheetOpen, setBookSheetOpen] = useState(false);
+  const redirected = useRef(false);
   // The "Continue with Instawork" sheet only exists to route a logged-out
-  // visitor into log-in or sign-up. Once we know they are signed in there is
-  // nothing to ask, so the CTA opens the shift deep link directly.
-  const { data: auth } = useAuthStatus();
+  // visitor into log-in or sign-up. Logged-in users go straight to the shift.
+  const { data: auth, isLoading: authLoading } = useAuthStatus();
 
   const { data: session, isLoading } = useGetSessionById(id || "", {
     query: { enabled: !!id, queryKey: getGetSessionByIdQueryKey(id || "") },
   });
+
+  const isAuthenticated = !!auth?.authenticated;
+
+  useEffect(() => {
+    if (authLoading || isLoading || !session?.bookUrl || !isAuthenticated) return;
+    if (redirected.current) return;
+    redirected.current = true;
+    trackEvent("instawork_redirect_started", {
+      session_id: session.id,
+      location: session.label || null,
+      date: session.dateISO || session.date || null,
+      source_page: "session_detail",
+      destination: "shift",
+    });
+    window.location.href = session.bookUrl;
+  }, [authLoading, isLoading, isAuthenticated, session]);
 
   const excludedStatesText =
     EXCLUDED_STATES.slice(0, -1).join(", ") + ", or " + EXCLUDED_STATES[EXCLUDED_STATES.length - 1];
@@ -54,6 +70,15 @@ export default function SessionDetail() {
         <Link href="/">
           <Button variant="outline">Go back</Button>
         </Link>
+      </div>
+    );
+  }
+
+  // Logged-in users with a shift link skip this page — redirect in useEffect above.
+  if (!authLoading && isAuthenticated && session.bookUrl) {
+    return (
+      <div className="flex-1 flex items-center justify-center flex-col gap-3 bg-[#FCFBF9]">
+        <p className="text-[16px] text-[#576270]">Opening shift in Instawork…</p>
       </div>
     );
   }
@@ -157,7 +182,8 @@ export default function SessionDetail() {
             </span>
           </p>
 
-          {/* How booking works — lightweight numbered rows. */}
+          {/* How booking works — logged-out visitors only. */}
+          {!authLoading && !isAuthenticated && (
           <div className="mt-8">
             <h3 className="text-[15px] font-semibold text-[#11243e] mb-1">How booking works</h3>
             <div className="divide-y divide-[#EEE9DD]">
@@ -174,24 +200,16 @@ export default function SessionDetail() {
               ))}
             </div>
           </div>
+          )}
         </div>
       </main>
 
+      {!authLoading && !isAuthenticated && (
       <div className="fixed bottom-0 left-0 right-0 bg-[#FCFBF9] border-t border-[#EEE9DD] px-6 py-4 pb-[calc(1rem+env(safe-area-inset-bottom))] z-20">
         <div className="max-w-[720px] mx-auto px-0 md:px-3 w-full flex flex-col gap-2.5">
           <PrimaryCtaButton
             onClick={() => {
               trackEvent("book_cta_clicked", analyticsProps);
-              // Fall back to the sheet if the link is missing — without a
-              // bookUrl there is nowhere to send them.
-              if (auth?.authenticated && session.bookUrl) {
-                trackEvent("instawork_redirect_started", {
-                  ...analyticsProps,
-                  destination: "shift",
-                });
-                window.open(session.bookUrl, "_blank", "noopener,noreferrer");
-                return;
-              }
               setBookSheetOpen(true);
               trackEvent("account_choice_modal_opened", analyticsProps);
             }}
@@ -200,6 +218,7 @@ export default function SessionDetail() {
           </PrimaryCtaButton>
         </div>
       </div>
+      )}
 
       <ContinueWithInstaworkSheet
         open={bookSheetOpen}
