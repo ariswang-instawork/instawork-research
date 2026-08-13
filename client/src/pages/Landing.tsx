@@ -6,7 +6,6 @@ import { SessionCard } from "@/components/SessionCard";
 import { useGetSessions, getGetSessionsQueryKey, useGetSites } from "@/lib/api-client";
 import type { SessionItem as Session } from "@/lib/api-client/generated/api.schemas";
 import { Skeleton } from "@/components/ui/skeleton";
-import { BadgeDollarSign, Clock } from "lucide-react";
 import { SiteLeafletMap } from "@/components/SiteLeafletMap";
 import { trackEvent } from "@/lib/analytics";
 import { EXCLUDED_STATES } from "@/lib/constants";
@@ -17,11 +16,6 @@ const INITIAL_SESSION_COUNT = 6;
 function isLocationExcluded(label: string | null | undefined): boolean {
   if (!label) return false;
   return EXCLUDED_STATES.some(state => label.includes(state));
-}
-
-/** "$75" for whole amounts, "$110.58" otherwise. */
-function formatPay(amount: number): string {
-  return Number.isInteger(amount) ? `$${amount}` : `$${amount.toFixed(2)}`;
 }
 
 /** Minutes since midnight for the session's start time, e.g. "8:30 AM – 11:30 AM". */
@@ -78,6 +72,7 @@ export default function Landing() {
   const [pickerFocus, setPickerFocus] = useState(0);
   const sessionsRef = useRef<HTMLDivElement | null>(null);
   const [showAll, setShowAll] = useState(false);
+  const [sessionsRevealed, setSessionsRevealed] = useState(false);
 
   const hasCity = !!site;
 
@@ -111,34 +106,6 @@ export default function Landing() {
     return all.slice().sort((a, b) => b.openCount - a.openCount)[0];
   }, [sitesData, site?.key]);
 
-  // Dynamic pay: min/max of total estimated pay across available sessions.
-  const payStats = useMemo(() => {
-    const amounts = sessions
-      .map((s) => parseFloat(s.payAmount))
-      .filter((n) => Number.isFinite(n));
-    if (amounts.length === 0) return null;
-    return { min: Math.min(...amounts), max: Math.max(...amounts) };
-  }, [sessions]);
-
-  const singlePay = payStats && payStats.min === payStats.max ? payStats.min : null;
-  // "$75" or "$66–$111"; null when unknown.
-  const payText = payStats
-    ? singlePay != null
-      ? formatPay(singlePay)
-      : `${formatPay(payStats.min)}–${formatPay(payStats.max)}`
-    : null;
-
-  // Hourly rate — leads the hero headline instead of the total.
-  const rateStats = useMemo(() => {
-    const rates = sessions
-      .map((s) => s.payRateUsd)
-      .filter((n): n is number => typeof n === "number" && Number.isFinite(n));
-    if (rates.length === 0) return null;
-    return { min: Math.min(...rates), max: Math.max(...rates) };
-  }, [sessions]);
-
-  const singleRate = rateStats && rateStats.min === rateStats.max ? rateStats.min : null;
-
   useEffect(() => {
     trackEvent("research_landing_viewed", { selected_city: site?.label ?? null, ...utmProps() });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -157,6 +124,7 @@ export default function Landing() {
         setPickerFocus((n) => n + 1);
         return;
       }
+      setSessionsRevealed(true);
       scrollToSessions();
     };
     window.addEventListener("iw:view-sessions", onViewSessions);
@@ -167,23 +135,20 @@ export default function Landing() {
   // where the change came from (picker, map popup, another tab).
   useEffect(() => {
     setShowAll(false);
+    setSessionsRevealed(false);
   }, [site?.key]);
 
   const openPicker = () => setPickerFocus((n) => n + 1);
 
-  const handleSeeSessions = () => {
+  const handleFindSessions = () => {
     trackEvent("find_sessions_clicked", { selected_city: site?.label ?? null, ...utmProps() });
     if (!hasCity) {
       openPicker();
       return;
     }
+    setSessionsRevealed(true);
     trackEvent("available_sessions_viewed", { selected_city: site?.label ?? null, ...utmProps() });
     scrollToSessions();
-  };
-
-  const handleBrowsePath = () => {
-    trackEvent("new_user_path_clicked", { selected_city: site?.label ?? null, ...utmProps() });
-    handleSeeSessions();
   };
 
   const handleReturningPath = () => {
@@ -221,140 +186,73 @@ export default function Landing() {
       <main className="flex-1 overflow-y-auto w-full pb-16">
         {/* ============ HERO ============ */}
         <div className="bg-background">
-        <div className="max-w-[1200px] mx-auto px-5 md:px-12 pt-10 md:pt-16 pb-4">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:gap-12">
-            {/* Left column: text content */}
-            <div className="lg:flex-1 text-center lg:text-left animate-in fade-in slide-in-from-bottom-3 duration-500">
-              <p className="text-[13px] font-bold uppercase tracking-wide text-[#3351E6] mb-3">
-                Instawork Research
-              </p>
-              <h1 className="text-[36px] md:text-[48px] lg:text-[56px] leading-[1.1] font-extrabold tracking-[-0.03em] text-[#11243e]">
-                Get paid for reading <span className="text-emphasis">short voice prompts</span>
-              </h1>
-              <p className="text-[17px] leading-[1.5] text-[#576270] mt-4">
-                Complete a 3-hour recording session at a nearby location.
-              </p>
+        <div className="max-w-md mx-auto px-5 md:px-6 pt-10 md:pt-16 pb-8">
+          <div className="text-center animate-in fade-in slide-in-from-bottom-3 duration-500">
+            <p className="text-[13px] font-bold uppercase tracking-wide text-[#3351E6] mb-3">
+              Instawork Research
+            </p>
+            <h1 className="text-[32px] md:text-[40px] leading-[1.1] font-extrabold tracking-[-0.03em] text-[#11243e]">
+              Get paid for reading <span className="text-emphasis">short voice prompts</span>
+            </h1>
+            <p className="text-[17px] leading-[1.5] text-[#576270] mt-4">
+              Complete a 3-hour recording session at a nearby location.
+            </p>
 
-              {/* Stat cards: Pay and Sessions */}
-              <div className="mt-6 flex flex-col sm:flex-row gap-4 text-center lg:text-left justify-center lg:justify-start">
-                <div className="flex-1 sm:flex-none">
-                  <p className="text-[36px] font-bold text-[#11243e]">
-                    {hasCity && isLoading ? (
-                      <Skeleton className="h-9 w-32 bg-muted inline-block" />
-                    ) : (
-                      payText ?? "Competitive"
-                    )}
-                  </p>
-                  <p className="text-[14px] text-[#576270] mt-1">Estimated pay</p>
-                </div>
-                <div className="flex-1 sm:flex-none">
-                  <p className="text-[36px] font-bold text-[#11243e]">500+</p>
-                  <p className="text-[14px] text-[#576270] mt-1">Sessions completed</p>
-                </div>
-              </div>
+            <div className="mt-8 text-left">
+              <LocationSelector
+                label={site?.label ?? null}
+                focusSignal={pickerFocus}
+                onSiteSelected={handleSiteSelected}
+                onOpened={() =>
+                  trackEvent("location_selector_opened", {
+                    selected_city: site?.label ?? null,
+                    ...utmProps(),
+                  })
+                }
+              />
+              {site && isLocationExcluded(site.label) && (
+                <p className="text-[13px] text-[#E04B4D] font-medium mt-2 bg-[#FCE8E8] rounded-[8px] px-3 py-2">
+                  This opportunity is not available in your location.
+                </p>
+              )}
+            </div>
 
-              {/* Benefit badges */}
-              <div className="mt-5 flex flex-wrap items-center justify-center lg:justify-start gap-3">
-                <span className="inline-flex items-center gap-2 rounded-full bg-[#EAEEFE] px-4 py-2 text-[14px] font-semibold text-[#3351E6]">
-                  <Clock className="w-4 h-4" strokeWidth={2} />
-                  In-person
-                </span>
-                <span className="inline-flex items-center gap-2 rounded-full bg-[#E8E4D9] px-4 py-2 text-[14px] font-semibold text-[#7C6534]">
-                  <Clock className="w-4 h-4" strokeWidth={2} />
-                  3 hours
-                </span>
-              </div>
+            <button
+              type="button"
+              onClick={handleFindSessions}
+              disabled={isLocationExcluded(site?.label ?? null)}
+              className={`mt-4 w-full h-[54px] rounded-[8px] text-white text-[16px] font-semibold transition-[transform,filter] duration-150 ${
+                isLocationExcluded(site?.label ?? null)
+                  ? "bg-gray-400 opacity-50 cursor-not-allowed"
+                  : "bg-cta-gradient hover:brightness-105 active:scale-[0.99] active:brightness-95"
+              } focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3351E6]/40`}
+            >
+              Find sessions near me
+            </button>
 
-              <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="rounded-[12px] border border-[#EEE9DD] bg-white p-4 text-left">
-                  <p className="text-[15px] font-bold text-[#11243e]">New to research sessions?</p>
-                  <p className="text-[13px] text-[#576270] mt-0.5">Browse paid sessions near you.</p>
-                  <button
-                    type="button"
-                    onClick={handleBrowsePath}
-                    className="mt-3 inline-flex items-center justify-center h-11 w-full rounded-[8px] border border-[#3351E6] text-[#3351E6] font-semibold text-[15px] active:opacity-80"
-                  >
-                    Browse sessions
-                  </button>
-                </div>
-                <div className="rounded-[12px] border border-[#3351E6]/30 bg-[#F5F7FF] p-4 text-left">
-                  <p className="text-[15px] font-bold text-[#11243e]">Already booked or completed a session?</p>
-                  <p className="text-[13px] text-[#576270] mt-0.5">See the sessions you can still book.</p>
-                  <button
-                    type="button"
-                    onClick={handleReturningPath}
-                    className="mt-3 inline-flex items-center justify-center h-11 w-full rounded-[8px] bg-cta-gradient text-white font-semibold text-[15px] hover:brightness-105 active:brightness-95"
-                  >
-                    See my sessions
-                  </button>
-                </div>
-              </div>
-
-              <div className="mt-6 text-left">
-                <LocationSelector
-                  label={site?.label ?? null}
-                  focusSignal={pickerFocus}
-                  onSiteSelected={handleSiteSelected}
-                  onOpened={() =>
-                    trackEvent("location_selector_opened", {
-                      selected_city: site?.label ?? null,
-                      ...utmProps(),
-                    })
-                  }
-                />
-                {site && isLocationExcluded(site.label) && (
-                  <p className="text-[13px] text-[#E04B4D] font-medium mt-2 bg-[#FCE8E8] rounded-[8px] px-3 py-2">
-                    This opportunity is not available in your location.
-                  </p>
-                )}
-              </div>
-
+            <p className="text-[14px] text-[#576270] mt-4">
+              Already booked with us?{" "}
               <button
                 type="button"
-                onClick={() => {
-                  const isMobile = /iPhone|iPad|Android|Mobile/i.test(navigator.userAgent);
-                  if (!isMobile && !hasCity) {
-                    window.location.href = "/get-app";
-                    return;
-                  }
-                  handleSeeSessions();
-                }}
-                disabled={isLocationExcluded(site?.label ?? null)}
-                className={`mt-4 w-full h-[54px] rounded-[8px] text-white text-[16px] font-semibold transition-[transform,filter] duration-150 ${
-                  isLocationExcluded(site?.label ?? null)
-                    ? "bg-gray-400 opacity-50 cursor-not-allowed"
-                    : "bg-cta-gradient hover:brightness-105 active:scale-[0.99] active:brightness-95"
-                } focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3351E6]/40`}
+                onClick={handleReturningPath}
+                className="text-[#3351E6] underline underline-offset-2 font-medium"
               >
-                Book sessions near me
+                See my sessions
               </button>
-
-              <p className="text-[14px] text-[#576270] mt-3 text-center lg:text-left">
-                This opportunity is not currently available to residents of Texas, Washington, or Illinois.
-              </p>
-            </div>
-
-            {/* Right column: image placeholder (desktop only) */}
-            <div className="hidden lg:flex lg:flex-1 items-center justify-center h-[500px] rounded-[20px] mt-8 lg:mt-0" style={{ background: "linear-gradient(135deg, #3351E6 0%, #1E2BA8 100%)" }}>
-              <div className="text-center">
-                <svg className="w-24 h-24 mx-auto mb-4 text-white opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 13c0 1.105-1.343 2-3 2s-3-.895-3-2m0-4c1.657 0 3-.895 3-2s-1.343-2-3-2-3 .895-3 2m0 4c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2m4 0c1.657 0 3-.895 3-2s-1.343-2-3-2-3 .895-3 2m0 4c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2M9 7a2 2 0 11-4 0 2 2 0 014 0zm0 8a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
-                <p className="text-white text-[18px] font-semibold">Real photo goes here — a real Instawork worker, not stock</p>
-              </div>
-            </div>
+            </p>
           </div>
         </div>
         </div>
 
-        {/* ============ SESSIONS ============ */}
+        {/* ============ SESSIONS (revealed on demand) ============ */}
+        {sessionsRevealed && (
         <section
           id="sessions"
           ref={sessionsRef}
-          className="scroll-mt-20 mt-12 md:mt-16 bg-[#FCFBF9] py-12 md:py-16"
+          className="scroll-mt-20 bg-[#FCFBF9] py-10 md:py-12"
         >
-          <div className="max-w-[1200px] mx-auto px-5 md:px-12">
-            <h2 className="text-[28px] md:text-[36px] lg:text-[42px] leading-[1.15] font-bold tracking-tight text-[#11243e]">
+          <div className="max-w-md mx-auto px-5 md:px-6">
+            <h2 className="text-[22px] md:text-[26px] leading-[1.2] font-bold tracking-tight text-[#11243e]">
               {hasCity ? `Available sessions near ${site!.label}` : "Available sessions"}
             </h2>
             <p className="text-[16px] text-[#576270] mt-1.5">
@@ -450,6 +348,7 @@ export default function Landing() {
 
           </div>
         </section>
+        )}
 
         {/* ============ EXPLORE OTHER LOCATIONS ============ */}
         <section className="bg-[#FCFBF9] py-14 md:py-20 lg:py-24">
