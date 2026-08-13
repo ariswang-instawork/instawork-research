@@ -7,7 +7,6 @@ import { useGetSessions, getGetSessionsQueryKey, useGetSites } from "@/lib/api-c
 import { useAuthStatus, login } from "@/hooks/use-auth";
 import type { SessionItem as Session } from "@/lib/api-client/generated/api.schemas";
 import { Skeleton } from "@/components/ui/skeleton";
-import { DollarSign, Clock, Mic } from "lucide-react";
 import { TestimonialMarquee } from "@/components/TestimonialMarquee";
 import { TESTIMONIALS, BOOKING_TIPS } from "@/lib/testimonials";
 import { trackEvent } from "@/lib/analytics";
@@ -278,28 +277,6 @@ export default function Landing() {
           </div>
         </div>
         </div>
-
-        {/* ============ WHAT A SESSION IS (trust intro) ============ */}
-        <section className="bg-background pb-4">
-          <div className="max-w-[1200px] mx-auto px-5 md:px-12">
-            <div className="max-w-[640px] mx-auto text-center">
-              <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[14px] font-medium text-[#11243e]">
-                <span className="inline-flex items-center gap-1.5">
-                  <DollarSign className="w-4 h-4 text-[#3351E6]" strokeWidth={2} />
-                  Paid via Instawork
-                </span>
-                <span className="inline-flex items-center gap-1.5">
-                  <Clock className="w-4 h-4 text-[#3351E6]" strokeWidth={2} />
-                  ~3 hours
-                </span>
-                <span className="inline-flex items-center gap-1.5">
-                  <Mic className="w-4 h-4 text-[#3351E6]" strokeWidth={2} />
-                  Simple voice tasks
-                </span>
-              </div>
-            </div>
-          </div>
-        </section>
 
         {/* ============ SESSIONS (revealed on demand) ============ */}
         {sessionsRevealed && (
