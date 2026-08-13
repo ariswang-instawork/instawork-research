@@ -1,3 +1,4 @@
+import { ArrowRight } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { useSiteStorage, type SiteOrigin } from "@/hooks/use-site";
@@ -16,11 +17,15 @@ import { EXCLUDED_STATES } from "@/lib/constants";
 const SECTION_HEADING =
   "text-[32px] md:text-[40px] lg:text-[48px] leading-[1.15] font-bold tracking-tight text-[#11243e]";
 
-/** Hero headline — slightly larger than section titles for hierarchy. */
+/** Hero headline — matches instawork.com marketing scale. */
 const HERO_HEADING =
-  "text-[36px] md:text-[44px] lg:text-[52px] leading-[1.12] font-bold tracking-tight text-[#11243e]";
+  "text-[40px] md:text-[52px] lg:text-[64px] leading-[1.08] font-bold tracking-tight text-[#11243e]";
 
-/** Shared subtitle under headings (hero + sections). */
+/** Hero body copy — darker and larger than section subtitles. */
+const HERO_BODY =
+  "text-[18px] md:text-[20px] lg:text-[22px] leading-[1.55] text-[#11243e]/80 mt-5 md:mt-6 max-w-[36rem]";
+
+/** Shared subtitle under section headings (below the fold). */
 const SECTION_SUBTITLE =
   "text-[18px] md:text-[20px] leading-[1.5] text-[#576270] mt-2";
 
@@ -226,20 +231,21 @@ export default function Landing() {
       <main className="flex-1 overflow-y-auto w-full pb-16">
         {/* ============ HERO ============ */}
         <div className="bg-background">
-        <div className="max-w-[1200px] mx-auto px-5 md:px-12 pt-10 md:pt-16 pb-8">
-          <div className="max-w-[760px] animate-in fade-in slide-in-from-bottom-3 duration-500">
-            <p className="text-[13px] font-bold uppercase tracking-wide text-[#3351E6] mb-3">
+        <div className="max-w-[1200px] mx-auto px-5 md:px-12 pt-12 md:pt-20 pb-12 md:pb-16">
+          <div className="max-w-[52rem] animate-in fade-in slide-in-from-bottom-3 duration-500">
+            <span className="inline-flex items-center rounded-full bg-[#11243e] px-4 py-1.5 text-[12px] md:text-[13px] font-semibold text-white tracking-wide mb-5 md:mb-6">
               Instawork Research
-            </p>
+            </span>
             <h1 className={HERO_HEADING}>
               Get paid for reading{" "}
               <span className="text-emphasis">short voice prompts</span>
             </h1>
-            <p className={SECTION_SUBTITLE}>
-              Complete a 3-hour recording session at a nearby location.
+            <p className={HERO_BODY}>
+              Complete a 3-hour recording session at a nearby location. No experience
+              needed — simple instructions on site, paid through Instawork.
             </p>
 
-            <div className="mt-8">
+            <div className="mt-8 md:mt-10 max-w-[480px]">
               <LocationSelector
                 label={site?.label ?? null}
                 focusSignal={pickerFocus}
@@ -262,7 +268,7 @@ export default function Landing() {
               type="button"
               onClick={handleFindSessions}
               disabled={isLocationExcluded(site?.label ?? null)}
-              className={`mt-4 w-full h-[54px] rounded-[8px] text-white text-[17px] font-semibold transition-[transform,filter] duration-150 ${
+              className={`mt-4 w-full h-[54px] rounded-[8px] text-white text-[14px] font-bold uppercase tracking-[0.04em] transition-[transform,filter] duration-150 ${
                 isLocationExcluded(site?.label ?? null)
                   ? "bg-gray-400 opacity-50 cursor-not-allowed"
                   : "bg-cta-gradient hover:brightness-105 active:scale-[0.99] active:brightness-95"
@@ -272,16 +278,14 @@ export default function Landing() {
             </button>
 
             {!isAuthenticated && (
-              <p className="text-[16px] text-[#576270] mt-4">
-                Already booked with us?{" "}
-                <button
-                  type="button"
-                  onClick={handleReturningPath}
-                  className="text-[#3351E6] underline underline-offset-2 font-medium"
-                >
-                  Log in to see your sessions
-                </button>
-              </p>
+              <button
+                type="button"
+                onClick={handleReturningPath}
+                className="mt-5 inline-flex items-center gap-2 text-[16px] md:text-[17px] font-medium text-[#11243e] hover:text-[#3351E6] transition-colors group"
+              >
+                Already booked with us? Log in to see your sessions
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+              </button>
             )}
           </div>
         </div>
