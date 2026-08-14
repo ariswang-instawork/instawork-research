@@ -381,7 +381,7 @@ export default function Landing() {
               Pros rate these sessions 5★
             </h2>
             <p className={SECTION_SUBTITLE}>
-              5-star average from Instawork Pros who&apos;ve done a session.
+              5-star ratings from Instawork Pros who&apos;ve done a session.
             </p>
           </div>
           <TestimonialMarquee items={TESTIMONIALS} />
