@@ -183,6 +183,11 @@ export async function registerRoutes(
       if (err) {
         return res.status(500).json({ error: "Failed to logout" });
       }
+      res.clearCookie("connect.sid", {
+        httpOnly: true,
+        sameSite: "lax",
+        secure: isProduction,
+      });
       res.json({ success: true });
     });
   });

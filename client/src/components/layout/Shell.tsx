@@ -91,8 +91,11 @@ export function Shell({ children }: { children: ReactNode }) {
   // "Log out" ends the session.
   const handleAuthClick = () => {
     closeMenu();
-    if (isAuthenticated) void logout();
-    else login();
+    if (isAuthenticated) {
+      void logout().then(() => go("/"));
+    } else {
+      login();
+    }
   };
 
   const navLink =

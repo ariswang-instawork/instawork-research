@@ -3,6 +3,29 @@ import type { SessionItem } from "@/lib/api-client/generated/api.schemas";
 
 const base = import.meta.env.BASE_URL;
 const RETURN_TO_KEY = "auth-return-to";
+const LOGGED_OUT_KEY = "iw:logged-out";
+
+/** Mark that the user explicitly logged out (suppress auto re-login). */
+export function markLoggedOut() {
+  try {
+    sessionStorage.setItem(LOGGED_OUT_KEY, "1");
+  } catch {
+    /* storage unavailable */
+  }
+}
+
+/** True once after logout; clears the flag when read. */
+export function consumeLoggedOut(): boolean {
+  try {
+    if (sessionStorage.getItem(LOGGED_OUT_KEY)) {
+      sessionStorage.removeItem(LOGGED_OUT_KEY);
+      return true;
+    }
+  } catch {
+    /* storage unavailable */
+  }
+  return false;
+}
 
 export type EligibilitySite = {
   businessId: number;
@@ -151,11 +174,14 @@ export function consumeAuthReturn() {
 export function useLogout() {
   const queryClient = useQueryClient();
   return async () => {
+    markLoggedOut();
     try {
       await fetch(`${base}api/auth/logout`, { credentials: "include" });
     } finally {
-      queryClient.invalidateQueries({ queryKey: ["auth-status"] });
+      queryClient.setQueryData(["auth-status"], { authenticated: false });
       queryClient.removeQueries({ queryKey: ["eligibility"] });
+      queryClient.removeQueries({ queryKey: ["me"] });
+      queryClient.removeQueries({ queryKey: ["eligibility-sessions"] });
     }
   };
 }

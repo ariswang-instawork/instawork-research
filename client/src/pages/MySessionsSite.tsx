@@ -7,6 +7,7 @@ import {
   useAuthStatus,
   useEligibility,
   useEligibilitySessions,
+  consumeLoggedOut,
 } from "@/hooks/use-auth";
 import { trackEvent } from "@/lib/analytics";
 import type { SessionItem } from "@/lib/api-client/generated/api.schemas";
@@ -30,9 +31,11 @@ export default function MySessionsSite() {
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
       setLocation("/");
-      window.dispatchEvent(
-        new CustomEvent("iw:login-required", { detail: { returnTo } }),
-      );
+      if (!consumeLoggedOut()) {
+        window.dispatchEvent(
+          new CustomEvent("iw:login-required", { detail: { returnTo } }),
+        );
+      }
     }
   }, [authLoading, isAuthenticated, returnTo, setLocation]);
 
