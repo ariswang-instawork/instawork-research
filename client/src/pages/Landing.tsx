@@ -5,7 +5,7 @@ import { useSiteStorage, type SiteOrigin } from "@/hooks/use-site";
 import { LocationSelector } from "@/components/LocationSelector";
 import { SessionCalendar } from "@/components/SessionCalendar";
 import { useGetSessions, getGetSessionsQueryKey, useGetSites } from "@/lib/api-client";
-import { useAuthStatus, login } from "@/hooks/use-auth";
+import { useAuthStatus, login, DEFAULT_LOGIN_RETURN } from "@/hooks/use-auth";
 import type { SessionItem as Session } from "@/lib/api-client/generated/api.schemas";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TestimonialMarquee } from "@/components/TestimonialMarquee";
@@ -201,8 +201,8 @@ export default function Landing() {
 
   const handleReturningPath = () => {
     trackEvent("returning_user_path_clicked", { selected_city: site?.label ?? null, ...utmProps() });
-    if (isAuthenticated) setLocation("/my-sessions");
-    else login("/my-sessions");
+    if (isAuthenticated) setLocation(DEFAULT_LOGIN_RETURN);
+    else login();
   };
 
   // Picking a city updates the selection.

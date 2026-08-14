@@ -125,14 +125,13 @@ export function useEligibilitySessions(businessId: number | null, enabled: boole
   });
 }
 
-/** Kick off the Instawork OAuth flow, remembering where the user was. */
-export function login(returnTo?: string) {
+/** Default post-login destination. */
+export const DEFAULT_LOGIN_RETURN = "/my-sessions";
+
+/** Kick off the Instawork OAuth flow, remembering where to return after auth. */
+export function login(returnTo: string = DEFAULT_LOGIN_RETURN) {
   try {
-    sessionStorage.setItem(
-      RETURN_TO_KEY,
-      returnTo ??
-        window.location.pathname + window.location.search + window.location.hash,
-    );
+    sessionStorage.setItem(RETURN_TO_KEY, returnTo);
   } catch {
     /* storage unavailable — worst case the user lands on home */
   }
@@ -153,20 +152,24 @@ export function consumeAuthReturn() {
   } catch {
     /* ignore */
   }
-  if (params.get("auth") === "success" && returnTo && returnTo !== window.location.pathname) {
-    window.history.replaceState(null, "", returnTo);
-    // wouter listens for popstate/pushState via its own events; a soft reload
-    // of routing state is triggered by dispatching popstate.
-    window.dispatchEvent(new PopStateEvent("popstate"));
-  } else {
-    // Just strip the ?auth=... noise from the URL.
-    params.delete("auth");
-    const qs = params.toString();
-    window.history.replaceState(
-      null,
-      "",
-      window.location.pathname + (qs ? `?${qs}` : "") + window.location.hash,
-    );
+  if (params.get("auth") === "success") {
+    const destination =
+      returnTo && returnTo !== "/" && returnTo !== window.location.pathname
+        ? returnTo
+        : DEFAULT_LOGIN_RETURN;
+    if (destination !== window.location.pathname) {
+      window.history.replaceState(null, "", destination);
+      window.dispatchEvent(new PopStateEvent("popstate"));
+    } else {
+      params.delete("auth");
+      const qs = params.toString();
+      window.history.replaceState(
+        null,
+        "",
+        window.location.pathname + (qs ? `?${qs}` : "") + window.location.hash,
+      );
+    }
+    return;
   }
 }
 

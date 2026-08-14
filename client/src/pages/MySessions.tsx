@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useLocation } from "wouter";
 import { EligibilityPanel } from "@/components/EligibilityPanel";
-import { useAuthStatus, useMe, firstNameOf, consumeLoggedOut } from "@/hooks/use-auth";
+import { useAuthStatus, useMe, firstNameOf, consumeLoggedOut, DEFAULT_LOGIN_RETURN } from "@/hooks/use-auth";
 import { trackEvent } from "@/lib/analytics";
 
 export default function MySessions() {
@@ -20,7 +20,7 @@ export default function MySessions() {
       setLocation("/");
       if (!consumeLoggedOut()) {
         window.dispatchEvent(
-          new CustomEvent("iw:login-required", { detail: { returnTo: "/my-sessions" } }),
+          new CustomEvent("iw:login-required", { detail: { returnTo: DEFAULT_LOGIN_RETURN } }),
         );
       }
     }

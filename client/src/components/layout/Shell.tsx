@@ -1,6 +1,6 @@
 import { ReactNode, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
-import { useAuthStatus, useLogout, login } from "@/hooks/use-auth";
+import { useAuthStatus, useLogout, login, DEFAULT_LOGIN_RETURN } from "@/hooks/use-auth";
 
 const LOGO_URL = `${import.meta.env.BASE_URL}iw-logo.svg`;
 
@@ -59,20 +59,20 @@ export function Shell({ children }: { children: ReactNode }) {
     setLocation(path);
   };
 
-  const openLogin = (returnTo = "/my-sessions") => {
+  const openLogin = (returnTo = DEFAULT_LOGIN_RETURN) => {
     closeMenu();
     login(returnTo);
   };
 
   const goMySessions = () => {
-    if (isAuthenticated) go("/my-sessions");
-    else openLogin("/my-sessions");
+    if (isAuthenticated) go(DEFAULT_LOGIN_RETURN);
+    else openLogin();
   };
 
   useEffect(() => {
     const onLoginRequired = (e: Event) => {
       const detail = (e as CustomEvent<{ returnTo?: string }>).detail;
-      openLogin(detail?.returnTo ?? "/my-sessions");
+      openLogin(detail?.returnTo ?? DEFAULT_LOGIN_RETURN);
     };
     window.addEventListener("iw:login-required", onLoginRequired);
     return () => window.removeEventListener("iw:login-required", onLoginRequired);
@@ -94,7 +94,7 @@ export function Shell({ children }: { children: ReactNode }) {
     if (isAuthenticated) {
       void logout().then(() => go("/"));
     } else {
-      login();
+      login(DEFAULT_LOGIN_RETURN);
     }
   };
 
