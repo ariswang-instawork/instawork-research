@@ -233,7 +233,7 @@ export default function Landing() {
         <div className="bg-background">
         <div className="max-w-[1200px] mx-auto px-5 md:px-12 pt-12 md:pt-20 pb-12 md:pb-16">
           <div className="animate-in fade-in slide-in-from-bottom-3 duration-500">
-            <span className="inline-flex items-center rounded-full bg-[#11243e] px-4 py-1.5 text-[12px] md:text-[13px] font-semibold text-white tracking-wide mb-5 md:mb-6">
+            <span className="inline-flex items-center rounded-full bg-[#11243e] px-5 py-2 md:px-6 md:py-2.5 text-[14px] md:text-[16px] font-semibold text-white tracking-wide mb-5 md:mb-6">
               Instawork Research
             </span>
             <h1 className={HERO_HEADING}>
