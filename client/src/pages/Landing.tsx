@@ -232,14 +232,13 @@ export default function Landing() {
         {/* ============ HERO ============ */}
         <div className="bg-background">
         <div className="max-w-[1200px] mx-auto px-5 md:px-12 pt-12 md:pt-20 pb-12 md:pb-16">
-          <div className="md:flex md:justify-end animate-in fade-in slide-in-from-bottom-3 duration-500">
-            <div className="w-full md:max-w-[640px] lg:max-w-[680px]">
+          <div className="max-w-[640px] animate-in fade-in slide-in-from-bottom-3 duration-500">
             <span className="inline-flex items-center rounded-full bg-[#11243e] px-4 py-1.5 text-[12px] md:text-[13px] font-semibold text-white tracking-wide mb-5 md:mb-6">
               Instawork Research
             </span>
             <h1 className={HERO_HEADING}>
               Get paid for reading{" "}
-              <span className="text-emphasis whitespace-nowrap">short voice prompts</span>
+              <span className="text-emphasis">short voice prompts</span>
             </h1>
             <div className="mt-5 md:mt-6 space-y-2">
               <p className={HERO_BODY}>
@@ -250,7 +249,7 @@ export default function Landing() {
               </p>
             </div>
 
-            <div className="mt-8 md:mt-10 w-full max-w-[480px] md:mx-auto">
+            <div className="mt-8 md:mt-10 w-full max-w-[480px]">
               <LocationSelector
                 label={site?.label ?? null}
                 focusSignal={pickerFocus}
@@ -268,35 +267,34 @@ export default function Landing() {
                 </p>
               )}
 
-            <button
-              type="button"
-              onClick={handleFindSessions}
-              disabled={isLocationExcluded(site?.label ?? null)}
-              className={`mt-4 w-full h-[54px] rounded-[8px] text-white text-[16px] font-semibold transition-[transform,filter] duration-150 ${
-                isLocationExcluded(site?.label ?? null)
-                  ? "bg-gray-400 opacity-50 cursor-not-allowed"
-                  : "bg-cta-gradient hover:brightness-105 active:scale-[0.99] active:brightness-95"
-              } focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3351E6]/40`}
-            >
-              Find Sessions Near Me
-            </button>
-
-            {!isAuthenticated && (
               <button
                 type="button"
-                onClick={handleReturningPath}
-                className="mt-5 text-left md:text-center md:w-full group"
+                onClick={handleFindSessions}
+                disabled={isLocationExcluded(site?.label ?? null)}
+                className={`mt-4 w-full h-[54px] rounded-[8px] text-white text-[16px] font-semibold transition-[transform,filter] duration-150 ${
+                  isLocationExcluded(site?.label ?? null)
+                    ? "bg-gray-400 opacity-50 cursor-not-allowed"
+                    : "bg-cta-gradient hover:brightness-105 active:scale-[0.99] active:brightness-95"
+                } focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3351E6]/40`}
               >
-                <span className="block text-[16px] md:text-[17px] font-medium text-[#11243e]">
-                  Already booked with us?
-                </span>
-                <span className="mt-1 inline-flex items-center gap-2 text-[16px] md:text-[17px] font-medium text-[#11243e] group-hover:text-[#3351E6] transition-colors md:mx-auto">
-                  Log in to see your sessions
-                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
-                </span>
+                Find Sessions Near Me
               </button>
-            )}
-            </div>
+
+              {!isAuthenticated && (
+                <button
+                  type="button"
+                  onClick={handleReturningPath}
+                  className="mt-5 text-left group"
+                >
+                  <span className="block text-[16px] md:text-[17px] font-medium text-[#11243e]">
+                    Already booked with us?
+                  </span>
+                  <span className="mt-1 inline-flex items-center gap-2 text-[16px] md:text-[17px] font-medium text-[#11243e] group-hover:text-[#3351E6] transition-colors">
+                    Log in to see your sessions
+                    <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+                  </span>
+                </button>
+              )}
             </div>
           </div>
         </div>
