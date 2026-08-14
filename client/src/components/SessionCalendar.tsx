@@ -176,14 +176,14 @@ export function SessionCalendar({
           ) : (
             <div className="rounded-[14px] border border-[#EEE9DD] bg-white overflow-hidden divide-y divide-[#EEE9DD]">
               {selectedSessions.map((s) => (
-                <div key={s.id} className="flex items-center justify-between gap-4 px-5 py-4 md:px-6 md:py-5">
-                  <span className="text-[18px] md:text-[20px] font-semibold text-[#11243e] min-w-0 truncate">
+                <div key={s.id} className="flex items-center justify-between gap-2 md:gap-4 px-4 py-3.5 md:px-6 md:py-5">
+                  <span className="text-[15px] md:text-[20px] font-semibold text-[#11243e] min-w-0 shrink">
                     {s.time}
                   </span>
                   <button
                     type="button"
                     onClick={() => onBook(s)}
-                    className="shrink-0 text-[16px] md:text-[17px] font-semibold text-white bg-cta-gradient rounded-[8px] px-5 py-2.5 hover:brightness-105 active:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3351E6]/40"
+                    className="shrink-0 text-[13px] md:text-[17px] font-semibold text-white bg-cta-gradient rounded-[8px] px-3.5 py-2 md:px-5 md:py-2.5 hover:brightness-105 active:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3351E6]/40"
                   >
                     {actionLabel}
                   </button>
