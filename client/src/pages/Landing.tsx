@@ -246,7 +246,7 @@ export default function Landing() {
               <p className={HERO_BODY}>
                 Complete a 3-hour recording session at a nearby location.
               </p>
-              <p className={`${HERO_BODY} lg:whitespace-nowrap`}>
+              <p className={`${HERO_BODY} hidden md:block lg:whitespace-nowrap`}>
                 No experience needed — simple instructions on site, paid through Instawork.
               </p>
             </div>
