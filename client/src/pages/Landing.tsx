@@ -268,13 +268,13 @@ export default function Landing() {
               type="button"
               onClick={handleFindSessions}
               disabled={isLocationExcluded(site?.label ?? null)}
-              className={`mt-4 w-full h-[54px] rounded-[8px] text-white text-[14px] font-bold uppercase tracking-[0.04em] transition-[transform,filter] duration-150 ${
+              className={`mt-4 w-full h-[54px] rounded-[8px] text-white text-[16px] font-semibold transition-[transform,filter] duration-150 ${
                 isLocationExcluded(site?.label ?? null)
                   ? "bg-gray-400 opacity-50 cursor-not-allowed"
                   : "bg-cta-gradient hover:brightness-105 active:scale-[0.99] active:brightness-95"
               } focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3351E6]/40`}
             >
-              Find sessions near me
+              Find Sessions Near Me
             </button>
 
             {!isAuthenticated && (
