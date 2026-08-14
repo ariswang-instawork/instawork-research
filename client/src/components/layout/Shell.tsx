@@ -194,7 +194,6 @@ export function Shell({ children }: { children: ReactNode }) {
                 <nav aria-label="Mobile" className="flex flex-col px-6 pt-4">
                   {[
                     { label: "Find sessions", action: findSessions },
-                    { label: "Locations", action: () => go("/") },
                     ...(isAuthenticated
                       ? [{ label: "My sessions", action: goMySessions }]
                       : []),
