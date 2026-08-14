@@ -311,7 +311,14 @@ export default function Landing() {
         >
           <div className="max-w-[1200px] mx-auto px-5 md:px-12">
             <h2 className={SECTION_HEADING}>
-              {hasCity ? `Available sessions in ${site!.label}` : "Available sessions"}
+              {hasCity ? (
+                <>
+                  Available sessions in{" "}
+                  <span className="block md:inline">{site!.label}</span>
+                </>
+              ) : (
+                "Available sessions"
+              )}
             </h2>
             <p className={SECTION_SUBTITLE}>
               Choose a time and finish booking in Instawork.
