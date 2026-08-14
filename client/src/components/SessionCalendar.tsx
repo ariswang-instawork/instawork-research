@@ -16,8 +16,8 @@ function parseISO(dateISO: string): { year: number; month: number; day: number }
 /**
  * Month calendar for one site's open sessions, grouped by dateISO. Days with
  * openings get a dot and are clickable; the selected day's time slots render
- * below the grid on mobile; beside the calendar on md+.
- * in `sessions` — everything is already loaded, there is nothing more to fetch.
+ * below the grid on mobile, beside the calendar on md+. Month navigation is
+ * bounded to the range of months present in `sessions`.
  */
 export function SessionCalendar({
   sessions,
