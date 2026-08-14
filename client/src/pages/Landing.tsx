@@ -23,7 +23,7 @@ const HERO_HEADING =
 
 /** Hero body copy — darker and larger than section subtitles. */
 const HERO_BODY =
-  "text-[18px] md:text-[20px] lg:text-[22px] leading-[1.55] text-[#11243e]/80 mt-5 md:mt-6 max-w-[36rem]";
+  "text-[18px] md:text-[20px] lg:text-[22px] leading-[1.55] text-[#11243e]/80";
 
 /** Shared subtitle under section headings (below the fold). */
 const SECTION_SUBTITLE =
