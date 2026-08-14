@@ -251,7 +251,7 @@ export default function Landing() {
               </p>
             </div>
 
-            <div className="mt-8 md:mt-10 w-full max-w-[480px] mx-auto">
+            <div className="mt-8 md:mt-10 w-full max-w-[480px]">
               <LocationSelector
                 label={site?.label ?? null}
                 focusSignal={pickerFocus}
