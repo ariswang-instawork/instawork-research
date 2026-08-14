@@ -4,6 +4,10 @@ import type { SessionItem } from "@/lib/api-client/generated/api.schemas";
 
 const WEEKDAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
+/** Shared with the calendar month title (e.g. "August 2026"). */
+const CALENDAR_TITLE =
+  "text-[18px] md:text-[20px] font-bold text-[#11243e]";
+
 function monthKey(year: number, month: number): string {
   return `${year}-${String(month + 1).padStart(2, "0")}`;
 }
@@ -116,7 +120,7 @@ export function SessionCalendar({
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
-          <p className="text-[18px] md:text-[20px] font-bold text-[#11243e]">{monthLabel}</p>
+          <p className={CALENDAR_TITLE}>{monthLabel}</p>
           <button
             type="button"
             onClick={goNext}
@@ -170,7 +174,7 @@ export function SessionCalendar({
 
       {selectedLabel && (
         <div className="mt-5 md:mt-0 flex-1 min-w-0">
-          <p className="text-[20px] md:text-[24px] leading-[1.2] font-bold tracking-tight text-[#11243e] mb-3">
+          <p className={`${CALENDAR_TITLE} mb-3`}>
             {selectedLabel}
           </p>
           {selectedSessions.length === 0 ? (
@@ -179,7 +183,7 @@ export function SessionCalendar({
             <div className="rounded-[14px] border border-[#EEE9DD] bg-white overflow-hidden divide-y divide-[#EEE9DD]">
               {selectedSessions.map((s) => (
                 <div key={s.id} className="flex items-center justify-between gap-2 md:gap-4 px-4 py-3.5 md:px-6 md:py-5">
-                  <span className="text-[17px] md:text-[20px] font-semibold text-[#11243e] min-w-0 shrink">
+                  <span className={`${CALENDAR_TITLE} font-semibold min-w-0 shrink`}>
                     {s.time}
                   </span>
                   <button
