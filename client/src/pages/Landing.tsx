@@ -17,9 +17,9 @@ import { EXCLUDED_STATES } from "@/lib/constants";
 const SECTION_HEADING =
   "text-[32px] md:text-[40px] lg:text-[48px] leading-[1.15] font-bold tracking-tight text-[#11243e]";
 
-/** Hero headline — matches instawork.com marketing scale. */
+/** Hero headline — sized to fit one line in the 1200px container on lg+ screens. */
 const HERO_HEADING =
-  "text-[40px] md:text-[52px] lg:text-[64px] leading-[1.08] font-bold tracking-tight text-[#11243e]";
+  "text-[36px] sm:text-[40px] md:text-[42px] lg:text-[46px] xl:text-[50px] leading-[1.08] font-bold tracking-tight text-[#11243e]";
 
 /** Hero body copy — darker and larger than section subtitles. */
 const HERO_BODY =
@@ -236,9 +236,11 @@ export default function Landing() {
             <span className="inline-flex items-center rounded-full bg-[#11243e] px-4 py-1.5 text-[12px] md:text-[13px] font-semibold text-white tracking-wide mb-5 md:mb-6">
               Instawork Research
             </span>
-            <h1 className={`${HERO_HEADING} max-w-[52rem]`}>
-              Get paid for reading{" "}
-              <span className="text-emphasis whitespace-nowrap">short voice prompts</span>
+            <h1 className={HERO_HEADING}>
+              <span className="lg:whitespace-nowrap">
+                Get paid for reading{" "}
+                <span className="text-emphasis">short voice prompts</span>
+              </span>
             </h1>
             <div className="mt-5 md:mt-6 max-w-[42rem] space-y-2">
               <p className={HERO_BODY}>
