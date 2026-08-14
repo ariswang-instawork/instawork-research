@@ -17,9 +17,9 @@ import { EXCLUDED_STATES } from "@/lib/constants";
 const SECTION_HEADING =
   "text-[32px] md:text-[40px] lg:text-[48px] leading-[1.15] font-bold tracking-tight text-[#11243e]";
 
-/** Hero headline — sized to fit one line in the 1200px container on lg+ screens. */
+/** Hero headline — as large as fits one line in the 1200px container on lg+ screens. */
 const HERO_HEADING =
-  "text-[36px] sm:text-[40px] md:text-[42px] lg:text-[46px] xl:text-[50px] leading-[1.08] font-bold tracking-tight text-[#11243e]";
+  "text-[36px] sm:text-[42px] md:text-[48px] lg:text-[54px] xl:text-[60px] leading-[1.08] font-bold tracking-tight text-[#11243e]";
 
 /** Hero body copy — darker and larger than section subtitles. */
 const HERO_BODY =
