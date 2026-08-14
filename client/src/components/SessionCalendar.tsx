@@ -16,7 +16,7 @@ function parseISO(dateISO: string): { year: number; month: number; day: number }
 /**
  * Month calendar for one site's open sessions, grouped by dateISO. Days with
  * openings get a dot and are clickable; the selected day's time slots render
- * below the grid. Month navigation is bounded to the range of months present
+ * below the grid on mobile; beside the calendar on md+.
  * in `sessions` — everything is already loaded, there is nothing more to fetch.
  */
 export function SessionCalendar({
@@ -103,7 +103,8 @@ export function SessionCalendar({
     : null;
 
   return (
-    <div className="space-y-5">
+    <div className="flex flex-col md:flex-row md:items-start md:gap-6 lg:gap-8">
+      <div className="w-full md:w-[min(100%,400px)] md:shrink-0">
       <div className="rounded-[14px] border border-[#EEE9DD] bg-white p-4 md:p-5">
         <div className="flex items-center justify-between mb-4">
           <button
@@ -165,9 +166,10 @@ export function SessionCalendar({
           })}
         </div>
       </div>
+      </div>
 
       {selectedLabel && (
-        <div>
+        <div className="mt-5 md:mt-0 flex-1 min-w-0">
           <p className="text-[20px] md:text-[24px] leading-[1.2] font-bold tracking-tight text-[#11243e] mb-3">
             {selectedLabel}
           </p>
