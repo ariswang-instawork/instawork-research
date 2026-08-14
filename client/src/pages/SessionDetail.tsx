@@ -152,16 +152,18 @@ export default function SessionDetail() {
           </p>
 
           <div className="mt-8">
-            <h3 className="text-[15px] font-semibold text-[#11243e] mb-1">How booking works</h3>
+            <h3 className="text-[20px] md:text-[24px] font-bold tracking-tight text-[#11243e] mb-2">
+              How booking works
+            </h3>
             <div className="divide-y divide-[#EEE9DD]">
               {BOOKING_STEPS.map((step, i) => (
-                <div key={step.title} className="flex items-start gap-3.5 py-4">
-                  <span className="w-6 h-6 rounded-full bg-[#3351E6]/10 text-[#3351E6] text-[12px] font-bold flex items-center justify-center shrink-0 mt-0.5">
+                <div key={step.title} className="flex items-start gap-3.5 py-4 md:py-5">
+                  <span className="w-7 h-7 rounded-full bg-[#3351E6]/10 text-[#3351E6] text-[13px] font-bold flex items-center justify-center shrink-0 mt-0.5">
                     {i + 1}
                   </span>
                   <div className="min-w-0">
-                    <p className="text-[16px] font-semibold text-[#11243e]">{step.title}</p>
-                    <p className="text-[14px] text-[#8A93A0] mt-1 leading-relaxed">{step.body}</p>
+                    <p className="text-[18px] md:text-[20px] font-semibold text-[#11243e]">{step.title}</p>
+                    <p className="text-[16px] md:text-[17px] text-[#8A93A0] mt-1.5 leading-relaxed">{step.body}</p>
                   </div>
                 </div>
               ))}
