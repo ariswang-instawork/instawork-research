@@ -173,14 +173,11 @@
 }
 
 @layer components {
-  /* Signature Instawork headline flourish: coral Georgia italic on a few words.
-     Slightly under the parent size — Georgia italic reads optically larger than
-     the bold grotesque at the same px. */
+  /* Signature Instawork headline flourish: coral Georgia italic on a few words. */
   .text-emphasis {
     font-family: var(--font-emphasis);
     font-style: italic;
     font-weight: 400;
-    font-size: 0.82em;
     color: hsl(var(--accent-coral));
     letter-spacing: 0.005em;
   }
