@@ -232,15 +232,15 @@ export default function Landing() {
         {/* ============ HERO ============ */}
         <div className="bg-background">
         <div className="max-w-[1200px] mx-auto px-5 md:px-12 pt-12 md:pt-20 pb-12 md:pb-16">
-          <div className="max-w-[640px] animate-in fade-in slide-in-from-bottom-3 duration-500">
+          <div className="animate-in fade-in slide-in-from-bottom-3 duration-500">
             <span className="inline-flex items-center rounded-full bg-[#11243e] px-4 py-1.5 text-[12px] md:text-[13px] font-semibold text-white tracking-wide mb-5 md:mb-6">
               Instawork Research
             </span>
-            <h1 className={HERO_HEADING}>
+            <h1 className={`${HERO_HEADING} max-w-[52rem]`}>
               Get paid for reading{" "}
-              <span className="text-emphasis">short voice prompts</span>
+              <span className="text-emphasis whitespace-nowrap">short voice prompts</span>
             </h1>
-            <div className="mt-5 md:mt-6 space-y-2">
+            <div className="mt-5 md:mt-6 max-w-[42rem] space-y-2">
               <p className={HERO_BODY}>
                 Complete a 3-hour recording session at a nearby location.
               </p>
