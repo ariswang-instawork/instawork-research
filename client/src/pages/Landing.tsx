@@ -285,10 +285,15 @@ export default function Landing() {
               <button
                 type="button"
                 onClick={handleReturningPath}
-                className="mt-5 inline-flex items-center gap-2 text-[16px] md:text-[17px] font-medium text-[#11243e] hover:text-[#3351E6] transition-colors group"
+                className="mt-5 text-left group"
               >
-                Already booked with us? Log in to see your sessions
-                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+                <span className="block text-[16px] md:text-[17px] font-medium text-[#11243e]">
+                  Already booked with us?
+                </span>
+                <span className="mt-1 inline-flex items-center gap-2 text-[16px] md:text-[17px] font-medium text-[#11243e] group-hover:text-[#3351E6] transition-colors">
+                  Log in to see your sessions
+                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+                </span>
               </button>
             )}
           </div>
