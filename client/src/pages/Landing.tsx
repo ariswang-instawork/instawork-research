@@ -242,16 +242,16 @@ export default function Landing() {
                 <span className="text-emphasis">short voice prompts</span>
               </span>
             </h1>
-            <div className="mt-5 md:mt-6 max-w-[42rem] space-y-2">
+            <div className="mt-5 md:mt-6 space-y-2">
               <p className={HERO_BODY}>
                 Complete a 3-hour recording session at a nearby location.
               </p>
-              <p className={HERO_BODY}>
+              <p className={`${HERO_BODY} lg:whitespace-nowrap`}>
                 No experience needed — simple instructions on site, paid through Instawork.
               </p>
             </div>
 
-            <div className="mt-8 md:mt-10 w-full max-w-[480px]">
+            <div className="mt-8 md:mt-10 w-full max-w-[480px] mx-auto">
               <LocationSelector
                 label={site?.label ?? null}
                 focusSignal={pickerFocus}
