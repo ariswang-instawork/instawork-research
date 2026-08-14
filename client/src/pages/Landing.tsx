@@ -232,15 +232,16 @@ export default function Landing() {
         {/* ============ HERO ============ */}
         <div className="bg-background">
         <div className="max-w-[1200px] mx-auto px-5 md:px-12 pt-12 md:pt-20 pb-12 md:pb-16">
-          <div className="max-w-[52rem] animate-in fade-in slide-in-from-bottom-3 duration-500">
+          <div className="md:flex md:justify-end animate-in fade-in slide-in-from-bottom-3 duration-500">
+            <div className="w-full md:max-w-[640px] lg:max-w-[680px]">
             <span className="inline-flex items-center rounded-full bg-[#11243e] px-4 py-1.5 text-[12px] md:text-[13px] font-semibold text-white tracking-wide mb-5 md:mb-6">
               Instawork Research
             </span>
             <h1 className={HERO_HEADING}>
               Get paid for reading{" "}
-              <span className="text-emphasis">short voice prompts</span>
+              <span className="text-emphasis whitespace-nowrap">short voice prompts</span>
             </h1>
-            <div className="mt-5 md:mt-6 max-w-[36rem] space-y-2">
+            <div className="mt-5 md:mt-6 space-y-2">
               <p className={HERO_BODY}>
                 Complete a 3-hour recording session at a nearby location.
               </p>
@@ -249,7 +250,7 @@ export default function Landing() {
               </p>
             </div>
 
-            <div className="mt-8 md:mt-10 max-w-[480px]">
+            <div className="mt-8 md:mt-10 w-full max-w-[480px] md:mx-auto">
               <LocationSelector
                 label={site?.label ?? null}
                 focusSignal={pickerFocus}
@@ -266,7 +267,6 @@ export default function Landing() {
                   This opportunity is not available in your location.
                 </p>
               )}
-            </div>
 
             <button
               type="button"
@@ -285,17 +285,19 @@ export default function Landing() {
               <button
                 type="button"
                 onClick={handleReturningPath}
-                className="mt-5 text-left group"
+                className="mt-5 text-left md:text-center md:w-full group"
               >
                 <span className="block text-[16px] md:text-[17px] font-medium text-[#11243e]">
                   Already booked with us?
                 </span>
-                <span className="mt-1 inline-flex items-center gap-2 text-[16px] md:text-[17px] font-medium text-[#11243e] group-hover:text-[#3351E6] transition-colors">
+                <span className="mt-1 inline-flex items-center gap-2 text-[16px] md:text-[17px] font-medium text-[#11243e] group-hover:text-[#3351E6] transition-colors md:mx-auto">
                   Log in to see your sessions
                   <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
                 </span>
               </button>
             )}
+            </div>
+            </div>
           </div>
         </div>
         </div>
